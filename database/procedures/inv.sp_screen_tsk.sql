@@ -29,7 +29,7 @@ DECLARE @Json NVARCHAR(MAX) = N'{
                                     "OperatingHour": [
                                     {
                                         "Id": null,
-                                        "DayOfWeek": "MONDAY",
+                                        "DayOfWeek": "SUNDAY",
                                         "OpenTime": "06:00",
                                         "CloseTime": "23:00",
                                         "AudienceSource": "FOOTTRAFFICSENSOR",
@@ -289,7 +289,7 @@ BEGIN
                                 s.orientation,
                                 s.[location],
                                 s.address_line,
-                                s.tag,
+                                JSON_QUERY(s.tag) AS tag,
                                 s.country_code,
                                 s.city,
                                 s.timezone,

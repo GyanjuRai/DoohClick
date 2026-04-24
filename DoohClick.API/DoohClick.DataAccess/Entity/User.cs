@@ -5,43 +5,69 @@ namespace DoohClick.DataAccess.Entity;
 
 public partial class User
 {
-    public Guid Id { get; set; }
+    public int Id { get; set; }
+
+    public Guid Uuid { get; set; }
+
+    public int TenantId { get; set; }
 
     public string UserName { get; set; } = null!;
 
     public string NormalizedUserName { get; set; } = null!;
 
-    public string? Name { get; set; }
+    public string Name { get; set; } = null!;
 
-    public string? SurName { get; set; }
+    public string SurName { get; set; } = null!;
 
     public string Email { get; set; } = null!;
 
     public string NormalizedEmail { get; set; } = null!;
 
-    public string? PasswordHash { get; set; }
-
-    public string SecurityStamp { get; set; } = null!;
+    public string PasswordHash { get; set; } = null!;
 
     public string? PhoneNumber { get; set; }
 
+    public string UserRole { get; set; } = null!;
+
     public bool IsActive { get; set; }
 
-    public string ConcurrencyStamp { get; set; } = null!;
+    public bool IsDeleted { get; set; }
+
+    public int CreatedBy { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
-    public Guid CreatedBy { get; set; }
-
-    public Guid? UpdatedBy { get; set; }
+    public int? UpdatedBy { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
 
-    public Guid? DeletedBy { get; set; }
+    public int? DeletedBy { get; set; }
 
     public DateTime? DeletedAt { get; set; }
 
-    public Guid TenantId { get; set; }
+    public virtual ICollection<Advertiser> AdvertiserCreatedByNavigations { get; set; } = new List<Advertiser>();
+
+    public virtual ICollection<Advertiser> AdvertiserDeletedByNavigations { get; set; } = new List<Advertiser>();
+
+    public virtual ICollection<Advertiser> AdvertiserUpdatedByNavigations { get; set; } = new List<Advertiser>();
+
+    public virtual ICollection<AuditLog> AuditLogs { get; set; } = new List<AuditLog>();
+
+    public virtual ICollection<Campaign> CampaignCreatedByNavigations { get; set; } = new List<Campaign>();
+
+    public virtual ICollection<Campaign> CampaignDeletedByNavigations { get; set; } = new List<Campaign>();
+
+    public virtual ICollection<CampaignPlaylist> CampaignPlaylistCreatedByNavigations { get; set; } = new List<CampaignPlaylist>();
+
+    public virtual ICollection<CampaignPlaylist> CampaignPlaylistDeletedByNavigations { get; set; } = new List<CampaignPlaylist>();
+
+    public virtual ICollection<CampaignPlaylist> CampaignPlaylistUpdatedByNavigations { get; set; } = new List<CampaignPlaylist>();
+
+    public virtual ICollection<CampaignSchedule> CampaignScheduleCreatedByNavigations { get; set; } = new List<CampaignSchedule>();
+
+    public virtual ICollection<CampaignSchedule> CampaignScheduleDeletedByNavigations { get; set; } = new List<CampaignSchedule>();
+
+    public virtual ICollection<Campaign> CampaignUpdatedByNavigations { get; set; } = new List<Campaign>();
 
     public virtual User CreatedByNavigation { get; set; } = null!;
 
@@ -53,35 +79,29 @@ public partial class User
 
     public virtual ICollection<User> InverseUpdatedByNavigation { get; set; } = new List<User>();
 
-    public virtual ICollection<Player> PlayerApprovedByNavigations { get; set; } = new List<Player>();
+    public virtual ICollection<MediaLibrary> MediaLibraryCreatedByNavigations { get; set; } = new List<MediaLibrary>();
 
-    public virtual ICollection<Player> PlayerCreatedByNavigations { get; set; } = new List<Player>();
+    public virtual ICollection<MediaLibrary> MediaLibraryDeletedByNavigations { get; set; } = new List<MediaLibrary>();
 
-    public virtual ICollection<Player> PlayerDeletedByNavigations { get; set; } = new List<Player>();
+    public virtual ICollection<MediaLibrary> MediaLibraryUploadedByNavigations { get; set; } = new List<MediaLibrary>();
 
-    public virtual ICollection<Player> PlayerUpdatedByNavigations { get; set; } = new List<Player>();
+    public virtual ICollection<PlaylistItem> PlaylistItemCreatedByNavigations { get; set; } = new List<PlaylistItem>();
 
-    public virtual ICollection<Ruleset> RulesetApprovedByNavigations { get; set; } = new List<Ruleset>();
-
-    public virtual ICollection<Ruleset> RulesetCreatedByNavigations { get; set; } = new List<Ruleset>();
-
-    public virtual ICollection<Ruleset> RulesetDeletedByNavigations { get; set; } = new List<Ruleset>();
-
-    public virtual ICollection<Ruleset> RulesetUpdatedByNavigations { get; set; } = new List<Ruleset>();
-
-    public virtual ICollection<Screen> ScreenApprovedByNavigations { get; set; } = new List<Screen>();
+    public virtual ICollection<PlaylistItem> PlaylistItemDeletedByNavigations { get; set; } = new List<PlaylistItem>();
 
     public virtual ICollection<Screen> ScreenCreatedByNavigations { get; set; } = new List<Screen>();
 
     public virtual ICollection<Screen> ScreenDeletedByNavigations { get; set; } = new List<Screen>();
 
-    public virtual ICollection<ScreenGroup> ScreenGroupCreatedByNavigations { get; set; } = new List<ScreenGroup>();
+    public virtual ICollection<ScreenOperatingHour> ScreenOperatingHours { get; set; } = new List<ScreenOperatingHour>();
 
-    public virtual ICollection<ScreenGroup> ScreenGroupDeletedByNavigations { get; set; } = new List<ScreenGroup>();
-
-    public virtual ICollection<ScreenGroup> ScreenGroupUpdatedByNavigations { get; set; } = new List<ScreenGroup>();
+    public virtual ICollection<ScreenSupportedMedium> ScreenSupportedMedia { get; set; } = new List<ScreenSupportedMedium>();
 
     public virtual ICollection<Screen> ScreenUpdatedByNavigations { get; set; } = new List<Screen>();
+
+    public virtual ICollection<Tag> TagCreatedByNavigations { get; set; } = new List<Tag>();
+
+    public virtual ICollection<Tag> TagUpdatedByNavigations { get; set; } = new List<Tag>();
 
     public virtual Tenant Tenant { get; set; } = null!;
 

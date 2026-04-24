@@ -37,5 +37,13 @@ namespace DoohClick.DataAccess.Dapper
             string result = await con.QueryFirstOrDefaultAsync<string>(sp, param, commandType: CommandType.StoredProcedure) ?? "{}";
             return result;
         }
+
+        public async Task<string> RetrievalProcedure(string sp)
+        {
+            await using SqlConnection con = new(_ConnectionString);
+            await con.OpenAsync();
+            string result = await con.QueryFirstOrDefaultAsync<string>(sp, commandType: CommandType.StoredProcedure) ?? "{}";
+            return result;
+        }
     }
 }

@@ -3,9 +3,9 @@ using Newtonsoft.Json.Serialization;
 
 namespace DoohClick.Service.Shared.JsonSetting
 {
-    internal static class JsonSettings
+    public static class JsonSettings
     {
-        internal static readonly JsonSerializerSettings SnakeCase = new()
+        public static readonly JsonSerializerSettings SnakeCase = new()
         {
             ContractResolver = new DefaultContractResolver
             {

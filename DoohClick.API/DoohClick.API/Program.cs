@@ -35,9 +35,10 @@ try
     var ACTIVE_DB = Environment.GetEnvironmentVariable(AppConst.ACTIVE_DB) ?? "Local";
     var CONNECTION_STRING = builder.Configuration.GetConnectionString(ACTIVE_DB);
 
-    builder.Services.AddDbContext<AppDbContext>((option) => {
+    builder.Services.AddDbContext<AppDbContext>((option) =>
+    {
         option.UseSqlServer(
-            CONNECTION_STRING, 
+            CONNECTION_STRING,
             SqlOptions => SqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)
         )
         .UseSnakeCaseNamingConvention();

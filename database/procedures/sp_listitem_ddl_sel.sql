@@ -28,8 +28,8 @@ BEGIN
 	SELECT	li.id,
 			li.item,
 			li.code
-	FROM shared.list_item AS li
-	INNER JOIN shared.list_item_category AS lic ON li.category_id = lic.id
+	FROM shared.listitem AS li
+	INNER JOIN shared.listitem_category AS lic ON li.category_id = lic.id
 	WHERE lic.category = @category FOR JSON PATH;
 
 END;

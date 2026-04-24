@@ -20,4 +20,9 @@
     <ProjectReference Include="..\DoohClick.Model\DoohClick.Model.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controller\Application\" />
+    <Folder Include="Controller\Shared\" />
+  </ItemGroup>
+
 </Project>

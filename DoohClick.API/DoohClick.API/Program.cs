@@ -1,10 +1,17 @@
 
 using DoohClick.API.Const;
 using DoohClick.API.Middleware;
+using DoohClick.DataAccess.Dapper;
 using DoohClick.DataAccess.Data;
+using DoohClick.Model.Shared.Auth;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Text;
 
 
 Log.Logger = new LoggerConfiguration()
@@ -44,24 +51,73 @@ try
         .UseSnakeCaseNamingConvention();
     });
 
+    builder.Services.AddCoreServices()
+                    .AddAppConfigurations(builder.Configuration);
+    builder.Services.AddControllers();
+    builder.Services.AddEndpointsApiExplorer();
+
+    /**
+     * ===============================
+     *      Jwt Configuration
+     * ===============================
+    */
+    MvJwtConfig jwtConfig = builder.Configuration.GetSection("Jwt").Get<MvJwtConfig>()
+                                    ?? throw new InvalidOperationException("JwtConfig configuration is missing");
+
+    JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = true;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtConfig.Issuer,
+            ValidateAudience = true,
+            ValidAudience = jwtConfig.Audience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Secret)),
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                context.Response.OnStarting(
+                    async () =>
+                    {
+                        context.NoResult();
+                        context.Response.Headers.Append("Token-Expired", "ture");
+                        context.Response.ContentType = "application/plain";
+                        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                        await context.Response.WriteAsync(context.Exception.Message);
+                    });
+                return Task.CompletedTask;
+            }
+        };
+    });
+
     /**
      * ===============================
      *      Cors Policy
      * ===============================
     */
+    string[] allowOrigins = (builder.Configuration.GetSection("AppSetting")["Origins"] ?? "").Split(',');
     builder.Services.AddCors(options =>
     {
         options.AddPolicy(AppConst.POLICY_NAME, builder =>
         {
-            builder.WithOrigins(AppConst.ORIGIN)
+            builder.WithOrigins(allowOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
         });
     });
-    builder.Services.AddCoreServices();
-    builder.Services.AddControllers();
-    builder.Services.AddEndpointsApiExplorer();
 
     /**
      * ===============================

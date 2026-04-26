@@ -736,6 +736,15 @@ public partial class AppDbContext : DbContext
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("uuid");
 
+            entity.Property(u => u.RefreshToken)
+                .HasColumnName("refresh_token")
+                .HasMaxLength(500)
+                .IsRequired(false);
+
+            entity.Property(u => u.RefreshTokenExpiry)
+                .HasColumnName("refresh_token_expiry")
+                .IsRequired(false);
+
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.InverseCreatedByNavigation)
                 .HasForeignKey(d => d.CreatedBy)
                 .OnDelete(DeleteBehavior.ClientSetNull)

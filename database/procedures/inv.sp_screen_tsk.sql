@@ -276,13 +276,14 @@ BEGIN
 
     EXEC inv.sp_screen_sup_media_ins @Json = @ScreenSupMeidaJson OUT;
 
-    COMMIT TRANSACTION
+    COMMIT TRANSACTION;
 
    SELECT @Json = ISNULL((
                         SELECT  s.id,
                                 s.tenant_id,
                                 t.[name]        AS tenant_name,
                                 s.[name],
+                                s.normalized_name,
                                 s.screen_code,
                                 s.[description],
                                 s.default_resolution,
@@ -296,24 +297,8 @@ BEGIN
                                 s.is_active,
                                 s.rate_per_hour,
                                 s.currency,
-                                JSON_QUERY((
-                                    SELECT  oh.id,
-                                            oh.day_of_week,
-                                            oh.open_time,
-                                            oh.close_time,
-                                            oh.audience_source,
-                                            oh.estimated_impression
-                                    FROM inv.screen_operating_hour AS oh
-                                    WHERE oh.screen_id = s.id
-                                    FOR JSON PATH, INCLUDE_NULL_VALUES
-                                )) AS operating_hour,
-                                JSON_QUERY((
-                                    SELECT  sm.id,
-                                            sm.media_type
-                                    FROM inv.screen_supported_media AS sm
-                                    WHERE sm.screen_id = s.id
-                                    FOR JSON PATH, INCLUDE_NULL_VALUES
-                                )) AS supported_media,
+                                JSON_QUERY(oh.operating_hour) AS operating_hour,
+                                JSON_QUERY(sm.supported_media) AS supported_media,
                                 s.created_by,
                                 CONCAT(cu.[name], ' ', ISNULL(cu.sur_name, '')) AS creator,
                                 s.updated_by,
@@ -321,10 +306,17 @@ BEGIN
                                 s.created_at,
                                 s.updated_at
                         FROM inv.screen AS s
-                        INNER JOIN #screen               AS ts ON s.id          = ts.id
+                        INNER JOIN #screen AS ts ON s.id = ts.id
+                        OR EXISTS (
+                            SELECT 1
+                            FROM #inserted
+                            WHERE id = s.id
+                        )
                         INNER JOIN [identity].tenant     AS t  ON s.tenant_id   = t.id
                         INNER JOIN [identity].[user]     AS cu ON s.created_by  = cu.id
                         LEFT  JOIN [identity].[user]     AS uu ON s.updated_by  = uu.id
+                        LEFT JOIN inv.tf_screen_operating_hour() AS oh ON s.id = oh.screen_id
+                        LEFT JOIN inv.tf_screen_supported_media() AS sm On s.id = sm.screen_id
                         FOR JSON PATH, INCLUDE_NULL_VALUES, WITHOUT_ARRAY_WRAPPER
                         ), '{}');
 

@@ -12,7 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application\" />
+    <Folder Include="Application\cms\media\" />
+    <Folder Include="Application\commercial\campaign\" />
+    <Folder Include="Application\crm\advertiser\" />
   </ItemGroup>
 
 </Project>

@@ -10,6 +10,6 @@ namespace DoohClick.Model.Shared.Response
     public class MvGridResponse<T>
     {
         public List<T>? Data { get; set; }
-        public int TotalCount { get; set; }
+        public int TotalRows { get; set; }
     }
 }

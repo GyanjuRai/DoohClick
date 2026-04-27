@@ -23,6 +23,7 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
+    Log.Information("Application starting up");
 
     var builder = WebApplication.CreateBuilder(args);
 
@@ -101,8 +102,9 @@ try
     });
 
     builder.Services.AddAppConfigurations(builder.Configuration)
+                 .AddAuthorizationPolicies()
                  .AddCoreServices()
-                 .AddAuthorizationPolicies();
+                 .AddApplicationService();
     builder.Services.AddControllers();
 
     builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerOptions>();

@@ -26,4 +26,8 @@
     <Folder Include="Entity\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DoohClick.Model\DoohClick.Model.csproj" />
+  </ItemGroup>
+
 </Project>

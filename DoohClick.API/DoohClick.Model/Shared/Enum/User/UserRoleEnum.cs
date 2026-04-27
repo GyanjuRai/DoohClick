@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace DoohClick.Model.Shared.Enum.UserEnum
+namespace DoohClick.Model.Shared.Enum.User
 {
     public enum UserRoleEnum
     {

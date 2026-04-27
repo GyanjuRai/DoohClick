@@ -1,5 +1,5 @@
 ﻿
-using DoohClick.Model.Shared.Enum.ResponseEnum;
+using DoohClick.Model.Shared.Enum.Response;
 
 namespace DoohClick.Model.Shared.Response
 {

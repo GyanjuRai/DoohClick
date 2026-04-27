@@ -1,7 +1,7 @@
 ﻿
 using System.ComponentModel;
 
-namespace DoohClick.Model.Shared.Enum.ResponseEnum
+namespace DoohClick.Model.Shared.Enum.Response
 {
     public enum ResponseStatusEnum
     {
@@ -18,6 +18,8 @@ namespace DoohClick.Model.Shared.Enum.ResponseEnum
         [Description("User does not have permission")]
         Forbidden,
         [Description("An unexpected error occurred")]
-        ServerError
+        ServerError,
+        [Description("Conflict with current state of the resource")]
+        Conflict
     }
 }

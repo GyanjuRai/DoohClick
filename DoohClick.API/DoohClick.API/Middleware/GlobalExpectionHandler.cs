@@ -34,7 +34,7 @@ namespace DoohClick.API.Middleware
             if(ex is AppException appEx)
             {
                 context.Response.StatusCode = appEx.StatusCode;
-                await context.Response.WriteAsJsonAsync(ApiResponse.Failure(appEx.Message));
+                await context.Response.WriteAsJsonAsync(ApiResponse.Failure(appEx.Message, appEx.ErrorCode));
                 return;
             }
            

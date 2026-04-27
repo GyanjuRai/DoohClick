@@ -15,11 +15,11 @@ namespace DoohClick.Model.Shared.Response
             };
         }
 
-        public static MvResponse<object> Failure(string message = "Failure")
+        public static MvResponse<object> Failure(string message, string? type = null)
         {
             return new MvResponse<object>
             {
-                Type = ResponseStatusEnum.Failure.ToString(),
+                Type = type ?? ResponseStatusEnum.Failure.ToString(),
                 Message = message,
                 Data = null
             };

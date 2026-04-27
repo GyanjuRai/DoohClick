@@ -7,6 +7,7 @@ namespace DoohClick.Model.Shared.Account
     {
         public required string UserName { get; set; }
         public required string Password { get; set; }
+        public string? TenantCode { get; set; }
     }
 
     public record MvLoginInfoResponse

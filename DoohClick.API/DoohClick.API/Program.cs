@@ -1,4 +1,5 @@
 
+using DoohClick.API.Config;
 using DoohClick.API.Const;
 using DoohClick.API.Middleware;
 using DoohClick.DataAccess.Dapper;
@@ -6,9 +7,11 @@ using DoohClick.DataAccess.Data;
 using DoohClick.Model.Shared.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Text;
@@ -28,7 +31,8 @@ try
      *      Serilog
      * ===============================
     */
-    builder.Host.UseSerilog((context, services, configuration) => {
+    builder.Host.UseSerilog((context, services, configuration) =>
+    {
         configuration.ReadFrom.Configuration(context.Configuration)
                         .ReadFrom.Services(services);
 
@@ -51,11 +55,6 @@ try
         .UseSnakeCaseNamingConvention();
     });
 
-    builder.Services.AddCoreServices()
-                    .AddAppConfigurations(builder.Configuration);
-    builder.Services.AddControllers();
-    builder.Services.AddEndpointsApiExplorer();
-
     /**
      * ===============================
      *      Jwt Configuration
@@ -63,7 +62,6 @@ try
     */
     MvJwtConfig jwtConfig = builder.Configuration.GetSection("Jwt").Get<MvJwtConfig>()
                                     ?? throw new InvalidOperationException("JwtConfig configuration is missing");
-
     JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
     builder.Services.AddAuthentication(options =>
     {
@@ -101,6 +99,15 @@ try
             }
         };
     });
+
+    builder.Services.AddAppConfigurations(builder.Configuration)
+                 .AddCoreServices()
+                 .AddAuthorizationPolicies();
+    builder.Services.AddControllers();
+
+    builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerOptions>();
+
+    builder.Services.AddEndpointsApiExplorer();
 
     /**
      * ===============================
@@ -147,6 +154,8 @@ try
     app.UseMiddleware<GlobalExpectionHandler>();
 
     app.UseSerilogRequestLogging();
+
+    app.UseAuthentication();
 
     app.UseAuthorization();
 

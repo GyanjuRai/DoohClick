@@ -38,11 +38,11 @@ namespace DoohClick.Service.Shared.Account
         public async Task<MvLoginResponse> Login(MvLoginInfoParam param)
         {
             string message = "Invalid credentials";
-            string loginInfoResult = await _dataAccessService.RetrievalProcedure("sp_user_login_info_sel", JsonConvert.SerializeObject(param));
+            string loginInfoResult = await _dataAccessService.RetrievalProcedure("identity.sp_user_login_info_sel", JsonConvert.SerializeObject(param));
 
             MvLoginInfoResponse? loginInfo = _jsonSerializer.DeserializeObject<MvLoginInfoResponse>(loginInfoResult);
 
-            if (loginInfo is null)
+            if (loginInfo is null || string.IsNullOrEmpty(loginInfo.UserUuid))
             {
                 throw new AuthException(
                     message: message,
@@ -135,13 +135,13 @@ namespace DoohClick.Service.Shared.Account
 
         public async Task<MvUserInfoResponse?> GetUserInfo(MvUserInfoParam param)
         {
-            string result = await _dataAccessService.RetrievalProcedure("sp_user_info_sel", JsonConvert.SerializeObject(param));
+            string result = await _dataAccessService.RetrievalProcedure("identity.sp_user_info_sel", JsonConvert.SerializeObject(param));
             return _jsonSerializer.DeserializeObject<MvUserInfoResponse>(result);
         }
 
         private async Task SyncRefreshToken(MvRefreshTokenSyncParam param)
         {
-            await _dataAccessService.ActionProcedure("sp_user_refresh_token_upd", JsonConvert.SerializeObject(param));
+            await _dataAccessService.ActionProcedure("identity.sp_user_refresh_token_upd", JsonConvert.SerializeObject(param));
         }
 
         private MvRefreshTokenSyncParam BuildRefreshTokenParam(int userId, MvJwtResult token)

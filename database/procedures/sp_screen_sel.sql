@@ -49,6 +49,7 @@ BEGIN
     CREATE TABLE #screen
     (
         id                  INT NULL,
+        uuid                UNIQUEIDENTIFIER NOT NULL,
 	    tenant_id			INT NOT NULL,
         tenant_name         NVARCHAR(100) NOT NULL,
 	    [name]				NVARCHAR(100) NOT NULL,
@@ -80,6 +81,7 @@ BEGIN
     INSERT INTO #screen
     (
         id,
+        uuid,
         tenant_id,
         tenant_name,
         [name],
@@ -108,6 +110,7 @@ BEGIN
         updated_at
     )
     SELECT  s.id,
+            s.uuid,
             s.tenant_id,
             t.[name]        AS tenant_name,
             s.[name],
@@ -178,6 +181,7 @@ BEGIN
                 SELECT ISNULL(
                         (
                             SELECT  ts.id,
+                                    ts.uuid,
                                     ts.tenant_id,
                                     ts.[name]        AS tenant_name,
                                     ts.[name],

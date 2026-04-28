@@ -25,7 +25,7 @@ DECLARE @Json NVARCHAR(MAX) = N'{
                                     "IsActive": true,
                                     "RatePerHour": 100000.00,
                                     "Currency": "USD",
-                                    "UserId": 1,
+                                    "CreatedBy": 1,
                                     "OperatingHour": [
                                     {
                                         "Id": null,
@@ -137,14 +137,14 @@ BEGIN
                 oj.Orientation,
                 oj.[Location],
                 oj.AddressLine,
-                oj.Tag,
+                ISNULL(oj.Tag, '[]'),
                 oj.CountryCode,
                 oj.City,
                 oj.Timezone,
                 oj.IsActive,
                 oj.RatePerHour,
                 oj.Currency,
-                oj.UserId,
+                oj.CreatedBy,
                 oj.OperatingHour,
                 oj.SupportedMedia,
                 GETUTCDATE(),
@@ -168,7 +168,7 @@ BEGIN
             IsActive BIT,
             RatePerHour DECIMAL(10,2),
             Currency NVARCHAR(50),
-            UserId  INT,
+            CreatedBy  INT,
             OperatingHour NVARCHAR(MAX) AS JSON,
             SupportedMedia NVARCHAR(MAX) AS JSON
         ) AS oj;
@@ -280,6 +280,7 @@ BEGIN
 
    SELECT @Json = ISNULL((
                         SELECT  s.id,
+                                s.uuid,
                                 s.tenant_id,
                                 t.[name]        AS tenant_name,
                                 s.[name],

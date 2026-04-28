@@ -13,18 +13,19 @@ namespace DoohClick.Model.Application.Inv.Screen
     }
     public record MvScreen
     {
-        public required int Id { get; set; }
-        public required int TenantId { get; set; }
-        public required string TenantName { get; set; }
+        public int? Id { get; set; }
+        public Guid? Uuid { get; set; }
+        public int? TenantId { get; set; }
+        public string? TenantName { get; set; }
         public required string Name { get; set; }
-        public required string NormalizedName { get; set; }
+        public string? NormalizedName { get; set; }
         public required string ScreenCode { get; set; }
         public string? Description { get; set; }
         public required string DefaultResolution { get; set; }
         public required string Orientation { get; set; }
         public required string Location { get; set; }
         public string? AddressLine { get; set; }
-        public required List<string> Tag { get; set; }
+        public List<string>? Tag { get; set; }
         public required string CountryCode { get; set; }
         public required string City { get; set; }
         public required string Timezone { get; set; }
@@ -33,8 +34,8 @@ namespace DoohClick.Model.Application.Inv.Screen
         public required string Currency { get; set; }
         public List<MvScreenOperatingHour>? OperatingHour { get; set; } = [];
         public List<MvScreenSupportedMedia>? SupportedMedia { get; set; } = [];
-        public required int CreatedBy { get; set; }
-        public required string Creator { get; set; }
+        public int? CreatedBy { get; set; }
+        public string? Creator { get; set; }
         public int? UpdatedBy { get; set; }
         public string? Modifier { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -55,5 +56,12 @@ namespace DoohClick.Model.Application.Inv.Screen
     {
         public int? Id { get; set; }
         public required string MediaType { get; set; }
+    }
+
+    public record MvScreenDelParam
+    {
+        public required Guid Uuid { get; set; }
+        public required int TenantId { get; set; }
+        public required int DeletedBy { get; set; }
     }
 }

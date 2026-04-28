@@ -6,7 +6,7 @@ using DoohClick.Interface.Shared.Auth;
 using DoohClick.Interface.Shared.JsonSerializer;
 using DoohClick.Model.Shared.AppSetting;
 using DoohClick.Model.Shared.Auth;
-using DoohClick.Model.Shared.Enum.UserEnum;
+using DoohClick.Model.Shared.Enum.User;
 using DoohClick.Service.Application.Inv.Screen;
 using DoohClick.Service.Shared.Account;
 using DoohClick.Service.Shared.Auth;

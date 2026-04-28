@@ -8,7 +8,7 @@ using DoohClick.Interface.Shared.JsonSerializer;
 using DoohClick.Model.Shared.Account;
 using DoohClick.Model.Shared.AppClaim;
 using DoohClick.Model.Shared.Auth;
-using DoohClick.Model.Shared.Exceptions;
+using DoohClick.Model.Shared.Exceptions.Auth;
 using DoohClick.Service.Shared.Base;
 using DoohClick.Service.Shared.Helper.HashingHelper;
 using Microsoft.EntityFrameworkCore;
@@ -45,18 +45,14 @@ namespace DoohClick.Service.Shared.Account
             if (loginInfo is null || string.IsNullOrEmpty(loginInfo.UserUuid))
             {
                 throw new AuthException(
-                    message: message,
-                    statusCode: 401,
-                    errorCode: "INVALID_CREDENTIALS"
+                    message: message
                 );
             }
 
             if (!EncryptionHelper.VerifyPassword(param.Password, loginInfo.PasswordHash))
             {
                 throw new AuthException(
-                    message: message,
-                    statusCode: 401,
-                    errorCode: "INVALID_CREDENTIALS"
+                    message: message
                 );
             }
 
@@ -69,9 +65,7 @@ namespace DoohClick.Service.Shared.Account
             if (userInfoResult is null)
             {
                 throw new AuthException(
-                    message: message,
-                    statusCode: 401,
-                    errorCode: "USER_INFO_NOT_FOUND"
+                    message: message
                 );
             }
 
@@ -94,6 +88,7 @@ namespace DoohClick.Service.Shared.Account
 
         public async Task<MvLoginResponse> RefreshToken(MvRefreshTokenParam param)
         {
+            string message = "Session has expired";
             MvRefreshToken? refreshToken = await _context.Users
                 .Where(u => u.RefreshToken == param.RefreshToken)
                 .Select(u => new MvRefreshToken
@@ -106,18 +101,14 @@ namespace DoohClick.Service.Shared.Account
             if (refreshToken is null)
             {
                 throw new AuthException(
-                    message: "Invalid refresh token",
-                    statusCode: 401,
-                    errorCode: "INVALID_REFRESH_TOKEN"
+                    message: message
                 );
             }
 
             if (refreshToken.RefreshTokenExpiry < DateTime.UtcNow)
             {
                 throw new AuthException(
-                    message: "Refresh token has expired",
-                    statusCode: 401,
-                    errorCode: "EXPIRED_REFRESH_TOKEN"
+                    message: message
                 );
             }
 
@@ -125,7 +116,7 @@ namespace DoohClick.Service.Shared.Account
 
             int UserId = int.TryParse(principal.FindFirst(AppClaim.UserId)?.Value, out int userId)
                                      ? userId
-                                     : throw new AuthException(message: "Invalid token claims", statusCode: 401, errorCode: "INVALID_TOKEN");
+                                     : throw new AuthException(message: message);
             MvJwtResult token = await _authService.GenerateAccessToken(principal.Claims.ToArray());
 
             await SyncRefreshToken(BuildRefreshTokenParam(UserId, token));

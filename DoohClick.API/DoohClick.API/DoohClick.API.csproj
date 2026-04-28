@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
@@ -18,6 +19,13 @@
     <ProjectReference Include="..\DoohClick.DataAccess\DoohClick.DataAccess.csproj" />
     <ProjectReference Include="..\DoohClick.Interface\DoohClick.Interface.csproj" />
     <ProjectReference Include="..\DoohClick.Model\DoohClick.Model.csproj" />
+    <ProjectReference Include="..\DoohClick.Service\DoohClick.Service.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controller\Application\cms\media\" />
+    <Folder Include="Controller\Application\commercial\campaign\" />
+    <Folder Include="Controller\Application\crm\advertiser\" />
   </ItemGroup>
 
 </Project>

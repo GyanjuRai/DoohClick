@@ -1,10 +1,20 @@
 
+using DoohClick.API.Config;
 using DoohClick.API.Const;
 using DoohClick.API.Middleware;
+using DoohClick.DataAccess.Dapper;
 using DoohClick.DataAccess.Data;
+using DoohClick.Model.Shared.Auth;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net;
+using System.Text;
 
 
 Log.Logger = new LoggerConfiguration()
@@ -13,6 +23,7 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
+    Log.Information("Application starting up");
 
     var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +32,8 @@ try
      *      Serilog
      * ===============================
     */
-    builder.Host.UseSerilog((context, services, configuration) => {
+    builder.Host.UseSerilog((context, services, configuration) =>
+    {
         configuration.ReadFrom.Configuration(context.Configuration)
                         .ReadFrom.Services(services);
 
@@ -35,9 +47,10 @@ try
     var ACTIVE_DB = Environment.GetEnvironmentVariable(AppConst.ACTIVE_DB) ?? "Local";
     var CONNECTION_STRING = builder.Configuration.GetConnectionString(ACTIVE_DB);
 
-    builder.Services.AddDbContext<AppDbContext>((option) => {
+    builder.Services.AddDbContext<AppDbContext>((option) =>
+    {
         option.UseSqlServer(
-            CONNECTION_STRING, 
+            CONNECTION_STRING,
             SqlOptions => SqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)
         )
         .UseSnakeCaseNamingConvention();
@@ -45,22 +58,75 @@ try
 
     /**
      * ===============================
+     *      Jwt Configuration
+     * ===============================
+    */
+    MvJwtConfig jwtConfig = builder.Configuration.GetSection("Jwt").Get<MvJwtConfig>()
+                                    ?? throw new InvalidOperationException("JwtConfig configuration is missing");
+    JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = true;
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwtConfig.Issuer,
+            ValidateAudience = true,
+            ValidAudience = jwtConfig.Audience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Secret)),
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                context.Response.OnStarting(
+                    async () =>
+                    {
+                        context.NoResult();
+                        context.Response.Headers.Append("Token-Expired", "ture");
+                        context.Response.ContentType = "application/plain";
+                        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                        await context.Response.WriteAsync(context.Exception.Message);
+                    });
+                return Task.CompletedTask;
+            }
+        };
+    });
+
+    builder.Services.AddAppConfigurations(builder.Configuration)
+                 .AddAuthorizationPolicies()
+                 .AddCoreServices()
+                 .AddApplicationService();
+    builder.Services.AddControllers();
+
+    builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerOptions>();
+
+    builder.Services.AddEndpointsApiExplorer();
+
+    /**
+     * ===============================
      *      Cors Policy
      * ===============================
     */
+    string[] allowOrigins = (builder.Configuration.GetSection("AppSetting")["Origins"] ?? "").Split(',');
     builder.Services.AddCors(options =>
     {
         options.AddPolicy(AppConst.POLICY_NAME, builder =>
         {
-            builder.WithOrigins(AppConst.ORIGIN)
+            builder.WithOrigins(allowOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
         });
     });
-    builder.Services.AddCoreServices();
-    builder.Services.AddControllers();
-    builder.Services.AddEndpointsApiExplorer();
 
     /**
      * ===============================
@@ -90,6 +156,8 @@ try
     app.UseMiddleware<GlobalExpectionHandler>();
 
     app.UseSerilogRequestLogging();
+
+    app.UseAuthentication();
 
     app.UseAuthorization();
 

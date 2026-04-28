@@ -8,11 +8,18 @@
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DoohClick.Interface\DoohClick.Interface.csproj" />
     <ProjectReference Include="..\DoohClick.Model\DoohClick.Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Application\cms\" />
+    <Folder Include="Application\commercial\" />
+    <Folder Include="Application\crm\" />
   </ItemGroup>
 
 </Project>

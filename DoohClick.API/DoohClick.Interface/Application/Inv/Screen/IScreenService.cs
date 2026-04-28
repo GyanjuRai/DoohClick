@@ -1,0 +1,17 @@
+﻿
+using DoohClick.Model.Application.Inv.Screen;
+using DoohClick.Model.Shared.Param;
+using DoohClick.Model.Shared.Response;
+
+namespace DoohClick.Interface.Application.Inv.Screen
+{
+    public interface IScreenService
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<MvGridResponse<MvScreen>?> GetGrid(MvGridParamOption<MvScreenFilterOptions> param);
+    }
+}

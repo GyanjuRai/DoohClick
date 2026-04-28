@@ -1,4 +1,8 @@
-﻿namespace DoohClick.API.Middleware
+﻿using DoohClick.Model.Shared.Enum.ResponseEnum;
+using DoohClick.Model.Shared.Exceptions;
+using DoohClick.Model.Shared.Response;
+
+namespace DoohClick.API.Middleware
 {
     public class GlobalExpectionHandler
     {
@@ -27,7 +31,16 @@
         {
             context.Response.ContentType = "application/json";
 
-            await context.Response.WriteAsync("");
-        }
+            if(ex is AppException appEx)
+            {
+                context.Response.StatusCode = appEx.StatusCode;
+                await context.Response.WriteAsJsonAsync(ApiResponse.Failure(appEx.Message, appEx.ErrorCode));
+                return;
+            }
+           
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            string message = _env.IsDevelopment() ? ex.Message : "An unexpected error occurred.";
+            await context.Response.WriteAsJsonAsync(ApiResponse.Failure(message, ResponseStatusEnum.ServerError.ToString()));
+            }
     }
 }

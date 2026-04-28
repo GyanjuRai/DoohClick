@@ -118,7 +118,7 @@ BEGIN
             s.orientation,
             s.[location],
             s.address_line,
-            s.tag,
+            JSON_QUERY(s.tag) AS tag,
             s.country_code,
             s.city,
             s.timezone,

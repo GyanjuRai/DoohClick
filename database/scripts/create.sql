@@ -110,7 +110,12 @@ CREATE TABLE inv.screen_supported_media
 	media_type		NVARCHAR(50) NOT NULL,
 
 	created_by		INT NOT NULL REFERENCES [identity].[user](id),
-	created_at		DATETIME2 NOT NULL
+	created_at		DATETIME2 NOT NULL,
+	is_deleted		BIT NOT NULL DEFAULT 0,
+	deleted_by		INT NULL REFERENCES [identity].[user](id),
+	deleted_at		DATETIME2 NULL
+
+	UNIQUE (screen_id, media_type)
 );
 
 CREATE TABLE inv.screen_operating_hour
@@ -125,7 +130,12 @@ CREATE TABLE inv.screen_operating_hour
 	estimated_impression	INT NULL,
 
 	created_by				INT NOT NULL REFERENCES [identity].[user](id),
-	created_at				DATETIME2 NOT NULL
+	created_at				DATETIME2 NOT NULL,
+	is_deleted				BIT NOT NULL DEFAULT 0,
+	deleted_by				INT NULL REFERENCES [identity].[user](id),
+	deleted_at				DATETIME2 NULL,
+
+	UNIQUE (screen_id, day_of_week)
 );
 
 CREATE TABLE crm.advertiser

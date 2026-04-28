@@ -3,18 +3,19 @@
 
 =====================================================================
 - Description: retrieve screen record with its
-               operating hours and supported media for gridd.
+               operating hours and supported media for grid.
 - Author: Gyanju Rai
 - Created: 2026-04-24
 =====================================================================
 
 DECLARE @Json NVARCHAR(MAX) = N'{
                                  "Filter": {
+                                    "TenantId": 0,
                                     "IsActive": 1,
                                     "CountryCodeList": [],
                                     "CityList": [],
                                     "OrientationList": [],
-                                    "DefaultResolution": []
+                                    "ResolutionList": []
                                  },
                                  "SearchText": "t",
                                  "Offset": 0,
@@ -34,10 +35,11 @@ BEGIN
     SET NOCOUNT ON;
 
     DECLARE @IsActive BIT = ISNULL(JSON_VALUE(@Json, '$.Filter.IsActive'), '[]'),
+            @TenantId INT = JSON_VALUE(@Json, '$.Filter.TenantId'),
             @CountryCodeList NVARCHAR(MAX) = ISNULL(JSON_QUERY(@Json, '$.Filter.CountryCodeList'), '[]'),
             @CityList NVARCHAR(MAX) = ISNULL(JSON_QUERY(@Json, '$.Filter.CityList'), '[]'),
             @OrientationList NVARCHAR(MAX) = ISNULL(JSON_QUERY(@Json, '$.Filter.OrientationList'), '[]'),
-            @DefaultResolution NVARCHAR(MAX) = ISNULL(JSON_QUERY(@Json, '$.Filter.OrientationList'), '[]'),
+            @ResolutionList NVARCHAR(MAX) = ISNULL(JSON_QUERY(@Json, '$.Filter.ResolutionList'), '[]'),
             @SearchText NVARCHAR(200) = ISNULL(LOWER(JSON_VALUE(@Json, '$.SearchText')), ''),
             @Offset INT = ISNULL(JSON_VALUE(@Json, '$.Offset'), 0),
             @PageSize INT = ISNULL(JSON_VALUE(@Json, '$.PageSize'), 10),
@@ -123,24 +125,8 @@ BEGIN
             s.is_active,
             s.rate_per_hour,
             s.currency,
-            JSON_QUERY((
-                SELECT  oh.id,
-                        oh.day_of_week,
-                        oh.open_time,
-                        oh.close_time,
-                        oh.audience_source,
-                        oh.estimated_impression
-                FROM inv.screen_operating_hour AS oh
-                WHERE oh.screen_id = s.id
-                FOR JSON PATH, INCLUDE_NULL_VALUES
-            )) AS operating_hour,
-            JSON_QUERY((
-                SELECT  sm.id,
-                        sm.media_type
-                FROM inv.screen_supported_media AS sm
-                WHERE sm.screen_id = s.id
-                FOR JSON PATH, INCLUDE_NULL_VALUES
-            )) AS supported_media,
+            oh.operating_hour,
+            sm.supported_media,
             s.created_by,
             CONCAT(cu.[name], ' ', ISNULL(cu.sur_name, '')) AS creator,
             s.updated_by,
@@ -151,9 +137,12 @@ BEGIN
     INNER JOIN [identity].tenant     AS t  ON s.tenant_id   = t.id
     INNER JOIN [identity].[user]     AS cu ON s.created_by  = cu.id
     LEFT  JOIN [identity].[user]     AS uu ON s.updated_by  = uu.id
+    LEFT JOIN inv.tf_screen_operating_hour() AS oh ON s.id = oh.screen_id
+    LEFT JOIN inv.tf_screen_supported_media() AS sm On s.id = sm.screen_id
     WHERE   
     s.deleted_at IS NULL AND
     s.is_active = @IsActive AND
+    s.tenant_id = @TenantId AND
     (
         @SearchText = ''
         OR LOWER(s.screen_code)    LIKE '%' + @SearchText + '%'
@@ -172,8 +161,8 @@ BEGIN
         OR s.orientation IN (SELECT [value] FROM OPENJSON(@OrientationList))
     ) AND
     (
-        @DefaultResolution = '[]'
-        OR s.default_resolution IN (SELECT [value] FROM OPENJSON(@DefaultResolution))
+        @ResolutionList = '[]'
+        OR s.default_resolution IN (SELECT [value] FROM OPENJSON(@ResolutionList))
     );
 
 
@@ -188,7 +177,32 @@ BEGIN
     SET @Query = N'
                 SELECT ISNULL(
                         (
-                            SELECT * 
+                            SELECT  ts.id,
+                                    ts.tenant_id,
+                                    ts.[name]        AS tenant_name,
+                                    ts.[name],
+                                    ts.normalized_name,
+                                    ts.screen_code,
+                                    ts.[description],
+                                    ts.default_resolution,
+                                    ts.orientation,
+                                    ts.[location],
+                                    ts.address_line,
+                                    JSON_QUERY(ts.tag) AS tag,
+                                    ts.country_code,
+                                    ts.city,
+                                    ts.timezone,
+                                    ts.is_active,
+                                    ts.rate_per_hour,
+                                    ts.currency,
+                                    JSON_QUERY(ts.operating_hour) AS operating_hour,
+                                    JSON_QUERY(ts.supported_media) AS supported_media,
+                                    ts.created_by,
+                                    ts.creator,
+                                    ts.updated_by,
+                                    ts.modifier,
+                                    ts.created_at,
+                                    ts.updated_at 
                             FROM #screen AS ts 
                             ORDER BY ts.normalized_name
                             OFFSET ' + CAST(@Offset AS VARCHAR(20)) + N' ROWS

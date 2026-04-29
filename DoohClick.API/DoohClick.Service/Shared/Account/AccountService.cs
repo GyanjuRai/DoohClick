@@ -92,7 +92,7 @@ namespace DoohClick.Service.Shared.Account
         {
             string message = "Session has expired";
             MvRefreshToken? refreshToken = await _context.Users
-                .Where(u => u.RefreshToken == param.RefreshToken)
+                .Where(u => u.Id == param.UserId)
                 .Select(u => new MvRefreshToken
                 {
                     RefreshToken = u.RefreshToken,

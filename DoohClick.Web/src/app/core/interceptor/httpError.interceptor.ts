@@ -38,8 +38,7 @@ export class HttpErrorInterceptor
     return next.handle(req).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
-          this.showToast('warn', 'Session expired.', 'Please log in again.');
-          this.auth.navigate([ROUTE_PATHS.AUTH_LOGIN]);
+          return this.handle401(req, next);
         }
 
         return throwError(() => error);
@@ -56,20 +55,18 @@ export class HttpErrorInterceptor
       return throwError(() => new Error('Session expired'));
     }
 
-    this.isRefreshing = true;
-
     const payload = {
       accessToken: this.auth.getAccessToken(),
       refreshToken: this.auth.getRefreshToken(),
       userId: this.auth.getUserId(),
     } as MvRefreshTokenParam;
 
+    this.isRefreshing = true;
+
     return this.accountService.refreshToken(payload).pipe(
       switchMap((response: MvResponse<MvLoginResponse>) => {
         this.isRefreshing = false;
-        const token = response.data ?? ({} as MvLoginResponse);
-        this.auth.setSession(token);
-
+        this.auth.setSession(response.data!);
         const retried = req.clone({
           setHeaders: { Authorization: `Bearer ${response.data?.accessToken}` },
         });

@@ -4,6 +4,7 @@ import { ScreenListComponent } from './screen/component/screen-list/screen-list.
 import { RouterModule } from '@angular/router';
 import { invRoutes } from './inv.routes';
 import { ScreenAddEditComponent } from './screen/component/screen-add-edit/screen-add-edit.component';
+import { SharedUiModule } from "../shared/module/shared-ui.module";
 
 
 
@@ -15,6 +16,7 @@ import { ScreenAddEditComponent } from './screen/component/screen-add-edit/scree
   imports: [
     CommonModule,
     RouterModule.forChild(invRoutes),
-  ]
+    SharedUiModule
+]
 })
 export class InvModule { }

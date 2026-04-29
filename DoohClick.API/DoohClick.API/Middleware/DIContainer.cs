@@ -4,6 +4,7 @@ using DoohClick.Interface.Application.Inv.Screen;
 using DoohClick.Interface.Shared.Account;
 using DoohClick.Interface.Shared.Auth;
 using DoohClick.Interface.Shared.JsonSerializer;
+using DoohClick.Model.Shared.AppClaim;
 using DoohClick.Model.Shared.AppSetting;
 using DoohClick.Model.Shared.Auth;
 using DoohClick.Model.Shared.Enum.User;
@@ -33,33 +34,29 @@ namespace DoohClick.API.Middleware
             services.AddAuthorization(options =>
             {
                 options.AddPolicy(AppPolicy.ADMIN, policy =>
-                    policy.RequireRole(nameof(UserRoleEnum.ADMIN)));
+                    policy.RequireClaim(AppClaim.UserRole, nameof(UserRoleEnum.ADMIN)));
 
                 options.AddPolicy(AppPolicy.MANAGER, policy =>
-                    policy.RequireRole(nameof(UserRoleEnum.MANAGER)));
+                    policy.RequireClaim(AppClaim.UserRole, nameof(UserRoleEnum.MANAGER)));
 
                 options.AddPolicy(AppPolicy.OPERATOR, policy =>
-                    policy.RequireRole(nameof(UserRoleEnum.OPERATOR)));
+                    policy.RequireClaim(AppClaim.UserRole, nameof(UserRoleEnum.OPERATOR)));
 
                 options.AddPolicy(AppPolicy.ADMINMANAGER, policy =>
-                    policy.RequireRole(
-                            nameof(UserRoleEnum.ADMIN),
-                            nameof(UserRoleEnum.MANAGER)
-                        ));
+                    policy.RequireClaim(AppClaim.UserRole,
+                        nameof(UserRoleEnum.ADMIN),
+                        nameof(UserRoleEnum.MANAGER)));
 
                 options.AddPolicy(AppPolicy.ADMINOPERATOR, policy =>
-                    policy.RequireRole(
-                            nameof(UserRoleEnum.ADMIN),
-                            nameof(UserRoleEnum.OPERATOR)
-                        ));
+                    policy.RequireClaim(AppClaim.UserRole,
+                        nameof(UserRoleEnum.ADMIN),
+                        nameof(UserRoleEnum.OPERATOR)));
 
                 options.AddPolicy(AppPolicy.ALL, policy =>
-                    policy.RequireRole(
-                            nameof(UserRoleEnum.ADMIN),
-                            nameof(UserRoleEnum.MANAGER),
-                            nameof(UserRoleEnum.OPERATOR)
-                        ));
-
+                    policy.RequireClaim(AppClaim.UserRole,
+                        nameof(UserRoleEnum.ADMIN),
+                        nameof(UserRoleEnum.MANAGER),
+                        nameof(UserRoleEnum.OPERATOR)));
             });
 
             return services;

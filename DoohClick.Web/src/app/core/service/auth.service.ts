@@ -62,7 +62,7 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     const token = this.getLocalStorage('accessToken');
-    if (token && !this.isTokenExpired()) {
+    if (token) {
       return true;
     }
     return false;
@@ -86,7 +86,7 @@ export class AuthService {
   }
 
   getUserId() {
-    return this.getLocalStorage('userId');
+    return Number(this.getLocalStorage('userId'));
   }
 
   getTenantCode() {

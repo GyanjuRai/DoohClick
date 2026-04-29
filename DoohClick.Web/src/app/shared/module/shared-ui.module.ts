@@ -24,6 +24,7 @@ import { CardModule } from 'primeng/card';
 import { ToolbarModule } from 'primeng/toolbar';
 import { BlockUIModule } from 'primeng/blockui';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { PasswordModule } from 'primeng/password'
 
 import { ConfirmationService, MessageService } from "primeng/api";
 
@@ -53,6 +54,7 @@ const PRIME_NG_MODULES = [
         ToolbarModule,
         BlockUIModule,
         ProgressSpinnerModule,
+        PasswordModule,
 ];
  
 @NgModule({

@@ -7,7 +7,6 @@ import { SharedUiModule } from "../shared/module/shared-ui.module";
 import { RouterModule } from "@angular/router";
 import { layoutRoutes } from "./layout.route";
 
-
 @NgModule({
     declarations: [
         MainLayoutComponent,

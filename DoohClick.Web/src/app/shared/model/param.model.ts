@@ -1,4 +1,4 @@
-export interface SelParamModel<T>
+export interface MvGridParamOption<T>
 {
     filter?: T;
     offset?: number;

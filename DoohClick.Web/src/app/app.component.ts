@@ -2,6 +2,8 @@ import { Component, Injector } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ROUTE_PATHS } from './shared';
 import { ConfirmationOptions } from './shared/model/confirmation.model';
+import { Router } from '@angular/router';
+import { AuthService } from './core/service/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -11,12 +13,14 @@ import { ConfirmationOptions } from './shared/model/confirmation.model';
 export class AppComponent {
   private _confirmationService: ConfirmationService;
   private _messageService: MessageService;
+  protected auth: AuthService;
 
   protected readonly routes = ROUTE_PATHS;
 
   constructor(injector: Injector) {
     this._confirmationService = injector.get(ConfirmationService);
     this._messageService = injector.get(MessageService);
+    this.auth = injector.get(AuthService);
   }
 
   /**
@@ -37,6 +41,7 @@ export class AppComponent {
       summary: summary,
       detail: details,
       life: life,
+      styleClass: 'toast-lg'
     });
   }
 
@@ -57,4 +62,7 @@ export class AppComponent {
     });
   }
 
+  protected navigate(route: string[]): void {
+    this.auth.navigate(route);
+  }
 }

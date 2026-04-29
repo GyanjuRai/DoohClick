@@ -22,7 +22,7 @@ namespace DoohClick.API.Controller.Application.Inv.Screen
             _screenService = screenService;
         }
 
-        [HttpGet("grid")]
+        [HttpGet("screen/grid")]
         [Authorize(Policy = AppPolicy.ALL)]
         public async Task<IActionResult> GetGrid([FromQuery] MvGridParamOption<MvScreenFilterOptions> param)
         {
@@ -35,7 +35,7 @@ namespace DoohClick.API.Controller.Application.Inv.Screen
             return Ok(ApiResponse.Success(result));
         }
 
-        [HttpPost("save")]
+        [HttpPost("screens")]
         [Authorize(Policy = AppPolicy.ADMINMANAGER)]
         public async Task<IActionResult> Save([FromBody] MvScreen param)
         {
@@ -51,7 +51,7 @@ namespace DoohClick.API.Controller.Application.Inv.Screen
             return Ok(ApiResponse.Success(result));
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("screen/{id}")]
         [Authorize(Policy = AppPolicy.ADMINMANAGER)]
         public async Task<IActionResult> Remove(Guid id)
         {

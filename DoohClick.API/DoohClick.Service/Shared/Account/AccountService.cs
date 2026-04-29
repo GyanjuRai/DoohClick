@@ -9,6 +9,8 @@ using DoohClick.Model.Shared.Account;
 using DoohClick.Model.Shared.AppClaim;
 using DoohClick.Model.Shared.Auth;
 using DoohClick.Model.Shared.Exceptions.Auth;
+using DoohClick.Model.Shared.Exceptions.NotFound;
+using DoohClick.Model.Shared.Exceptions.Validation;
 using DoohClick.Service.Shared.Base;
 using DoohClick.Service.Shared.Helper.HashingHelper;
 using Microsoft.EntityFrameworkCore;
@@ -44,14 +46,14 @@ namespace DoohClick.Service.Shared.Account
 
             if (loginInfo is null || string.IsNullOrEmpty(loginInfo.UserUuid))
             {
-                throw new AuthException(
+                throw new NotFoundException(
                     message: message
                 );
             }
 
             if (!EncryptionHelper.VerifyPassword(param.Password, loginInfo.PasswordHash))
             {
-                throw new AuthException(
+                throw new ValidationException(
                     message: message
                 );
             }
@@ -64,7 +66,7 @@ namespace DoohClick.Service.Shared.Account
             MvUserInfoResponse? userInfoResult = await GetUserInfo(userInfoParam);
             if (userInfoResult is null)
             {
-                throw new AuthException(
+                throw new NotFoundException(
                     message: message
                 );
             }
@@ -72,12 +74,12 @@ namespace DoohClick.Service.Shared.Account
             Claim[] claims =
             [
                 new Claim(AppClaim.UserId, userInfoResult.UserId.ToString()),
-                new Claim(ClaimTypes.NameIdentifier, userInfoResult.UserUuid),
+                new Claim(AppClaim.UserUuuId, userInfoResult.UserUuid),
                 new Claim(AppClaim.TenantId, userInfoResult.TenantId.ToString()),
                 new Claim(AppClaim.TenantCode, userInfoResult.TenantCode),
-                new Claim(ClaimTypes.Name, userInfoResult.FullName),
-                new Claim(ClaimTypes.Role, userInfoResult.UserRole),
-                new Claim(ClaimTypes.Email, userInfoResult.Email)
+                new Claim(AppClaim.FullName, userInfoResult.FullName),
+                new Claim(AppClaim.UserRole, userInfoResult.UserRole),
+                new Claim(AppClaim.Email, userInfoResult.Email)
             ];
             MvJwtResult token = await _authService.GenerateAccessToken(claims);
          

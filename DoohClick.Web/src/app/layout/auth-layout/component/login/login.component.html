@@ -1,0 +1,56 @@
+
+<div class="login-wrapper">
+  <form [formGroup]="formGroup" class="login-card">
+    <div class="login-header">
+      <p-avatar
+        image="../../../../assets/logo/logo.webp"
+        shape="square"
+        [style]="{ width: '80px', height: '50px' }"
+      />
+      <span class="login-title">Welcome Back</span>
+    </div>
+
+    <div class="login-fields">
+      <div class="field">
+        <label>Tenant Code</label>
+        <input
+          formControlName="tenantCode"
+          pInputText
+          type="text"
+          placeholder="Enter tenant code"
+          class="w-full"
+        />
+      </div>
+
+      <div class="field">
+        <label>UserName</label>
+        <input
+          formControlName="userName"
+          pInputText
+          type="text"
+          placeholder="Username"
+          class="w-full"
+        />
+      </div>
+
+      <div class="field">
+        <label>Password</label>
+        <p-password
+          formControlName="password"
+          placeholder="Password"
+          styleClass="w-full"
+          inputStyleClass="w-full"
+          [toggleMask]="true"
+          [feedback]="false"
+        />
+      </div>
+    </div>
+
+    <p-button
+      label="Sign In"
+      icon="pi pi-user"
+      styleClass="w-full"
+      (onClick)="onSubmit()"
+    />
+  </form>
+</div>

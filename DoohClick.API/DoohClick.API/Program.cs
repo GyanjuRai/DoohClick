@@ -165,6 +165,8 @@ try
 
     app.UseSerilogRequestLogging();
 
+    app.UseCors(AppConst.POLICY_NAME);
+
     app.UseAuthentication();
 
     app.UseAuthorization();

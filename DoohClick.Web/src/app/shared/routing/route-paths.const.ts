@@ -7,9 +7,14 @@ export const ROUTE_PATHS = {
   ROOT: '',
   
   LAYOUT: '',
-  
+
+  AUTH: 'auth',
+  LOGIN: 'login',
+  AUTH_LOGIN: 'auth/login',
+
   SCREEN: 'screen',
   SCREEN_LIST: 'list',
+  SCREEN_HOME: 'screen/list',
 
   CAMPAIGN: 'campaign',
   CAMPAIGN_DRAFT: 'drafts',

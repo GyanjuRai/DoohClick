@@ -1,0 +1,7 @@
+
+{
+    "production": false,
+    "apiUrl": "http://localhost:5200/",
+    "secretKey": "54v9D7MJaQ+mUMZDOOEUyUnyakpZybZxwjsOHmzjorY=",
+    "storageKey": "JRfU0GgIrWsO6cDyZqUWNIqdNhh5kyBtZZBq40BG+8U="
+}

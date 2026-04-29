@@ -2,7 +2,7 @@
 export interface GridConfig {
     column: GridColumn[],
     dataSource: {
-        data: [],
+        data: any[],
         totalRows: number
     }
     options: {
@@ -14,6 +14,8 @@ export interface GridConfig {
 }
 
 export interface GridColumn {
-    name: string;
-    displayName: string;
+  name: string;
+  displayName: string;
+  width?: string;
+  type: 'text' | 'number' | 'date' | 'badge' | 'currency' | 'action';
 }

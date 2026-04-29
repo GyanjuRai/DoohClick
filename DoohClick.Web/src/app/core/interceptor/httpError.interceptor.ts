@@ -6,11 +6,9 @@ import {
   HttpRequest,
 } from '@angular/common/http';
 import { Injectable, Injector } from '@angular/core';
-import { Router } from '@angular/router';
 import { catchError, Observable, switchMap, throwError } from 'rxjs';
 import { AppComponent } from '../../app.component';
 import { ROUTE_PATHS } from '../../shared';
-import { AuthService } from '../service/auth.service';
 import { MvLoginResponse, MvRefreshTokenParam } from '../model/account.model';
 import { AccountService } from '../service/account.service';
 import { MvResponse } from '../../shared/model/response.model';

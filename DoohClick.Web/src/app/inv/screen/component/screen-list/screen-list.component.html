@@ -1,10 +1,149 @@
+<div class="flex align-items-center gap-2 mt-2 pl-3">
+  <h2 class="text-2xl font-semibold m-0" style="color: var(--surface-600)">
+    Screens
+  </h2>
+  <p-badge [value]="gridConfig.dataSource.totalRows" severity="secondary" />
+</div>
 
-<div class="card">
-    <p-table [value]="gridConfig.dataSource.data" >
-        <ng-template pTemplate="header">
-            <tr>
-                <th *ngFor="let col of gridConfig.column" style="width: 5rem;">{{ col.displayName }}</th>
-            </tr>
-        </ng-template>
-    </p-table>
+<div class="card grid-wrapper">
+  <p-table
+    [loading]="isTableLoading"
+    [value]="gridConfig.dataSource.data"
+    [scrollable]="true"
+    scrollHeight="500px"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex align-items-center justify-content-between gap-3">
+        <form class="grid flex-1" style="max-width: 800px">
+          <div class="col-12 md:col-4">
+            <span class="p-input-icon-left w-full">
+              <i class="pi pi-search"></i>
+              <input
+                pInputText
+                type="text"
+                placeholder="Search..."
+                class="w-full"
+              />
+            </span>
+          </div>
+          <div class="col-12 md:col-4">
+            <p-dropdown placeholder="Status" styleClass="w-full" />
+          </div>
+          <div class="col-12 md:col-4">
+            <p-dropdown placeholder="Country" styleClass="w-full" />
+          </div>
+          <div class="col-12 md:col-4">
+            <p-dropdown placeholder="City" styleClass="w-full" />
+          </div>
+          <div class="col-12 md:col-4">
+            <p-dropdown placeholder="Orientation" styleClass="w-full" />
+          </div>
+          <div class="col-12 md:col-4">
+            <p-dropdown placeholder="Resolution" styleClass="w-full" />
+          </div>
+
+          <div class="col-12 md:col-4 flex align-items-center gap-2">
+            <p-button
+              label="Apply"
+              icon="pi pi-filter"
+              size="small"
+              styleClass="w-full"
+            />
+            <p-button
+              label="Reset"
+              icon="pi pi-filter-slash"
+              severity="secondary"
+              size="small"
+              [outlined]="true"
+              styleClass="w-full"
+            />
+          </div>
+        </form>
+
+        <div class="flex gap-2 flex-shrink-0">
+          <p-button
+            icon="pi pi-upload"
+            label="Export"
+            severity="secondary"
+            size="small"
+            [outlined]="true"
+            [disabled]="true"
+          />
+          <p-button icon="pi pi-plus" label="Add Screen" size="small" />
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th
+          *ngFor="let col of gridConfig.column"
+          [style.width]="col.width || '5rem'"
+        >
+          {{ col.displayName }}
+        </th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body">
+      <ng-container
+        *ngIf="gridConfig.dataSource.totalRows > 0; else noDataGrid"
+      >
+        <tr *ngFor="let screen of gridConfig.dataSource.data">
+          <td *ngFor="let col of gridConfig.column">
+            <ng-container *ngIf="col.name === 'action'; else dateCheck">
+              <div class="flex justify-content-center">
+                <p-menu
+                  #menu
+                  [model]="actionMenuItems"
+                  [popup]="true"
+                  appendTo="body"
+                />
+                <p-button
+                  pRipple
+                  (onClick)="openActionMenu($event, menu, screen)"
+                  icon="pi pi-cog"
+                  label="Actions"
+                  size="small"
+                />
+              </div>
+            </ng-container>
+
+            <ng-template #dateCheck>
+              <ng-container *ngIf="col.type === 'date'; else badgeCheck">
+                {{ screen[col.name] | date: "yyyy MMMM dd" }}
+              </ng-container>
+            </ng-template>
+
+            <ng-template #badgeCheck>
+              <ng-container *ngIf="col.type === 'badge'; else defaultCell">
+                <p-tag
+                  [value]="screen[col.name]"
+                  [severity]="
+                    screen[col.name] === true ||
+                    screen[col.name] === 'LANDSCAPE'
+                      ? 'success'
+                      : 'secondary'
+                  "
+                />
+              </ng-container>
+            </ng-template>
+
+            <ng-template #defaultCell>
+              {{ screen[col.name] }}
+            </ng-template>
+          </td>
+        </tr>
+      </ng-container>
+      <ng-template #noDataGrid>
+        <tr>
+          <td [attr.colspan]="gridConfig.column.length" class="text-center p-4">
+            <div class="flex justify-content-center align-items-center w-full">
+              <p class="m-0">No Data</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </ng-template>
+  </p-table>
 </div>

@@ -15,7 +15,7 @@ export class ScreenService {
   getGird(
     param: MvGridParamOption<MvScreenFilterOptions>,
   ): Observable<MvResponse<MvGridResponse<MvScreen>>> {
-    return this.api.get('inv/screen/grid', param);
+    return this.api.get('inv/screen/grid', param, true);
   }
 
   save() {

@@ -31,7 +31,7 @@ export class RequestInterceptor implements HttpInterceptor {
         const isLoginReq = url.includes('/login');
 
         if(!isLoginReq) {
-            const token = this.auth.getLocalStorage('token');
+            const token = this.auth.getAccessToken();
             if(token != '') {
                 headers = headers.set('Authorization', `Bearer ${token}`);
             }

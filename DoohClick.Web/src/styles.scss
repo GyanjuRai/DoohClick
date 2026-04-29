@@ -4,12 +4,17 @@
 @import "primeicons/primeicons.css";
 
 :root {
-  --sidebar-width: 16.5rem;
+  --sidebar-width: 15rem;
+}
+
+html {
+  height: 100vh;
 }
 
 body {
   margin: 0;
   padding: 0;
+  background-color: var(--surface-100);
 }
 
 .card {

@@ -15,7 +15,8 @@ import { BaseComponent } from './base.component';
       </div>
     </div>
   `,
-  styles: [`
+  styles: [
+    `
       .layout-main-container {
         transition: margin-left 0.2s cubic-bezier(0, 0, 0.2, 1);
         min-height: 95vh;
@@ -29,9 +30,9 @@ import { BaseComponent } from './base.component';
 
       .layout-container {
         flex: 1;
-        background-color: var(--surface-50) !important;
       }
-    `]
+    `,
+  ],
 })
 export class MainLayoutComponent extends BaseComponent {
   isSidebarVisible$ = this._mainLayoutService.sideBar$;

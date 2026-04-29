@@ -1,5 +1,15 @@
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
 ::ng-deep .p-menubar {
-  background-color: var(--surface-0) !important;  
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+  background-color: var(--surface-0) !important;
 }
 
 .text-primary {

@@ -89,6 +89,10 @@ export class AuthService {
     return Number(this.getLocalStorage('userId'));
   }
 
+  getTenantId() {
+    return Number(this.getLocalStorage('tenantId'));
+  }
+
   getTenantCode() {
     return this.getLocalStorage('tenantCode');
   }

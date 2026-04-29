@@ -3,6 +3,12 @@
   width: var(--sidebar-width) !important;
 }
 
+::ng-deep .logout-btn {
+  &:hover {
+    color: var(--red-400) !important;
+  }
+}
+
 .text-primary {
   color: var(--primary-text);
 }

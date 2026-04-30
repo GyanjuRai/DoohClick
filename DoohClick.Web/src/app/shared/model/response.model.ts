@@ -9,3 +9,9 @@ export interface MvResponse<T> {
     message: string;
     data?: T
 }
+
+export interface MvListitemDdl {
+    id: number;
+    item: string;
+    code: string;
+}

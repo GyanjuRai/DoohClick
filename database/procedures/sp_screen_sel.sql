@@ -10,7 +10,7 @@
 
 DECLARE @Json NVARCHAR(MAX) = N'{
                                  "Filter": {
-                                    "TenantId": 0,
+                                    "TenantId": 1,
                                     "IsActive": 1,
                                     "CountryCodeList": [],
                                     "CityList": [],
@@ -34,7 +34,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    DECLARE @IsActive BIT = ISNULL(JSON_VALUE(@Json, '$.Filter.IsActive'), '[]'),
+    DECLARE @IsActive BIT = ISNULL(JSON_VALUE(@Json, '$.Filter.IsActive'), 1),
             @TenantId INT = JSON_VALUE(@Json, '$.Filter.TenantId'),
             @CountryCodeList NVARCHAR(MAX) = ISNULL(JSON_QUERY(@Json, '$.Filter.CountryCodeList'), '[]'),
             @CityList NVARCHAR(MAX) = ISNULL(JSON_QUERY(@Json, '$.Filter.CityList'), '[]'),

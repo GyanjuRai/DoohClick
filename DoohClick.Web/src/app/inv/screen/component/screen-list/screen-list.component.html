@@ -7,19 +7,32 @@
 
 <div class="card grid-wrapper">
   <p-table
+    [scrollable]="true"
+    scrollHeight="flex"
     [loading]="isTableLoading"
     [value]="gridConfig.dataSource.data"
-    [scrollable]="true"
-    scrollHeight="500px"
+    [paginator]="true"
+    [rows]="gridConfig.options.pageSize"
+    [totalRecords]="gridConfig.dataSource.totalRows"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} screens"
+    [rowsPerPageOptions]="[10, 20, 30]"
+    [lazy]="true"
+    (onLazyLoad)="onPageChange($event)"
   >
     <ng-template pTemplate="caption">
       <div class="flex align-items-center justify-content-between gap-3">
-        <form class="grid flex-1" style="max-width: 800px">
+        <form
+          [formGroup]="formGroup"
+          class="grid flex-1"
+          style="max-width: 800px"
+        >
           <div class="col-12 md:col-4">
             <span class="p-input-icon-left w-full">
               <i class="pi pi-search"></i>
               <input
                 pInputText
+                formControlName="searchText"
                 type="text"
                 placeholder="Search..."
                 class="w-full"
@@ -27,19 +40,58 @@
             </span>
           </div>
           <div class="col-12 md:col-4">
-            <p-dropdown placeholder="Status" styleClass="w-full" />
+            <p-dropdown
+              [options]="[
+                { label: 'Active', value: true },
+                { label: 'Inactive', value: false },
+              ]"
+              formControlName="isActive"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="status"
+              styleClass="w-full"
+            />
           </div>
           <div class="col-12 md:col-4">
-            <p-dropdown placeholder="Country" styleClass="w-full" />
+            <p-multiSelect
+              [options]="countryListItemList"
+              formControlName="countryCodeList"
+              optionLabel="item"
+              optionValue="code"
+              placeholder="Country"
+              styleClass="w-full"
+            />
+          </div>
+
+          <div class="col-12 md:col-4">
+            <p-multiSelect
+              [options]="cityListItemList"
+              formControlName="cityList"
+              optionLabel="item"
+              optionValue="code"
+              placeholder="City"
+              styleClass="w-full"
+            />
           </div>
           <div class="col-12 md:col-4">
-            <p-dropdown placeholder="City" styleClass="w-full" />
+            <p-multiSelect
+              [options]="orientationListItemList"
+              formControlName="orientationList"
+              optionLabel="item"
+              optionValue="code"
+              placeholder="Orientation"
+              styleClass="w-full"
+            />
           </div>
           <div class="col-12 md:col-4">
-            <p-dropdown placeholder="Orientation" styleClass="w-full" />
-          </div>
-          <div class="col-12 md:col-4">
-            <p-dropdown placeholder="Resolution" styleClass="w-full" />
+            <p-multiSelect
+              [options]="ResolutionListItemList"
+              formControlName="resolutionList"
+              optionLabel="item"
+              optionValue="code"
+              placeholder="Resolution"
+              styleClass="w-full"
+            />
           </div>
 
           <div class="col-12 md:col-4 flex align-items-center gap-2">
@@ -47,6 +99,7 @@
               label="Apply"
               icon="pi pi-filter"
               size="small"
+              (onClick)="applyFilter()"
               styleClass="w-full"
             />
             <p-button
@@ -54,6 +107,7 @@
               icon="pi pi-filter-slash"
               severity="secondary"
               size="small"
+              (onClick)="resetFiler()"
               [outlined]="true"
               styleClass="w-full"
             />
@@ -69,7 +123,19 @@
             [outlined]="true"
             [disabled]="true"
           />
-          <p-button icon="pi pi-plus" label="Add Screen" size="small" />
+          <p-button
+            icon="pi pi-plus"
+            label="Add Screen"
+            size="small"
+            (onClick)="saveScreen()"
+          />
+          <p-button
+            icon="pi pi-refresh"
+            label="Refresh"
+            size="small"
+            severity="secondary"
+          >
+          </p-button>
         </div>
       </div>
     </ng-template>
@@ -147,3 +213,7 @@
     </ng-template>
   </p-table>
 </div>
+
+<screen-detail #screenDetail></screen-detail>
+<screen-add-edit #screenAddEdit></screen-add-edit>
+<p-confirmDialog></p-confirmDialog>

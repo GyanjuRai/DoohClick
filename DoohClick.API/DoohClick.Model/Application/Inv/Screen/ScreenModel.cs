@@ -5,7 +5,7 @@ namespace DoohClick.Model.Application.Inv.Screen
     public record MvScreenFilterOptions
     {
         public required int TenantId { get; set; }
-        public bool IsActive { get; set; } = true;
+        public bool? IsActive { get; set; }
         public List<string>? CountryCodeList { get; set; }
         public List<string>? CityList { get; set; }
         public List<string>? OrientationList { get; set; }
@@ -50,12 +50,14 @@ namespace DoohClick.Model.Application.Inv.Screen
         public required string CloseTime { get; set; }
         public required string AudienceSource { get; set; }
         public int? EstimatedImpression { get; set; }
+        public int? DeletedBy { get; set; }
     }
 
     public record MvScreenSupportedMedia
     {
         public int? Id { get; set; }
         public required string MediaType { get; set; }
+        public int? DeletedBy { get; set; }
     }
 
     public record MvScreenDelParam

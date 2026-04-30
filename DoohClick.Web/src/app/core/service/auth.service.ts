@@ -22,6 +22,7 @@ export class AuthService {
   setSession(response: MvLoginResponse) {
     const user = this.jwtHelper.decodeToken(response.accessToken);
     this.setLocalStorage('accessToken', response.accessToken);
+    this.setLocalStorage('refreshToken', response.refreshToken);
     this.setLocalStorage('userId', user['UserId']);
     this.setLocalStorage('tenantId', user['TenantId']);
     this.setLocalStorage('tenantCode', user['TenantCode']);
@@ -82,7 +83,7 @@ export class AuthService {
   }
 
   getRefreshToken() {
-    return this.getLocalStorage('accessToken');
+    return this.getLocalStorage('refreshToken');
   }
 
   getUserId() {

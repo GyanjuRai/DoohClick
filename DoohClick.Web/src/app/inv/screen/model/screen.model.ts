@@ -51,7 +51,7 @@ export interface MvScreenDelParam {
 
 export interface MvScreenFilterOptions {
     tenantId : number;
-    isActive: boolean;
+    isActive?: boolean;
     countryCodeList?: string[];
     cityList?: string[];
     orientationList?: string[];

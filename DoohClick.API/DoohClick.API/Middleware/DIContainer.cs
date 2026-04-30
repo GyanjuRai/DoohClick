@@ -4,6 +4,7 @@ using DoohClick.Interface.Application.Inv.Screen;
 using DoohClick.Interface.Shared.Account;
 using DoohClick.Interface.Shared.Auth;
 using DoohClick.Interface.Shared.JsonSerializer;
+using DoohClick.Interface.Shared.Listitem;
 using DoohClick.Model.Shared.AppClaim;
 using DoohClick.Model.Shared.AppSetting;
 using DoohClick.Model.Shared.Auth;
@@ -12,6 +13,7 @@ using DoohClick.Service.Application.Inv.Screen;
 using DoohClick.Service.Shared.Account;
 using DoohClick.Service.Shared.Auth;
 using DoohClick.Service.Shared.JsonSerializer;
+using DoohClick.Service.Shared.Listitem;
 
 namespace DoohClick.API.Middleware
 {
@@ -73,6 +75,11 @@ namespace DoohClick.API.Middleware
         public static IServiceCollection AddApplicationService(this IServiceCollection services)
         {
             return services.AddTransient<IScreenService, ScreenService>();
+        }
+
+        public static IServiceCollection AddSharedService(this IServiceCollection services)
+        {
+            return services.AddTransient<IListiemService, ListitemService>();
         }
     }
 }

@@ -1,0 +1,17 @@
+<p-dialog
+  [modal]="true"
+  [(visible)]="isDialogOpen"
+  [maximizable]="true"
+  [draggable]="false"
+  position="top"
+  [style]="{ width: '70rem', marginTop: '0.5rem' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  (onHide)="close()"
+  header="Screen Details"
+>
+  <div class="card">
+    <div class="flex align-items-center justify-content-between p-3">
+      <span class="text-xl font-semibold">Screen Detail work</span>
+    </div>
+  </div>
+</p-dialog>

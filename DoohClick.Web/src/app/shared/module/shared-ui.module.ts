@@ -24,7 +24,9 @@ import { CardModule } from 'primeng/card';
 import { ToolbarModule } from 'primeng/toolbar';
 import { BlockUIModule } from 'primeng/blockui';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { PasswordModule } from 'primeng/password'
+import { PasswordModule } from 'primeng/password';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { TabViewModule } from 'primeng/tabview';
 
 import { ConfirmationService, MessageService } from "primeng/api";
 
@@ -55,6 +57,8 @@ const PRIME_NG_MODULES = [
         BlockUIModule,
         ProgressSpinnerModule,
         PasswordModule,
+        MultiSelectModule,
+        TabViewModule,
 ];
  
 @NgModule({

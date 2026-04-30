@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
+import { DialogModule } from "primeng/dialog";
 import { MvScreen } from '../../model/screen.model';
 
 @Component({
-  selector: 'screen-add-edit',
-  templateUrl: './screen-add-edit.component.html',
-  styleUrl: './screen-add-edit.component.scss',
+  selector: 'screen-detail',
+  templateUrl: './screen-detail.component.html',
+  styleUrl: './screen-detail.component.scss',
 })
-export class ScreenAddEditComponent {
+export class ScreenDetailComponent {
   protected isDialogOpen: boolean = false;
   protected screen!: MvScreen;
 

@@ -4,6 +4,8 @@ import { ROUTE_PATHS } from './shared';
 import { ConfirmationOptions } from './shared/model/confirmation.model';
 import { Router } from '@angular/router';
 import { AuthService } from './core/service/auth.service';
+import { ListitemService } from './shared/service/listitem.service';
+import { MvListitemDdlParam } from './shared/model/param.model';
 
 @Component({
   selector: 'app-root',
@@ -13,6 +15,7 @@ import { AuthService } from './core/service/auth.service';
 export class AppComponent {
   private _confirmationService: ConfirmationService;
   private _messageService: MessageService;
+  protected _listItemService: ListitemService;
   protected auth: AuthService;
 
   protected readonly routes = ROUTE_PATHS;
@@ -21,6 +24,7 @@ export class AppComponent {
     this._confirmationService = injector.get(ConfirmationService);
     this._messageService = injector.get(MessageService);
     this.auth = injector.get(AuthService);
+    this._listItemService = injector.get(ListitemService);
   }
 
   /**

@@ -20,7 +20,7 @@ DECLARE @Json NVARCHAR(MAX) = N'{
                                     "AddressLine": "1560 Broadway, New York, NY 10036",
                                     "Tag": "[\"outdoor\",\"premium\",\"high-traffic\"]",
                                     "CountryCode": "US",
-                                    "City": "NEWYORK",
+                                    "City": "NYC",
                                     "Timezone": "AMERICA/NEWYORK",
                                     "IsActive": true,
                                     "RatePerHour": 100000.00,
@@ -28,28 +28,34 @@ DECLARE @Json NVARCHAR(MAX) = N'{
                                     "CreatedBy": 1,
                                     "OperatingHour": [
                                     {
-                                        "Id": null,
+                                        "Id": 1,
                                         "DayOfWeek": "SUNDAY",
                                         "OpenTime": "06:00",
                                         "CloseTime": "23:00",
                                         "AudienceSource": "FOOTTRAFFICSENSOR",
-                                        "EstimatedImpression": 5000000
+                                        "EstimatedImpression": 5000000,
+                                        "DeletedBy": null
                                     },
                                     {
-                                        "Id": null,
+                                        "Id": 2,
                                         "DayOfWeek": "SATURDAY",
                                         "OpenTime": "08:00",
                                         "CloseTime": "00:00",
                                         "AudienceSource": "FOOTTRAFFICSENSOR",
-                                        "EstimatedImpression": 7500000
+                                        "EstimatedImpression": 7500000,
+                                        "DeletedBy": 1
                                     }
                                     ],
                                     "SupportedMedia": [
-                                    {
-                                        "MediaType": "MP4"
+                                    {   
+                                        "Id": 1,
+                                        "MediaType": "MP4",
+                                        "DeletedBy": null
                                     },
                                     {
-                                        "MediaType": "JPEG"
+                                        "Id": 2,
+                                        "MediaType": "JPEG",
+                                        "DeletedBy": null
                                     }
                                     ]
                                 }';
@@ -251,14 +257,15 @@ BEGIN
 						OpenTime TIME,
 						CloseTime TIME,
 						AudienceSource NVARCHAR(50),
-						EstimatedImpression INT
+						EstimatedImpression INT,
+                        DeletedBy INT
 						)
 				) AS ca
 			FOR JSON PATH,
 				INCLUDE_NULL_VALUES
 			), '[]');
 
-    EXEC inv.sp_screen_opr_hrs_ins @Json = @ScreenOperatingHrJson OUT;
+    EXEC inv.sp_screen_opr_hrs_tsk @Json = @ScreenOperatingHrJson OUT;
 
     DECLARE @ScreenSupMeidaJson NVARCHAR(MAX) = ISNULL((
 			SELECT  s.id AS [ScreenId],
@@ -268,13 +275,18 @@ BEGIN
 			INNER JOIN #screen AS ts ON s.id = ts.id
 			CROSS APPLY (
 				SELECT *
-				FROM OPENJSON(ts.supported_media) WITH (MediaType NVARCHAR(50))
+				FROM OPENJSON(ts.supported_media) WITH 
+                (
+                    Id INT,
+                    MediaType NVARCHAR(50),
+                    DeletedBy INT    
+                )
 				) AS ca
 			FOR JSON PATH,
 				INCLUDE_NULL_VALUES
 			), '[]');
 
-    EXEC inv.sp_screen_sup_media_ins @Json = @ScreenSupMeidaJson OUT;
+    EXEC inv.sp_screen_sup_media_tsk @Json = @ScreenSupMeidaJson OUT;
 
     COMMIT TRANSACTION;
 

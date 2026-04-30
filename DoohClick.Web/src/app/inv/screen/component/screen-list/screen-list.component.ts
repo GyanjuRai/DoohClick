@@ -1,17 +1,33 @@
-import { Component, Injector, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  Injector,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { AppComponent } from '../../../../app.component';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { ScreenService } from '../../service/screen.service';
 import {
   MvGridResponse,
+  MvListitemDdl,
   MvResponse,
 } from '../../../../shared/model/response.model';
-import { MvScreen } from '../../model/screen.model';
+import { MvScreen, MvScreenFilterOptions } from '../../model/screen.model';
 import { GridConfig } from '../../../../shared/model/grid-config.model';
 import { screenColumn } from '../../model/screen-column';
 import { ResponseStatusEnum } from '../../../../shared';
 import { MenuItem } from 'primeng/api';
 import { screenMenuItem } from '../../model/screen-list-action-items';
+import {
+  MvGridParamOption,
+  MvListitemDdlParam,
+} from '../../../../shared/model/param.model';
+import { ScreenDetailComponent } from '../screen-detail/screen-detail.component';
+import { ScreenAddEditComponent } from '../screen-add-edit/screen-add-edit.component';
+import { ConfirmationOptions } from '../../../../shared/model/confirmation.model';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { TableLazyLoadEvent } from 'primeng/table';
 
 @Component({
   selector: 'screen-list',
@@ -22,7 +38,10 @@ export class ScreenListComponent
   extends AppComponent
   implements OnInit, OnDestroy
 {
+  @ViewChild('screenDetail') screenDetail!: ScreenDetailComponent;
+  @ViewChild('screenAddEdit') screenAddEdit!: ScreenAddEditComponent;
   private __unSubscribeAll$: Subject<any>;
+  private _tenantId!: number;
   gridConfig: GridConfig = {
     column: screenColumn,
     dataSource: {
@@ -40,27 +59,58 @@ export class ScreenListComponent
       },
       offset: 0,
       pageSize: 10,
+      searchText: '',
     },
   };
+  protected formGroup!: FormGroup;
   protected isTableLoading: boolean = false;
   protected actionMenuItems: MenuItem[] = [];
+  protected countryListItemList!: MvListitemDdl[];
+  protected cityListItemList!: MvListitemDdl[];
+  protected orientationListItemList!: MvListitemDdl[];
+  protected ResolutionListItemList!: MvListitemDdl[];
 
   constructor(
     private injector: Injector,
     private _screenService: ScreenService,
+    private fb: FormBuilder,
   ) {
     super(injector);
     this.__unSubscribeAll$ = new Subject<any>();
+    this._tenantId = this.auth.getTenantId();
   }
 
   ngOnInit(): void {
+    this.initForm();
     this.loadScreen();
+    this.loadDdl();
+  }
+
+  initForm() {
+    this.formGroup = this.fb.group({
+      searchText: [],
+      isActive: [],
+      countryCodeList: [],
+      cityList: [],
+      orientationList: [],
+      resolutionList: [],
+    });
   }
 
   loadScreen() {
     this.isTableLoading = true;
-    const param = this.gridConfig.options;
-    param.filter.tenantId = this.auth.getTenantId();
+    const { searchText, ...filterFields } = this.formGroup.value;
+    const param: MvGridParamOption<MvScreenFilterOptions> = {
+      offset: this.gridConfig.options.offset,
+      pageSize: this.gridConfig.options.pageSize,
+      searchText: searchText ?? '',
+      filter: {
+        tenantId: this._tenantId,
+        ...Object.fromEntries(
+          Object.entries(filterFields).filter(([_, v]) => v !== null),
+        ),
+      },
+    };
     this._screenService
       .getGird(param)
       .pipe(
@@ -69,16 +119,89 @@ export class ScreenListComponent
           this.isTableLoading = false;
         }),
       )
-      .subscribe((response: MvResponse<MvGridResponse<MvScreen>>) => {
-        if (
-          response.type === ResponseStatusEnum.success &&
-          response.data?.data
-        ) {
-          this.gridConfig.dataSource.data = [...response.data.data];
-          this.gridConfig.dataSource.totalRows = response.data.totalRows;
-        }
-        this.isTableLoading = false;
+      .subscribe({
+        next: (response: MvResponse<MvGridResponse<MvScreen>>) => {
+          if (
+            response.type === ResponseStatusEnum.success &&
+            response.data?.data
+          ) {
+            this.gridConfig.dataSource.data = [...response.data.data];
+            this.gridConfig.dataSource.totalRows = response.data.totalRows;
+          }
+          this.isTableLoading = false;
+        },
+        error: () => {
+          this.isTableLoading = false;
+        },
       });
+  }
+
+  loadDdl() {
+    this.getCountryDdl();
+    this.getCityDdl();
+    this.getOrientationDdl();
+    this.getResolutionDdl();
+  }
+
+  getCountryDdl() {
+    const param = {
+      categoryCode: 'COUNTRY',
+    } as MvListitemDdlParam;
+    this._listItemService
+      .getDdl(param)
+      .pipe(takeUntil(this.__unSubscribeAll$))
+      .subscribe((response: MvResponse<MvListitemDdl[]>) => {
+        if (response.type === ResponseStatusEnum.success && response.data) {
+          this.countryListItemList = [...response.data];
+        }
+      });
+  }
+
+  getCityDdl() {
+    const param = {
+      categoryCode: 'CITY',
+    } as MvListitemDdlParam;
+    this._listItemService
+      .getDdl(param)
+      .pipe(takeUntil(this.__unSubscribeAll$))
+      .subscribe((response: MvResponse<MvListitemDdl[]>) => {
+        if (response.type === ResponseStatusEnum.success && response.data) {
+          this.cityListItemList = [...response.data];
+        }
+      });
+  }
+
+  getOrientationDdl() {
+    const param = {
+      categoryCode: 'ORIENTATION',
+    } as MvListitemDdlParam;
+    this._listItemService
+      .getDdl(param)
+      .pipe(takeUntil(this.__unSubscribeAll$))
+      .subscribe((response: MvResponse<MvListitemDdl[]>) => {
+        if (response.type === ResponseStatusEnum.success && response.data) {
+          this.orientationListItemList = [...response.data];
+        }
+      });
+  }
+
+  getResolutionDdl() {
+    const param = {
+      categoryCode: 'DEFAULT_RESOLUTION',
+    } as MvListitemDdlParam;
+    this._listItemService
+      .getDdl(param)
+      .pipe(takeUntil(this.__unSubscribeAll$))
+      .subscribe((response: MvResponse<MvListitemDdl[]>) => {
+        if (response.type === ResponseStatusEnum.success && response.data) {
+          this.ResolutionListItemList = [...response.data];
+        }
+      });
+  }
+
+  saveScreen() {
+    const screen = {} as MvScreen;
+    this.screenAddEdit.openDialog(screen);
   }
 
   openActionMenu(event: Event, menu: any, screen: MvScreen) {
@@ -91,11 +214,41 @@ export class ScreenListComponent
     menu.toggle(event);
   }
 
-  onView(screen: MvScreen) {}
+  onView(screen: MvScreen) {
+    this.screenDetail.openDialog(screen);
+  }
 
-  onEdit(screen: MvScreen) {}
+  onEdit(screen: MvScreen) {
+    this.screenAddEdit.openDialog(screen);
+  }
 
-  onDelete(screen: MvScreen) {}
+  onDelete(screen: MvScreen) {
+    const confirmationOptions = {
+      message: `Are you sure you want to delete <b>${screen.name}</b>?`,
+      header: 'Confirm Delete',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger',
+      onAccept: () => {
+        this.showToast('success', 'Success', `Product ${screen.name} deleted.`);
+      },
+    } as ConfirmationOptions;
+    this.openConfirmationBox(confirmationOptions);
+  }
+
+  applyFilter() {
+    this.gridConfig.options.offset = 0;
+    this.loadScreen();
+  }
+
+  resetFiler() {
+    this.formGroup.reset();
+  }
+
+  onPageChange(event: TableLazyLoadEvent) {
+    this.gridConfig.options.offset = event.first ?? 0;
+    this.gridConfig.options.pageSize = event.rows ?? 10;
+    this.loadScreen();
+  }
 
   ngOnDestroy(): void {
     this.__unSubscribeAll$.next(null);

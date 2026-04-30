@@ -5,18 +5,22 @@ import { RouterModule } from '@angular/router';
 import { invRoutes } from './inv.routes';
 import { ScreenAddEditComponent } from './screen/component/screen-add-edit/screen-add-edit.component';
 import { SharedUiModule } from "../shared/module/shared-ui.module";
+import { ScreenDetailComponent } from './screen/component/screen-detail/screen-detail.component';
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 
 
 @NgModule({
   declarations: [
     ScreenListComponent,
-    ScreenAddEditComponent
+    ScreenAddEditComponent,
+    ScreenDetailComponent
   ],
   imports: [
     CommonModule,
     RouterModule.forChild(invRoutes),
-    SharedUiModule
+    SharedUiModule,
+    ReactiveFormsModule,
 ]
 })
 export class InvModule { }

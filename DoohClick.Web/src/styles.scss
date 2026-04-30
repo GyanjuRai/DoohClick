@@ -1,4 +1,4 @@
-@import "primeng/resources/themes/aura-light-green/theme.css";
+@import "primeng/resources/themes/aura-light-teal/theme.css";
 @import "primeng/resources/primeng.css";
 @import "primeflex/primeflex.css";
 @import "primeicons/primeicons.css";
@@ -35,4 +35,8 @@ body {
   border-left: none !important;
   border-right: none !important;
   border-top: none !important;
+}
+
+.p-dialog {
+  border-radius: 4px !important;
 }

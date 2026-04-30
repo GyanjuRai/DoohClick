@@ -3,4 +3,23 @@
   min-height: 80vh;
   padding: 1rem;
   background-color: var(--surface-0) !important;
+
+  display: flex;
+  flex-direction: column;
+
+  .p-datatable {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .p-datatable-wrapper {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .p-paginator {
+    margin-top: auto;
+    border-top: 1px solid var(--surface-200);
+  }
 }

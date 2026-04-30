@@ -109,7 +109,9 @@ try
     builder.Services.AddAppConfigurations(builder.Configuration)
                  .AddAuthorizationPolicies()
                  .AddCoreServices()
-                 .AddApplicationService();
+                 .AddApplicationService()
+                 .AddSharedService();
+
     builder.Services.AddControllers(options =>
     {
         options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));

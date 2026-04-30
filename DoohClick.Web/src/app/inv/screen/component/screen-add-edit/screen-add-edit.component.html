@@ -1,1 +1,31 @@
-<p>screen-add-edit works!</p>
+<p-dialog
+  [modal]="true"
+  [(visible)]="isDialogOpen"
+  [maximizable]="true"
+  [draggable]="false"
+  position="top"
+  [style]="{ width: '70rem', marginTop: '0.5rem' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  (onHide)="close()"
+  header="Screen Details"
+>
+  <form>
+    <p-tabView>
+      <p-tabPanel header="Detail">
+        <div>detail</div>
+      </p-tabPanel>
+
+      <p-tabPanel header="Operating Hours">
+        <div>Operating hour</div>
+      </p-tabPanel>
+
+      <p-tabPanel header="Supported media">
+        <div>Media</div>
+      </p-tabPanel>
+    </p-tabView>
+    <div class="flex justify-content-end gap-2">
+      <p-button label="Cancel" icon="pi pi-times" severity="secondary" />
+      <p-button label="Save" icon="pi pi-save" />
+    </div>
+  </form>
+</p-dialog>

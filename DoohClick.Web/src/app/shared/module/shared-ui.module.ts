@@ -27,6 +27,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { PasswordModule } from 'primeng/password';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { TabViewModule } from 'primeng/tabview';
+import { CalendarModule } from 'primeng/calendar';
 
 import { ConfirmationService, MessageService } from "primeng/api";
 
@@ -59,6 +60,7 @@ const PRIME_NG_MODULES = [
         PasswordModule,
         MultiSelectModule,
         TabViewModule,
+        CalendarModule,
 ];
  
 @NgModule({

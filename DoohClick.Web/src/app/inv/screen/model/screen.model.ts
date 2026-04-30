@@ -36,11 +36,13 @@ export interface MvScreenOperatingHour {
   closeTime: string;
   audienceSource: string;
   estimatedImpression?: number;
+  deletedBy?: number;
 }
 
 export interface MvScreenSupportedMedia {
   id?: number;
   mediaType: string;
+  deletedBy?: number;
 }
 
 export interface MvScreenDelParam {

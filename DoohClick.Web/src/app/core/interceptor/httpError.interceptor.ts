@@ -6,7 +6,15 @@ import {
   HttpRequest,
 } from '@angular/common/http';
 import { Injectable, Injector } from '@angular/core';
-import { catchError, Observable, switchMap, throwError } from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  filter,
+  Observable,
+  switchMap,
+  take,
+  throwError,
+} from 'rxjs';
 import { AppComponent } from '../../app.component';
 import { ROUTE_PATHS } from '../../shared';
 import { MvLoginResponse, MvRefreshTokenParam } from '../model/account.model';
@@ -21,6 +29,7 @@ export class HttpErrorInterceptor
   implements HttpInterceptor
 {
   private isRefreshing = false;
+  private refreshSubject = new BehaviorSubject<string | null>(null);
 
   constructor(
     private accountService: AccountService,
@@ -49,9 +58,21 @@ export class HttpErrorInterceptor
     next: HttpHandler,
   ): Observable<HttpEvent<any>> {
     if (this.isRefreshing) {
-      this.forceLogout();
-      return throwError(() => new Error('Session expired'));
+      return this.refreshSubject.pipe(
+        filter((token) => token !== null),
+        take(1),
+        switchMap((token) =>
+          next.handle(
+            req.clone({
+              setHeaders: { Authorization: `Bearer ${token}` },
+            }),
+          ),
+        ),
+      );
     }
+
+    this.isRefreshing = true;
+    this.refreshSubject.next(null);
 
     const payload = {
       accessToken: this.auth.getAccessToken(),
@@ -59,16 +80,18 @@ export class HttpErrorInterceptor
       userId: this.auth.getUserId(),
     } as MvRefreshTokenParam;
 
-    this.isRefreshing = true;
-
     return this.accountService.refreshToken(payload).pipe(
       switchMap((response: MvResponse<MvLoginResponse>) => {
         this.isRefreshing = false;
         this.auth.setSession(response.data!);
-        const retried = req.clone({
-          setHeaders: { Authorization: `Bearer ${response.data?.accessToken}` },
-        });
-        return next.handle(retried);
+        this.refreshSubject.next(response.data!.accessToken);
+        return next.handle(
+          req.clone({
+            setHeaders: {
+              Authorization: `Bearer ${response.data?.accessToken}`,
+            },
+          }),
+        );
       }),
       catchError(() => {
         this.isRefreshing = false;

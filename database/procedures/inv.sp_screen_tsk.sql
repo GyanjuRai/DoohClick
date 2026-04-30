@@ -229,6 +229,7 @@ BEGIN
         s.normalized_name = ts.normalized_name,
         s.[description] = ts.[description],
         s.[location] = ts.[location],
+        s.city = ts.city,
         s.address_line = ts.address_line,
         s.tag = ts.tag,
         s.is_active = ts.is_active,

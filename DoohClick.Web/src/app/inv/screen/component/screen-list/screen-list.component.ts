@@ -68,7 +68,7 @@ export class ScreenListComponent
   protected countryListItemList!: MvListitemDdl[];
   protected cityListItemList!: MvListitemDdl[];
   protected orientationListItemList!: MvListitemDdl[];
-  protected ResolutionListItemList!: MvListitemDdl[];
+  protected resolutionListItemList!: MvListitemDdl[];
 
   constructor(
     private injector: Injector,
@@ -194,7 +194,7 @@ export class ScreenListComponent
       .pipe(takeUntil(this.__unSubscribeAll$))
       .subscribe((response: MvResponse<MvListitemDdl[]>) => {
         if (response.type === ResponseStatusEnum.success && response.data) {
-          this.ResolutionListItemList = [...response.data];
+          this.resolutionListItemList = [...response.data];
         }
       });
   }

@@ -1,4 +1,3 @@
-
 export interface MvScreen {
   id?: number;
   uuid?: string;
@@ -52,10 +51,10 @@ export interface MvScreenDelParam {
 }
 
 export interface MvScreenFilterOptions {
-    tenantId : number;
-    isActive?: boolean;
-    countryCodeList?: string[];
-    cityList?: string[];
-    orientationList?: string[];
-    resolutionList?: string[];
+  tenantId: number;
+  isActive?: boolean;
+  countryCodeList?: string[];
+  cityList?: string[];
+  orientationList?: string[];
+  resolutionList?: string[];
 }

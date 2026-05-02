@@ -40,3 +40,17 @@ body {
 .p-dialog {
   border-radius: 4px !important;
 }
+
+.p-dialog .p-dialog-header {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--surface-600);
+  padding: 0.6rem;
+}
+
+.p-dialog .p-tabView .p-tabPanel .p-tabPanel-header {
+  font-size: 0.4rem;
+  font-weight: 600;
+  color: var(--surface-600);
+  padding: 0.6rem;
+}

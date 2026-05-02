@@ -28,6 +28,10 @@ import { PasswordModule } from 'primeng/password';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { TabViewModule } from 'primeng/tabview';
 import { CalendarModule } from 'primeng/calendar';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+import { InputTextareaModule } from 'primeng/inputtextarea';
+import { InputSwitchModule } from 'primeng/inputswitch';
 
 import { ConfirmationService, MessageService } from "primeng/api";
 
@@ -61,6 +65,10 @@ const PRIME_NG_MODULES = [
         MultiSelectModule,
         TabViewModule,
         CalendarModule,
+        InputGroupModule,
+        InputGroupAddonModule,
+        InputTextareaModule,
+        InputSwitchModule,
 ];
  
 @NgModule({

@@ -7,7 +7,6 @@ using DoohClick.DataAccess.Data;
 using DoohClick.Model.Shared.Auth;
 using DoohClick.Model.Shared.Response;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -115,6 +114,10 @@ try
     builder.Services.AddControllers(options =>
     {
         options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
+    })
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.Converters.Add(new TimeOnlyJsonConverter());
     });
 
     builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerOptions>();

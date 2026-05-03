@@ -2,23 +2,20 @@ import {
   Component,
   EventEmitter,
   Injector,
-  OnChanges,
   OnDestroy,
   OnInit,
   Output,
-  SimpleChanges,
 } from '@angular/core';
 import {
   MvScreen,
   MvScreenOperatingHour,
   MvScreenSupportedMedia,
 } from '../../model/screen.model';
-import { Subject, takeUntil } from 'rxjs';
+import { from, Subject, takeUntil } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ScreenService } from '../../service/screen.service';
 import { GridColumn } from '../../../../shared/model/grid-config.model';
 import { screenAddEditColumn } from '../../model/screen-add-edit.column';
-import { TableLazyLoadEvent } from 'primeng/table';
 import {
   MvListitemDdl,
   MvResponse,
@@ -98,6 +95,14 @@ export class ScreenAddEditComponent
       isActive: [this.screen?.isActive ?? true],
       ratePerHour: [this.screen?.ratePerHour ?? null, Validators.required],
       currency: [this.screen?.currency ?? '', Validators.required],
+
+      operatingHour: this.fb.group({
+        dayOfWeek: [null],
+        openTime: [this.getDefaultTime()],
+        closeTime: [this.getDefaultTime()],
+        estimatedImpression: [null],
+        audienceSource: [null],
+      }),
     });
   }
 
@@ -245,6 +250,10 @@ export class ScreenAddEditComponent
     return this.screen?.id ? 'Screen details' : 'Create new screen';
   }
 
+  protected get action(): string {
+    return this.screen?.id ? 'edit' : 'save';
+  }
+
   public openDialog(screen: MvScreen) {
     if (screen) {
       this.screen = screen;
@@ -255,41 +264,112 @@ export class ScreenAddEditComponent
       this.screen = {} as MvScreen;
       this.operatingHourList = [];
       this.supportedMediaList = [];
-      this.formGroup.reset(this.screen);
+      this.formGroup.reset();
     }
     this.isDialogOpen = true;
   }
 
-  protected _afterClose(action: string) {
+  protected onDialogShow() {
+    this.formGroup.get('operatingHour')?.patchValue({
+      dayOfWeek: null,
+      openTime: this.getDefaultTime(),
+      closeTime: this.getDefaultTime(),
+      estimatedImpression: null,
+      audienceSource: null,
+    });
+  }
 
-    if(action === "cancel"){
+  protected _afterClose(action: string) {
+    if (action === 'cancel') {
       this.close();
       return;
-    }
-    if (this.formGroup.invalid) {
-      this.formGroup.markAllAsTouched();
-      return;
-    }
+    } else {
+      if (this.formGroup.valid && (this.formGroup.dirty || action === 'edit')) {
+        let param: MvScreen = this.buildPayload(); 
 
-    if (this.formGroup.dirty) {
-      console.log(this.buildPayload());
+        this._screenService
+          .save(param)
+          .pipe(takeUntil(this.__unSubscribeAll$))
+          .subscribe({
+            next: (response: MvResponse<MvScreen>) => {
+              if (
+                response.type === ResponseStatusEnum.success &&
+                response.data
+              ) {
+                this.showToast(
+                  'success',
+                  'Screen Saved',
+                  `Screen ${response.data.name} saved!`,
+                );
+                this.close(response.data);
+              }
+            },
+            error: () => {
+              this.showToast(
+                'error',
+                'Failed to save',
+                `Failed to save screen ${param.name}`,
+              );
+            },
+          });
+      }
     }
-    this.close();
+  }
+
+  protected onAddOperatingHour() {
+    const oh = this.formGroup.get('operatingHour')?.value;
+    this.operatingHourList.push({
+      ...oh,
+      openTime: this.toTimeString(oh.openTime),
+      closeTime: this.toTimeString(oh.closeTime),
+      deletedBy: null,
+    });
+    this.formGroup.get('operatingHour')?.reset({
+      dayOfWeek: null,
+      openTime: this.getDefaultTime(),
+      closeTime: this.getDefaultTime(),
+      estimatedImpression: null,
+      audienceSource: null,
+    });
+  }
+
+  protected onRemoveOperatingHour(oh: MvScreenOperatingHour) {
+    if (oh.id) {
+      oh.deletedBy = this.auth.getUserId();
+    } else {
+      this.operatingHourList = this.operatingHourList.filter((x) => x !== oh);
+    }
+  }
+
+  protected get visibleOperatingHour() {
+    return this.operatingHourList.filter((x) => x.deletedBy === null);
   }
 
   protected onRemoveMedia(media: MvScreenSupportedMedia): void {
-    this.supportedMediaList = this.supportedMediaList.filter(
-      (x) => x.mediaType !== media.mediaType,
-    );
+    if (media.id) {
+      media.deletedBy = this.auth.getUserId();
+    } else {
+      this.supportedMediaList = this.supportedMediaList.filter(
+        (x) => x.mediaType !== media.mediaType,
+      );
+    }
   }
 
-  onAddMedia(event: any): void {
+  protected onAddMedia(event: any): void {
     const already = this.supportedMediaList.some(
       (x) => x.mediaType === event.value,
     );
     if (!already) {
-      this.supportedMediaList.push({ mediaType: event.value });
+      this.supportedMediaList.push({
+        id: null as any,
+        mediaType: event.value,
+        deletedBy: null as any,
+      });
     }
+  }
+
+  protected get visibleSupportedMedia() {
+    return this.supportedMediaList.filter((x) => x.deletedBy === null);
   }
 
   private buildPayload(): MvScreen {
@@ -297,11 +377,11 @@ export class ScreenAddEditComponent
 
     return {
       id: this.screen?.id,
-      tenantId: this.screen?.tenantId,
+      tenantId: this.screen?.tenantId || this.auth.getTenantId(),
       name: fg.name,
       screenCode: fg.screenCode,
       description: fg.description,
-      defaultResolution: fg.defgaultResolution,
+      defaultResolution: fg.defaultResolution,
       orientation: fg.orientation,
       timezone: fg.timezone,
       countryCode: fg.countryCode,
@@ -312,13 +392,26 @@ export class ScreenAddEditComponent
       isActive: fg.isActive,
       ratePerHour: fg.ratePerHour,
       currency: fg.currency,
-      createdAt: this.screen?.createdAt ?? new Date().toISOString(),
       operatingHour: this.operatingHourList,
       supportedMedia: this.supportedMediaList,
     };
   }
 
-  protected close() {
+  private getDefaultTime(): Date {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  private toTimeString(date: Date | null): string {
+    if (!date) return '00:00:00';
+    const h = date.getHours().toString().padStart(2, '0');
+    const m = date.getMinutes().toString().padStart(2, '0');
+    return `${h}:${m}:00`;
+  }
+
+  private close(screen: MvScreen | null = null) {
+    this.afterClosed.emit(screen);
     this.screen = {} as MvScreen;
     this.isDialogOpen = false;
     this.operatingHourList = [];

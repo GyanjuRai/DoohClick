@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { DialogModule } from "primeng/dialog";
 import { MvScreen } from '../../model/screen.model';
 
 @Component({
@@ -9,7 +8,7 @@ import { MvScreen } from '../../model/screen.model';
 })
 export class ScreenDetailComponent {
   protected isDialogOpen: boolean = false;
-  protected screen!: MvScreen;
+  protected screen: MvScreen = {} as MvScreen;
 
   public openDialog(screen: MvScreen) {
     this.screen = screen;

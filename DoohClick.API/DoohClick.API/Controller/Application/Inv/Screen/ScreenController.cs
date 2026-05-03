@@ -3,9 +3,11 @@ using DoohClick.API.Helper;
 using DoohClick.Interface.Application.Inv.Screen;
 using DoohClick.Model.Application.Inv.Screen;
 using DoohClick.Model.Shared.AppClaim;
+using DoohClick.Model.Shared.CodePrefix;
 using DoohClick.Model.Shared.Enum.Response;
 using DoohClick.Model.Shared.Param;
 using DoohClick.Model.Shared.Response;
+using DoohClick.Service.Shared.Helper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -42,6 +44,7 @@ namespace DoohClick.API.Controller.Application.Inv.Screen
             MvScreen screen = param;
             screen.CreatedBy = ClaimsPrincipalExtensions.GetUserId(User);
             screen.TenantId = ClaimsPrincipalExtensions.GetTenantId(User);
+            screen.ScreenCode = CodeGenerator.Generate(CodePrefix.Screen, ClaimsPrincipalExtensions.GetTenantCode(User));
 
             MvScreen? result = await _screenService.Save(screen);
             if (result is null)

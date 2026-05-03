@@ -199,7 +199,7 @@ export class ScreenListComponent
       });
   }
 
-  saveScreen() {
+  addScreen() {
     const screen = {} as MvScreen;
     this.screenAddEdit.openDialog(screen);
   }
@@ -222,6 +222,21 @@ export class ScreenListComponent
     this.screenAddEdit.openDialog(screen);
   }
 
+  afterFormClose(screen: MvScreen | null) {
+    if (screen !== null) {
+      const index = this.gridConfig.dataSource.data.findIndex(
+        (s) => (s.id = screen.id),
+      );
+      if (index > -1) {
+        this.gridConfig.dataSource.data[index] === screen;
+      } else {
+        this.gridConfig.dataSource.data.unshift(screen);
+        this.gridConfig.dataSource.totalRows++;
+      }
+      this.gridConfig.dataSource.data = [...this.gridConfig.dataSource.data];
+    }
+  }
+
   onDelete(screen: MvScreen) {
     const confirmationOptions = {
       message: `Are you sure you want to delete <b>${screen.name}</b>?`,
@@ -242,6 +257,11 @@ export class ScreenListComponent
 
   resetFiler() {
     this.formGroup.reset();
+  }
+
+  protected onRefresh() {
+    this.loadScreen();
+    this.resetFiler();
   }
 
   onPageChange(event: TableLazyLoadEvent) {

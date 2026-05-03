@@ -17,7 +17,7 @@ DECLARE @Json NVARCHAR(MAX) = N'{
                                     "OrientationList": [],
                                     "ResolutionList": []
                                  },
-                                 "SearchText": "zs",
+                                 "SearchText": "",
                                  "Offset": 0,
                                  "PageSize": 10
                                 }';

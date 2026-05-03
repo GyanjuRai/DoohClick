@@ -1,3 +1,4 @@
+<p-toast></p-toast>
 <p-dialog
   [modal]="true"
   [(visible)]="isDialogOpen"
@@ -7,6 +8,7 @@
   [style]="{ width: '75rem', height: '75vh', marginTop: '0.5rem' }"
   [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
   (onHide)="_afterClose('cancel')"
+  (onShow)="onDialogShow()"
 >
   <ng-template pTemplate="header">
     <span>{{ dialogHeader }}</span>
@@ -176,10 +178,11 @@
             </div>
           </ng-template>
 
-          <div class="operation-row">
+          <div class="operation-row" formGroupName="operatingHour">
             <div class="op-field">
               <label class="op-label">Day</label>
               <p-dropdown
+                formControlName="dayOfWeek"
                 placeholder="Select"
                 [options]="dayList"
                 optionLabel="item"
@@ -191,8 +194,9 @@
             <div class="op-field">
               <label class="op-label">Open Time</label>
               <p-calendar
+                formControlName="openTime"
                 [inline]="true"
-                [hourFormat]="'12'"
+                [hourFormat]="'24'"
                 [timeOnly]="true"
                 styleClass="op-calendar"
               ></p-calendar>
@@ -201,8 +205,9 @@
             <div class="op-field">
               <label class="op-label">Close Time</label>
               <p-calendar
+                formControlName="closeTime"
                 [inline]="true"
-                [hourFormat]="'12'"
+                [hourFormat]="'24'"
                 [timeOnly]="true"
                 styleClass="op-calendar"
               ></p-calendar>
@@ -210,13 +215,17 @@
 
             <div class="op-field">
               <label class="op-label">Audience</label>
-              <p-inputNumber styleClass="op-input-number" />
+              <p-inputNumber
+                formControlName="estimatedImpression"
+                styleClass="op-input-number"
+              />
             </div>
 
             <div class="op-field">
               <label class="op-label">Audience source</label>
               <p-dropdown
                 [options]="audienceSourceList"
+                formControlName="audienceSource"
                 optionLabel="item"
                 optionValue="code"
                 placeholder="Select"
@@ -230,6 +239,7 @@
                 icon="pi pi-plus"
                 label="Add"
                 styleClass="op-add-btn"
+                (onClick)="onAddOperatingHour()"
               ></p-button>
             </div>
           </div>
@@ -238,7 +248,7 @@
             <p-table
               [columns]="columns"
               [rows]="10"
-              [value]="operatingHourList"
+              [value]="visibleOperatingHour"
               [scrollable]="true"
               scrollHeight="300px"
             >
@@ -262,7 +272,11 @@
                           icon="pi pi-trash"
                           severity="danger"
                           [text]="true"
+                          (onClick)="onRemoveOperatingHour(oh)"
                         />
+                      </ng-container>
+                      <ng-container *ngSwitchCase="'date'">
+                        {{ "1970-01-01T" + oh[col.name] | date: "hh:mm a" }}
                       </ng-container>
                       <ng-container *ngSwitchDefault>
                         {{ oh[col.name] }}
@@ -330,7 +344,7 @@
           </div>
           <div class="flex flex-wrap align-items-center gap-2">
             <p-chip
-              *ngFor="let media of supportedMediaList"
+              *ngFor="let media of visibleSupportedMedia"
               [label]="media.mediaType"
               [removable]="true"
               (onRemove)="onRemoveMedia(media)"
@@ -360,7 +374,7 @@
       />
       <p-button
         label="Save"
-        (onClick)="_afterClose('save')"
+        (onClick)="_afterClose(action)"
         icon="pi pi-save"
       />
     </div>

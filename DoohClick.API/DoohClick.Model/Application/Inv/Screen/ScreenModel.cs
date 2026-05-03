@@ -19,7 +19,7 @@ namespace DoohClick.Model.Application.Inv.Screen
         public string? TenantName { get; set; }
         public required string Name { get; set; }
         public string? NormalizedName { get; set; }
-        public required string ScreenCode { get; set; }
+        public string? ScreenCode { get; set; }
         public string? Description { get; set; }
         public required string DefaultResolution { get; set; }
         public required string Orientation { get; set; }
@@ -38,7 +38,7 @@ namespace DoohClick.Model.Application.Inv.Screen
         public string? Creator { get; set; }
         public int? UpdatedBy { get; set; }
         public string? Modifier { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
     }
 
@@ -46,8 +46,8 @@ namespace DoohClick.Model.Application.Inv.Screen
     {
         public int? Id { get; set; }
         public required string DayOfWeek { get; set; }
-        public required string OpenTime { get; set; }
-        public required string CloseTime { get; set; }
+        public required TimeOnly OpenTime { get; set; }
+        public required TimeOnly CloseTime { get; set; }
         public required string AudienceSource { get; set; }
         public int? EstimatedImpression { get; set; }
         public int? DeletedBy { get; set; }

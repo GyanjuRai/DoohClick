@@ -24,7 +24,7 @@ export interface MvScreen {
   creator?: string;
   updatedBy?: number;
   modifier?: string;
-  createdAt: string;
+  createdAt?: string;
   updatedAt?: string;
 }
 

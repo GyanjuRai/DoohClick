@@ -127,13 +127,14 @@
             icon="pi pi-plus"
             label="Add Screen"
             size="small"
-            (onClick)="saveScreen()"
+            (onClick)="addScreen()"
           />
           <p-button
             icon="pi pi-refresh"
             label="Refresh"
             size="small"
             severity="secondary"
+            (onClick)="onRefresh()"
           >
           </p-button>
         </div>
@@ -151,11 +152,11 @@
       </tr>
     </ng-template>
 
-    <ng-template pTemplate="body">
+    <ng-template pTemplate="body" let-screen>
       <ng-container
         *ngIf="gridConfig.dataSource.totalRows > 0; else noDataGrid"
       >
-        <tr *ngFor="let screen of gridConfig.dataSource.data">
+        <tr>
           <td *ngFor="let col of gridConfig.column">
             <ng-container *ngIf="col.name === 'action'; else dateCheck">
               <div class="flex justify-content-center">
@@ -215,5 +216,5 @@
 </div>
 
 <screen-detail #screenDetail></screen-detail>
-<screen-add-edit #screenAddEdit></screen-add-edit>
+<screen-add-edit #screenAddEdit (afterClosed)="afterFormClose($event)"></screen-add-edit>
 <p-confirmDialog></p-confirmDialog>

@@ -9,12 +9,12 @@ export const screenAddEditColumn = [
   {
     name: 'openTime',
     displayName: 'Open time',
-    type: 'text',
+    type: 'date',
   },
   {
     name: 'closeTime',
     displayName: 'Close time',
-    type: 'text',
+    type: 'date',
   },
   {
     name: 'estimatedImpression',

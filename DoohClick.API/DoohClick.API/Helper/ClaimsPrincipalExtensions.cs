@@ -16,6 +16,17 @@ namespace DoohClick.API.Helper
             return tenantId;
         }
 
+        public static string GetTenantCode(this ClaimsPrincipal user)
+        {
+            string? tenantCodeClaim = user.FindFirst(AppClaim.TenantCode)?.Value;
+            if (tenantCodeClaim == null || string.IsNullOrEmpty(tenantCodeClaim))
+            {
+                throw new AuthException("Session has expired.");
+            }
+
+            return tenantCodeClaim;
+        }
+
         public static int GetUserId(this ClaimsPrincipal user)
         {
             string? userIdClaim = user.FindFirst(AppClaim.UserId)?.Value;

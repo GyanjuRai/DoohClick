@@ -18,11 +18,11 @@ export class ScreenService {
     return this.api.get('inv/screen/grid', param, true);
   }
 
-  save() {
-    return this.api.post('', {});
+  save(param: MvScreen): Observable<MvResponse<MvScreen>> {
+    return this.api.post('inv/screens', param);
   }
 
-  remove() {
-    return this.api.delete('');
+  remove(id: number) {
+    return this.api.delete(`inv/screen/${id}`);
   }
 }

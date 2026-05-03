@@ -3,6 +3,7 @@ using DoohClick.DataAccess.Dapper;
 using DoohClick.Interface.Application.Inv.Screen;
 using DoohClick.Interface.Shared.JsonSerializer;
 using DoohClick.Model.Application.Inv.Screen;
+using DoohClick.Model.Shared.AppClaim;
 using DoohClick.Model.Shared.Param;
 using DoohClick.Model.Shared.Response;
 using DoohClick.Service.Shared.Base;

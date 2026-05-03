@@ -1,12 +1,20 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AdvertiserListComponent } from './advertiser/component/advertiser-list/advertiser-list.component';
+import { AdvertiserAddEditComponent } from './advertiser/component/advertiser-add-edit/advertiser-add-edit.component';
+import { RouterModule } from '@angular/router';
+import { crmRoutes } from './crm.routes';
 
 
 
 @NgModule({
-  declarations: [],
+  declarations: [
+    AdvertiserListComponent,
+    AdvertiserAddEditComponent
+  ],
   imports: [
-    CommonModule
+    CommonModule,
+    RouterModule.forChild(crmRoutes)
   ]
 })
 export class CrmModule { }

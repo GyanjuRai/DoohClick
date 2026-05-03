@@ -34,7 +34,7 @@ namespace DoohClick.DataAccess.Dapper
                 DynamicParameters param = new();
                 param.Add("@Json", json, DbType.String, direction: ParameterDirection.InputOutput);
                 await con.ExecuteAsync(sp, param, commandType: CommandType.StoredProcedure);
-                return param.Get<String>("@Json") ?? "{}";
+                return param.Get<string>("@Json") ?? "{}";
             }
             catch (SqlException ex)
             {

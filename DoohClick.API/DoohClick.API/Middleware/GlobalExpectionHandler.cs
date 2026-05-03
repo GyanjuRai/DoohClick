@@ -1,4 +1,4 @@
-﻿using DoohClick.Model.Shared.Enum.ResponseEnum;
+﻿using DoohClick.Model.Shared.Enum.Response;
 using DoohClick.Model.Shared.Exceptions;
 using DoohClick.Model.Shared.Response;
 
@@ -41,6 +41,7 @@ namespace DoohClick.API.Middleware
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             string message = _env.IsDevelopment() ? ex.Message : "An unexpected error occurred.";
             await context.Response.WriteAsJsonAsync(ApiResponse.Failure(message, ResponseStatusEnum.ServerError.ToString()));
-            }
+        }
+
     }
 }

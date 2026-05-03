@@ -1,0 +1,382 @@
+<p-toast></p-toast>
+<p-dialog
+  [modal]="true"
+  [(visible)]="isDialogOpen"
+  [maximizable]="true"
+  [draggable]="false"
+  position="top"
+  [style]="{ width: '75rem', height: '75vh', marginTop: '0.5rem' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  (onHide)="_afterClose('cancel')"
+  (onShow)="onDialogShow()"
+>
+  <ng-template pTemplate="header">
+    <span>{{ dialogHeader }}</span>
+  </ng-template>
+
+  <form [formGroup]="formGroup">
+    <p-tabView>
+      <p-tabPanel rightIcon="pi pi-info-circle">
+        <ng-template pTemplate="header">
+          <span class="tab-label">General</span>
+        </ng-template>
+
+        <div class="dialog-section">
+          <div class="dialog-section-header">
+            <span class="dialog-section-title">Basic information</span>
+            <span class="dialog-section-sub"
+              >Identity and display configuration of this screen</span
+            >
+          </div>
+          <div class="formgrid grid">
+            <div class="field col-12 md:col-6">
+              <label>Name</label>
+              <input pInputText formControlName="name" class="w-full" />
+            </div>
+            <div class="field col-12">
+              <label>Description</label>
+              <textarea
+                pInputTextarea
+                class="w-full"
+                formControlName="description"
+                rows="4"
+                autoResize="true"
+              ></textarea>
+            </div>
+            <div class="field col-12 md:col-4">
+              <label>Default resolution</label>
+              <p-dropdown
+                [options]="resolutionListItemList"
+                formControlName="defaultResolution"
+                optionLabel="item"
+                optionValue="code"
+                placeholder="Select"
+                styleClass="w-full"
+              />
+            </div>
+            <div class="field col-12 md:col-4">
+              <label>Orientation</label>
+              <p-dropdown
+                [options]="orientationListItemList"
+                formControlName="orientation"
+                optionLabel="item"
+                optionValue="code"
+                placeholder="Select"
+                styleClass="w-full"
+              />
+            </div>
+            <div class="field col-12 md:col-4">
+              <label>Timezone</label>
+              <p-dropdown
+                [options]="timezoneListItemList"
+                formControlName="timezone"
+                optionLabel="item"
+                optionValue="code"
+                placeholder="Select"
+                [filter]="true"
+                [appendTo]="'body'"
+                styleClass="w-full"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog-section">
+          <div class="dialog-section-header">
+            <span class="dialog-section-title">Location</span>
+            <span class="dialog-section-sub">Physical placement details</span>
+          </div>
+          <div class="formgrid grid">
+            <div class="field col-12 md:col-6">
+              <label>Country</label>
+              <p-dropdown
+                [options]="countryListItemList"
+                formControlName="countryCode"
+                optionLabel="item"
+                optionValue="code"
+                placeholder="Select"
+                [filter]="true"
+                [appendTo]="'body'"
+                styleClass="w-full"
+              />
+            </div>
+            <div class="field col-12 md:col-6">
+              <label>City</label>
+              <p-dropdown
+                [options]="cityListItemList"
+                formControlName="city"
+                optionLabel="item"
+                optionValue="code"
+                placeholder="Select"
+                [filter]="true"
+                [appendTo]="'body'"
+                styleClass="w-full"
+              />
+            </div>
+            <div class="field col-12 md:col-6">
+              <label>Location</label>
+              <input formControlName="location" pInputText class="w-full" />
+            </div>
+            <div class="field col-12 md:col-6">
+              <label>Address line</label>
+              <input formControlName="addressLine" pInputText class="w-full" />
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog-section">
+          <div class="dialog-section-header">
+            <span class="dialog-section-title">Tags & status</span>
+            <span class="dialog-section-sub"
+              >Categorization and advertiser visibility</span
+            >
+          </div>
+          <div class="formgrid grid">
+            <div class="field col-12 md:col-9">
+              <label>Tags</label>
+              <p-multiSelect
+                [options]="screenTagList"
+                formControlName="tag"
+                optionLabel="item"
+                optionValue="code"
+                placeholder="Select tags"
+                display="chip"
+                [appendTo]="'body'"
+                styleClass="w-full"
+              />
+            </div>
+            <div class="field col-12 md:col-3">
+              <label>Status</label>
+              <div class="flex align-items-center gap-2 mt-1">
+                <p-inputSwitch
+                  [formControl]="$any(formGroup.get('isActive'))"
+                />
+                <span class="text-sm text-color-secondary">
+                  {{ formGroup.get("isActive")?.value ? "Active" : "Inactive" }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-tabPanel>
+
+      <p-tabPanel rightIcon="pi pi-clock">
+        <ng-template pTemplate="header">
+          <span class="tab-label">Operation </span>
+        </ng-template>
+
+        <p-card styleClass="operation-card">
+          <ng-template pTemplate="header">
+            <div class="operation-card-header">
+              <span class="op-title"
+                >Screen Operating Hours & Audience Reach</span
+              >
+              <span class="op-subtitle"
+                >Defines operating hours and audience reach for each time
+                period</span
+              >
+            </div>
+          </ng-template>
+
+          <div class="operation-row" formGroupName="operatingHour">
+            <div class="op-field">
+              <label class="op-label">Day</label>
+              <p-dropdown
+                formControlName="dayOfWeek"
+                placeholder="Select"
+                [options]="dayList"
+                optionLabel="item"
+                optionValue="code"
+                styleClass="op-dropdown"
+              ></p-dropdown>
+            </div>
+
+            <div class="op-field">
+              <label class="op-label">Open Time</label>
+              <p-calendar
+                formControlName="openTime"
+                [inline]="true"
+                [hourFormat]="'24'"
+                [timeOnly]="true"
+                styleClass="op-calendar"
+              ></p-calendar>
+            </div>
+
+            <div class="op-field">
+              <label class="op-label">Close Time</label>
+              <p-calendar
+                formControlName="closeTime"
+                [inline]="true"
+                [hourFormat]="'24'"
+                [timeOnly]="true"
+                styleClass="op-calendar"
+              ></p-calendar>
+            </div>
+
+            <div class="op-field">
+              <label class="op-label">Audience</label>
+              <p-inputNumber
+                formControlName="estimatedImpression"
+                styleClass="op-input-number"
+              />
+            </div>
+
+            <div class="op-field">
+              <label class="op-label">Audience source</label>
+              <p-dropdown
+                [options]="audienceSourceList"
+                formControlName="audienceSource"
+                optionLabel="item"
+                optionValue="code"
+                placeholder="Select"
+                styleClass="op-dropdown"
+              ></p-dropdown>
+            </div>
+
+            <div class="op-field op-field--btn">
+              <label class="op-label">&nbsp;</label>
+              <p-button
+                icon="pi pi-plus"
+                label="Add"
+                styleClass="op-add-btn"
+                (onClick)="onAddOperatingHour()"
+              ></p-button>
+            </div>
+          </div>
+
+          <div class="operation-table-area">
+            <p-table
+              [columns]="columns"
+              [rows]="10"
+              [value]="visibleOperatingHour"
+              [scrollable]="true"
+              scrollHeight="300px"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th
+                    *ngFor="let col of columns"
+                    [style.width]="col.width || '5rem'"
+                  >
+                    {{ col.displayName }}
+                  </th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-oh>
+                <tr>
+                  <td *ngFor="let col of columns">
+                    <ng-container [ngSwitch]="col.type">
+                      <ng-container *ngSwitchCase="'action'">
+                        <p-button
+                          icon="pi pi-trash"
+                          severity="danger"
+                          [text]="true"
+                          (onClick)="onRemoveOperatingHour(oh)"
+                        />
+                      </ng-container>
+                      <ng-container *ngSwitchCase="'date'">
+                        {{ "1970-01-01T" + oh[col.name] | date: "hh:mm a" }}
+                      </ng-container>
+                      <ng-container *ngSwitchDefault>
+                        {{ oh[col.name] }}
+                      </ng-container>
+                    </ng-container>
+                  </td>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td [attr.colspan]="columns.length" class="text-center p-4">
+                    <p class="m-0">No entires</p>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </p-card>
+      </p-tabPanel>
+      <p-tabPanel rightIcon="pi pi pi-image">
+        <ng-template pTemplate="header">
+          <span class="tab-label">Pricing & Media </span>
+        </ng-template>
+
+        <div class="dialog-section">
+          <div class="dialog-section-header">
+            <span class="dialog-section-title">Pricing</span>
+            <span class="dialog-section-sub"
+              >Rate charged to advertisers per hour of screen time</span
+            >
+          </div>
+          <div class="formgrid grid">
+            <div class="field col-12 md:col-6">
+              <label>Rate per hour</label>
+              <p-inputNumber
+                formControlName="ratePerHour"
+                styleClass="w-full"
+                [minFractionDigits]="2"
+                [maxFractionDigits]="2"
+              />
+            </div>
+            <div class="field col-12 md:col-6">
+              <label>Currency</label>
+              <p-dropdown
+                [options]="currencyListItemList"
+                formControlName="currency"
+                optionLabel="item"
+                optionValue="code"
+                placeholder="Select"
+                [filter]="true"
+                [appendTo]="'body'"
+                styleClass="w-full"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="dialog-section">
+          <div class="dialog-section-header">
+            <span class="dialog-section-title">Supported media</span>
+            <span class="dialog-section-sub"
+              >File types this screen can accept for campaign playback</span
+            >
+          </div>
+          <div class="flex flex-wrap align-items-center gap-2">
+            <p-chip
+              *ngFor="let media of visibleSupportedMedia"
+              [label]="media.mediaType"
+              [removable]="true"
+              (onRemove)="onRemoveMedia(media)"
+            />
+            <p-dropdown
+              [options]="mediaTypeListItemList"
+              optionLabel="item"
+              optionValue="code"
+              placeholder="+ Add media type"
+              styleClass="media-add-dropdown"
+              [appendTo]="'body'"
+              (onChange)="onAddMedia($event)"
+            />
+          </div>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <p-button
+        label="Cancel"
+        (onClick)="_afterClose('cancel')"
+        icon="pi pi-times"
+        severity="secondary"
+      />
+      <p-button
+        label="Save"
+        (onClick)="_afterClose(action)"
+        icon="pi pi-save"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

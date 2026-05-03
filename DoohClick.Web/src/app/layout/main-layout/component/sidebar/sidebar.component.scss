@@ -1,0 +1,23 @@
+
+::ng-deep p-sidebar .p-sidebar-left {
+  width: var(--sidebar-width) !important;
+}
+
+::ng-deep .logout-btn {
+  &:hover {
+    color: var(--red-400) !important;
+  }
+}
+
+.text-primary {
+  color: var(--primary-text);
+}
+
+li.active > a {
+  color: var(--primary-color) !important;
+  font-weight: 600;
+}
+
+li.active > a span {
+  color: inherit;
+}

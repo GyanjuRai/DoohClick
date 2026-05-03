@@ -1,0 +1,24 @@
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+::ng-deep .p-menubar {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+  background-color: var(--surface-0) !important;
+}
+
+.text-primary {
+  color: var(--primary-text);
+}
+
+.p-menubar {
+  border-radius: 0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+}

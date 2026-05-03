@@ -1,11 +1,13 @@
 
 using DoohClick.API.Config;
 using DoohClick.API.Const;
+using DoohClick.API.Helper;
 using DoohClick.API.Middleware;
-using DoohClick.DataAccess.Dapper;
 using DoohClick.DataAccess.Data;
 using DoohClick.Model.Shared.Auth;
+using DoohClick.Model.Shared.Response;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -71,7 +73,7 @@ try
     })
     .AddJwtBearer(options =>
     {
-        options.RequireHttpsMetadata = true;
+        options.RequireHttpsMetadata = builder.Environment.IsProduction();
         options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -81,22 +83,24 @@ try
             ValidAudience = jwtConfig.Audience,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Secret)),
+            ClockSkew = TimeSpan.Zero
         };
 
         options.Events = new JwtBearerEvents
         {
-            OnAuthenticationFailed = context =>
+            OnChallenge = context =>
             {
-                context.Response.OnStarting(
-                    async () =>
-                    {
-                        context.NoResult();
-                        context.Response.Headers.Append("Token-Expired", "ture");
-                        context.Response.ContentType = "application/plain";
-                        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                        await context.Response.WriteAsync(context.Exception.Message);
-                    });
-                return Task.CompletedTask;
+                context.HandleResponse();
+
+                bool tokenExpired = context.AuthenticateFailure is SecurityTokenExpiredException;
+                
+                context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                context.Response.ContentType = "application/json";
+                
+                if(tokenExpired)
+                    context.Response.Headers.Append("Token-Expired", "true");
+
+                return context.Response.WriteAsJsonAsync(ApiResponse.Failure(tokenExpired ? "Session has expired" : "Invalid token"));
             }
         };
     });
@@ -104,8 +108,17 @@ try
     builder.Services.AddAppConfigurations(builder.Configuration)
                  .AddAuthorizationPolicies()
                  .AddCoreServices()
-                 .AddApplicationService();
-    builder.Services.AddControllers();
+                 .AddApplicationService()
+                 .AddSharedService();
+
+    builder.Services.AddControllers(options =>
+    {
+        options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
+    })
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.Converters.Add(new TimeOnlyJsonConverter());
+    });
 
     builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerOptions>();
 
@@ -156,6 +169,8 @@ try
     app.UseMiddleware<GlobalExpectionHandler>();
 
     app.UseSerilogRequestLogging();
+
+    app.UseCors(AppConst.POLICY_NAME);
 
     app.UseAuthentication();
 

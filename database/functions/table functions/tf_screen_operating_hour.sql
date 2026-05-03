@@ -14,7 +14,7 @@ RETURN
                         oh2.audience_source, 
                         oh2.estimated_impression
                 FROM inv.screen_operating_hour oh2
-                WHERE oh2.screen_id = oh.screen_id
+                WHERE oh2.screen_id = oh.screen_id AND oh2.is_deleted = 0
                 FOR JSON PATH, INCLUDE_NULL_VALUES
             ) AS operating_hour
         FROM inv.screen_operating_hour oh

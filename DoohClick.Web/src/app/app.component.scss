@@ -1,0 +1,14 @@
+.toast-lg {
+  .p-toast-message {
+    padding: 1.25rem 1.5rem;
+    min-width: 320px;
+
+    .p-toast-summary {
+      font-size: 1rem;
+    }
+
+    .p-toast-detail {
+      font-size: 0.875rem;
+    }
+  }
+}

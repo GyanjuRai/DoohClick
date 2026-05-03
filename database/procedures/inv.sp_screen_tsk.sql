@@ -20,36 +20,42 @@ DECLARE @Json NVARCHAR(MAX) = N'{
                                     "AddressLine": "1560 Broadway, New York, NY 10036",
                                     "Tag": "[\"outdoor\",\"premium\",\"high-traffic\"]",
                                     "CountryCode": "US",
-                                    "City": "NEWYORK",
+                                    "City": "NYC",
                                     "Timezone": "AMERICA/NEWYORK",
                                     "IsActive": true,
                                     "RatePerHour": 100000.00,
                                     "Currency": "USD",
-                                    "UserId": 1,
+                                    "CreatedBy": 1,
                                     "OperatingHour": [
                                     {
-                                        "Id": null,
+                                        "Id": 1,
                                         "DayOfWeek": "SUNDAY",
                                         "OpenTime": "06:00",
                                         "CloseTime": "23:00",
                                         "AudienceSource": "FOOTTRAFFICSENSOR",
-                                        "EstimatedImpression": 5000000
+                                        "EstimatedImpression": 5000000,
+                                        "DeletedBy": null
                                     },
                                     {
-                                        "Id": null,
+                                        "Id": 2,
                                         "DayOfWeek": "SATURDAY",
                                         "OpenTime": "08:00",
                                         "CloseTime": "00:00",
                                         "AudienceSource": "FOOTTRAFFICSENSOR",
-                                        "EstimatedImpression": 7500000
+                                        "EstimatedImpression": 7500000,
+                                        "DeletedBy": 1
                                     }
                                     ],
                                     "SupportedMedia": [
-                                    {
-                                        "MediaType": "MP4"
+                                    {   
+                                        "Id": 1,
+                                        "MediaType": "MP4",
+                                        "DeletedBy": null
                                     },
                                     {
-                                        "MediaType": "JPEG"
+                                        "Id": 2,
+                                        "MediaType": "JPEG",
+                                        "DeletedBy": null
                                     }
                                     ]
                                 }';
@@ -87,7 +93,7 @@ BEGIN
 	        orientation			NVARCHAR(50) NOT NULL,
 	        [location]			NVARCHAR(100) NOT NULL,
 	        address_line		NVARCHAR(200) NULL,
-	        tag					NVARCHAR(50) NOT NULL,
+	        tag					NVARCHAR(500) NOT NULL,
 	        country_code		NVARCHAR(50) NOT NULL,
 	        city				NVARCHAR(50) NOT NULL,
 	        timezone			NVARCHAR(50) NOT NULL,
@@ -137,14 +143,14 @@ BEGIN
                 oj.Orientation,
                 oj.[Location],
                 oj.AddressLine,
-                oj.Tag,
+                ISNULL(oj.Tag, '[]'),
                 oj.CountryCode,
                 oj.City,
                 oj.Timezone,
                 oj.IsActive,
                 oj.RatePerHour,
                 oj.Currency,
-                oj.UserId,
+                oj.CreatedBy,
                 oj.OperatingHour,
                 oj.SupportedMedia,
                 GETUTCDATE(),
@@ -161,14 +167,14 @@ BEGIN
             Orientation NVARCHAR(50),
             [Location] NVARCHAR(100),
             AddressLine NVARCHAR(200),
-            Tag NVARCHAR(MAX),
+            Tag NVARCHAR(MAX) AS JSON,
             CountryCode NVARCHAR(50),
             City NVARCHAR(50),
             Timezone NVARCHAR(50),
             IsActive BIT,
             RatePerHour DECIMAL(10,2),
             Currency NVARCHAR(50),
-            UserId  INT,
+            CreatedBy  INT,
             OperatingHour NVARCHAR(MAX) AS JSON,
             SupportedMedia NVARCHAR(MAX) AS JSON
         ) AS oj;
@@ -223,6 +229,10 @@ BEGIN
         s.normalized_name = ts.normalized_name,
         s.[description] = ts.[description],
         s.[location] = ts.[location],
+        s.default_resolution = ts.default_resolution,
+        s.orientation = ts.orientation,
+        s.timezone = ts.timezone,
+        s.city = ts.city,
         s.address_line = ts.address_line,
         s.tag = ts.tag,
         s.is_active = ts.is_active,
@@ -251,14 +261,15 @@ BEGIN
 						OpenTime TIME,
 						CloseTime TIME,
 						AudienceSource NVARCHAR(50),
-						EstimatedImpression INT
+						EstimatedImpression INT,
+                        DeletedBy INT
 						)
 				) AS ca
 			FOR JSON PATH,
 				INCLUDE_NULL_VALUES
 			), '[]');
 
-    EXEC inv.sp_screen_opr_hrs_ins @Json = @ScreenOperatingHrJson OUT;
+    EXEC inv.sp_screen_opr_hrs_tsk @Json = @ScreenOperatingHrJson OUT;
 
     DECLARE @ScreenSupMeidaJson NVARCHAR(MAX) = ISNULL((
 			SELECT  s.id AS [ScreenId],
@@ -268,18 +279,24 @@ BEGIN
 			INNER JOIN #screen AS ts ON s.id = ts.id
 			CROSS APPLY (
 				SELECT *
-				FROM OPENJSON(ts.supported_media) WITH (MediaType NVARCHAR(50))
+				FROM OPENJSON(ts.supported_media) WITH 
+                (
+                    Id INT,
+                    MediaType NVARCHAR(50),
+                    DeletedBy INT    
+                )
 				) AS ca
 			FOR JSON PATH,
 				INCLUDE_NULL_VALUES
 			), '[]');
 
-    EXEC inv.sp_screen_sup_media_ins @Json = @ScreenSupMeidaJson OUT;
+    EXEC inv.sp_screen_sup_media_tsk @Json = @ScreenSupMeidaJson OUT;
 
     COMMIT TRANSACTION;
 
    SELECT @Json = ISNULL((
                         SELECT  s.id,
+                                s.uuid,
                                 s.tenant_id,
                                 t.[name]        AS tenant_name,
                                 s.[name],

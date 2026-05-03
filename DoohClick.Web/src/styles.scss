@@ -1,1 +1,56 @@
-/* You can add global styles to this file, and also import other style files */
+@import "primeng/resources/themes/aura-light-teal/theme.css";
+@import "primeng/resources/primeng.css";
+@import "primeflex/primeflex.css";
+@import "primeicons/primeicons.css";
+
+:root {
+  --sidebar-width: 15rem;
+}
+
+html {
+  height: 100vh;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--surface-100);
+}
+
+.card {
+  background-color: var(--surface-0) !important;
+}
+
+.overflow-y-auto {
+  -ms-overflow-style: none; /* Edge */
+  scrollbar-width: none; /* Firefox */
+
+  &::-webkit-scrollbar {
+    display: none; /* Chrome/Safari */
+  }
+}
+
+.p-menubar {
+  border-radius: 0 !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-top: none !important;
+}
+
+.p-dialog {
+  border-radius: 4px !important;
+}
+
+.p-dialog .p-dialog-header {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--surface-600);
+  padding: 0.6rem;
+}
+
+.p-dialog .p-tabView .p-tabPanel .p-tabPanel-header {
+  font-size: 0.4rem;
+  font-weight: 600;
+  color: var(--surface-600);
+  padding: 0.6rem;
+}

@@ -4,7 +4,7 @@ namespace DoohClick.API.Controller.Application.Inv
 {
     [Produces("application/json")]
     [ApiController]
-    [Route("/[controller]")]
+    [Route("/inv/")]
     public class InvController: ControllerBase
     {
     }

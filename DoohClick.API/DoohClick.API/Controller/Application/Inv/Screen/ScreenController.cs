@@ -1,16 +1,20 @@
 ﻿using DoohClick.API.Const;
+using DoohClick.API.Helper;
 using DoohClick.Interface.Application.Inv.Screen;
 using DoohClick.Model.Application.Inv.Screen;
-using DoohClick.Model.Shared.Enum.ResponseEnum;
+using DoohClick.Model.Shared.AppClaim;
+using DoohClick.Model.Shared.CodePrefix;
+using DoohClick.Model.Shared.Enum.Response;
 using DoohClick.Model.Shared.Param;
 using DoohClick.Model.Shared.Response;
+using DoohClick.Service.Shared.Helper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DoohClick.API.Controller.Application.Inv.Screen
 {
     [Tags("Inventory")]
-    public class ScreenController: InvController
+    public class ScreenController : InvController
     {
         private readonly IScreenService _screenService;
         public ScreenController(
@@ -20,7 +24,7 @@ namespace DoohClick.API.Controller.Application.Inv.Screen
             _screenService = screenService;
         }
 
-        [HttpGet("grid")]
+        [HttpGet("screen/grid")]
         [Authorize(Policy = AppPolicy.ALL)]
         public async Task<IActionResult> GetGrid([FromQuery] MvGridParamOption<MvScreenFilterOptions> param)
         {
@@ -33,5 +37,40 @@ namespace DoohClick.API.Controller.Application.Inv.Screen
             return Ok(ApiResponse.Success(result));
         }
 
+        [HttpPost("screens")]
+        [Authorize(Policy = AppPolicy.ADMINMANAGER)]
+        public async Task<IActionResult> Save([FromBody] MvScreen param)
+        {
+            MvScreen screen = param;
+            screen.CreatedBy = ClaimsPrincipalExtensions.GetUserId(User);
+            screen.TenantId = ClaimsPrincipalExtensions.GetTenantId(User);
+            screen.ScreenCode = CodeGenerator.Generate(CodePrefix.Screen, ClaimsPrincipalExtensions.GetTenantCode(User));
+
+            MvScreen? result = await _screenService.Save(screen);
+            if (result is null)
+            {
+                return BadRequest(ApiResponse.Success("Failed to save data", ResponseStatusEnum.Failure.ToString()));
+            }
+            return Ok(ApiResponse.Success(result));
+        }
+
+        [HttpDelete("screen/{id}")]
+        [Authorize(Policy = AppPolicy.ADMINMANAGER)]
+        public async Task<IActionResult> Remove(Guid id)
+        {
+            MvScreenDelParam screen = new MvScreenDelParam
+            {
+                Uuid = id,
+                TenantId = ClaimsPrincipalExtensions.GetTenantId(User),
+                DeletedBy = ClaimsPrincipalExtensions.GetUserId(User)
+            };
+
+            MvScreen? result = await _screenService.Remove(screen);
+            if (result is null)
+            {
+                return BadRequest(ApiResponse.Failure("Failed to remove data"));
+            }
+            return Ok(ApiResponse.Success(result));
+        }
     }
 }

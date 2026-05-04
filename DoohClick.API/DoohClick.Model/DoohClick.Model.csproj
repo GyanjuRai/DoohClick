@@ -9,7 +9,6 @@
   <ItemGroup>
     <Folder Include="Application\cms\" />
     <Folder Include="Application\commercial\" />
-    <Folder Include="Application\crm\" />
   </ItemGroup>
 
 </Project>

@@ -4,6 +4,8 @@ import { AdvertiserListComponent } from './advertiser/component/advertiser-list/
 import { AdvertiserAddEditComponent } from './advertiser/component/advertiser-add-edit/advertiser-add-edit.component';
 import { RouterModule } from '@angular/router';
 import { crmRoutes } from './crm.routes';
+import { SharedUiModule } from '../shared/module/shared-ui.module';
+import { FormsModule } from "@angular/forms";
 
 
 
@@ -14,7 +16,9 @@ import { crmRoutes } from './crm.routes';
   ],
   imports: [
     CommonModule,
-    RouterModule.forChild(crmRoutes)
-  ]
+    SharedUiModule,
+    RouterModule.forChild(crmRoutes),
+    FormsModule
+]
 })
 export class CrmModule { }

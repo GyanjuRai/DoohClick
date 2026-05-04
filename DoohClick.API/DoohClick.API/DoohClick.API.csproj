@@ -26,7 +26,6 @@
   <ItemGroup>
     <Folder Include="Controller\Application\cms\media\" />
     <Folder Include="Controller\Application\commercial\campaign\" />
-    <Folder Include="Controller\Application\crm\advertiser\" />
   </ItemGroup>
 
 </Project>

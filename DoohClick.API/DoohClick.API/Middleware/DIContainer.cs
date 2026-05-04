@@ -1,5 +1,6 @@
 ﻿using DoohClick.API.Const;
 using DoohClick.DataAccess.Dapper;
+using DoohClick.Interface.Application.crm.advertiser;
 using DoohClick.Interface.Application.Inv.Screen;
 using DoohClick.Interface.Shared.Account;
 using DoohClick.Interface.Shared.Auth;
@@ -9,6 +10,7 @@ using DoohClick.Model.Shared.AppClaim;
 using DoohClick.Model.Shared.AppSetting;
 using DoohClick.Model.Shared.Auth;
 using DoohClick.Model.Shared.Enum.User;
+using DoohClick.Service.Application.crm.advertiser;
 using DoohClick.Service.Application.Inv.Screen;
 using DoohClick.Service.Shared.Account;
 using DoohClick.Service.Shared.Auth;
@@ -74,7 +76,8 @@ namespace DoohClick.API.Middleware
 
         public static IServiceCollection AddApplicationService(this IServiceCollection services)
         {
-            return services.AddTransient<IScreenService, ScreenService>();
+            return services.AddTransient<IScreenService, ScreenService>()
+                            .AddTransient<IAdvertiserService, AdvertiserService>();
         }
 
         public static IServiceCollection AddSharedService(this IServiceCollection services)

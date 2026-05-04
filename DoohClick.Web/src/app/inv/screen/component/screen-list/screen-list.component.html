@@ -169,10 +169,14 @@
                 <p-button
                   pRipple
                   (onClick)="openActionMenu($event, menu, screen)"
-                  icon="pi pi-cog"
-                  label="Actions"
                   size="small"
-                />
+                >
+                  <ng-template pTemplate="content">
+                    <i class="pi pi-cog"></i>
+                    <span class="mx-2">Actions</span>
+                    <i class="pi pi-chevron-down"></i>
+                  </ng-template>
+                </p-button>
               </div>
             </ng-container>
 
@@ -216,5 +220,8 @@
 </div>
 
 <screen-detail #screenDetail></screen-detail>
-<screen-add-edit #screenAddEdit (afterClosed)="afterFormClose($event)"></screen-add-edit>
+<screen-add-edit
+  #screenAddEdit
+  (afterClosed)="afterFormClose($event)"
+></screen-add-edit>
 <p-confirmDialog></p-confirmDialog>

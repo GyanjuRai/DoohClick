@@ -34,15 +34,9 @@
             </span>
           </div>
           <div class="col-12 md:col-4">
-            <p-dropdown
-              [options]="[
-                { label: 'Active', value: true },
-                { label: 'Inactive', value: false },
-              ]"
-              optionLabel="label"
-              optionValue="value"
-              placeholder="status"
-              styleClass="w-full"
+            <p-toggleButton
+              onLabel="Archived"
+              offLabel="Archived"
             />
           </div>
           <div class="col-12 md:col-4">

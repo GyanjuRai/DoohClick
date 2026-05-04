@@ -1,6 +1,7 @@
 import { GridColumn } from '../../../shared/model/grid-config.model';
 
 export const mediaColumn: GridColumn[] = [
+  { name: 'action', displayName: 'Action', width: '100px', type: 'action' },
   { name: 'preview', displayName: 'Preview', width: '5rem', type: 'preview' },
   { name: 'displayName', displayName: 'Name', width: '12rem', type: 'text' },
   { name: 'fileName', displayName: 'File name', width: '12rem', type: 'text' },

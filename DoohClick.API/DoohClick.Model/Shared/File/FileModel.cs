@@ -5,7 +5,6 @@ namespace DoohClick.Model.Shared.File
 {
     public record MvFileUploadParam
     {
-        public required string DisplayName { get; set; }
         public required IFormFile File { get; set; } 
     }
 

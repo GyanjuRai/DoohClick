@@ -11,8 +11,8 @@
 DECLARE @Json NVARCHAR(MAX) = N'{
                                  "Filter": {
                                     "TenantId": 1,
-                                    "StatusList": ["PENDING", "READY"],
-                                    "IsVideo": 1
+                                    "IsArchieved": null,
+                                    "IsVideo": null
                                  },
                                  "SearchText": "",
                                  "Offset": 0,
@@ -31,7 +31,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
     DECLARE @TenantId INT = ISNULL(JSON_VALUE(@Json, '$.Filter.TenantId'), 0),
-            @StatusList NVARCHAR(MAX) = ISNULL(JSON_QUERY(@Json, '$.Filter.StatusList'), '[]'),
+            @IsArchieved BIT = ISNULL(JSON_VALUE(@Json, '$.Filter.IsArchieved'), 0),
             @IsVideo BIT = JSON_VALUE(@Json, '$.Filter.IsVideo'),
             @SearchText NVARCHAR(200) = ISNULL(LOWER(JSON_VALUE(@Json, '$.SearchText')), ''),
             @Offset INT = ISNULL(JSON_VALUE(@Json, '$.Offset'), 0),
@@ -92,21 +92,17 @@ BEGIN
             ml.uploaded_at,
             [identity].sf_get_user_fullname_by_id(ml.uploaded_by) AS uploader,
             ml.created_by,
-            [identity].sf_get_user_fullname_by_id(ml.created_by) AS creator,
-            ml.created_at
+            ml.created_at,
+            [identity].sf_get_user_fullname_by_id(ml.created_by) AS creator
     FROM dbo.media_library AS ml
     WHERE   ml.tenant_id = @TenantId AND 
-            ml.is_deleted = 0 AND 
+            (
+                ml.is_deleted = @IsArchieved
+            ) AND 
             (@SearchText = '' OR LOWER(ml.display_name) LIKE N'%' + @SearchText + N'%') AND 
 		    (
-			    @IsVideo IS NULL OR ml.is_deleted = @IsVideo
-		    ) AND
-            (
-                @StatusList = '[]' OR ml.[status] IN (
-                    SELECT [value]
-                    FROM OPENJSON(@StatusList)
-                )
-            );
+			    @IsVideo IS NULL OR ml.is_video = @IsVideo
+		    );
 
     SELECT @TotalRows = COUNT(*) FROM #media;
 

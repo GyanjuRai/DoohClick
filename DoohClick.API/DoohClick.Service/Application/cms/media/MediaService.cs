@@ -32,22 +32,20 @@ namespace DoohClick.Service.Application.cms.media
             return _jsonSerializer.DeserializeObject<MvGridResponse<MvMedia>>(result);
         }
 
-        public async Task<MvMedia?> Add(MvFileUploadParam param, int tenantId, int userId)
+        public async Task<MvMedia?> Add(MvMedia param)
         {
-            MvFileUploadResult fileUploadResult = await _fileService.UploadAsync(param);
-
             MvMedia media = new MvMedia
             {
-                TenantId = tenantId,
+                TenantId = param.TenantId,
                 DisplayName = param.DisplayName,
-                FileName = fileUploadResult.FileName,
-                FileUrl = fileUploadResult.FileUrl,
-                FileSizeBytes = fileUploadResult.FileSizeBytes,
-                Resolution = fileUploadResult.Resolution,
-                DurationSec = fileUploadResult.DurationSec,
-                IsVideo = fileUploadResult.IsVideo,
-                UploadedBy = userId,
-                CreatedBy = userId
+                FileName = param.FileName,
+                FileUrl = param.FileUrl,
+                FileSizeBytes = param.FileSizeBytes,
+                Resolution = param.Resolution,
+                DurationSec = param.DurationSec,
+                IsVideo = param.IsVideo,
+                UploadedBy = param.UploadedBy,
+                CreatedBy = param.CreatedBy
             };
 
             string result = await _dataAccessService.ActionProcedure("dbo.sp_media_ins", JsonConvert.SerializeObject(media));
@@ -57,20 +55,13 @@ namespace DoohClick.Service.Application.cms.media
         public async Task<MvMedia?> Remove(MvMediaDel param)
         {
             string result = await _dataAccessService.ActionProcedure("dbo.sp_media_del", JsonConvert.SerializeObject(param));
-            var media = _jsonSerializer.DeserializeObject<MvMedia>(result);
-
-            if (media != null && !string.IsNullOrEmpty(media.FileUrl))
-            {
-                _fileService.DeleteAsync(media.FileUrl);
-            }
-
-            return media;
+            return _jsonSerializer.DeserializeObject<MvMedia>(result);
         }
 
-        public async Task<MvMediaDdl?> GetDdl(MvTenantIdParam param)
+        public async Task<List<MvMediaDdl>?> GetDdl(MvTenantIdParam param)
         {
             string result = await _dataAccessService.RetrievalProcedure("dbo.sp_media_ddl", JsonConvert.SerializeObject(param));
-            return _jsonSerializer.DeserializeObject<MvMediaDdl>(result);
+            return _jsonSerializer.DeserializeObject<List<MvMediaDdl>>(result);
         }
     }
 }

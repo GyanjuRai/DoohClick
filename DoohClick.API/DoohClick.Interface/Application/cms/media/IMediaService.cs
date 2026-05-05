@@ -21,7 +21,7 @@ namespace DoohClick.Interface.Application.cms.media
         /// </summary>
         /// <param name="screen"></param>
         /// <returns></returns>
-        Task<MvMedia?> Add(MvFileUploadParam screen, int tenantId, int userId);
+        Task<MvMedia?> Add(MvMedia param);
         
         /// <summary>
         /// 
@@ -34,6 +34,6 @@ namespace DoohClick.Interface.Application.cms.media
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<MvMediaDdl?> GetDdl(MvTenantIdParam param);
+        Task<List<MvMediaDdl>?> GetDdl(MvTenantIdParam param);
     }
 }

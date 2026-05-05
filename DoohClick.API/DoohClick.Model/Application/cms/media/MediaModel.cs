@@ -34,7 +34,7 @@ namespace DoohClick.Model.Application.cms.media
     public record MvMediaFilterOptions
     {
         public required int TenantId { get; set; }
-        public List<string>? StatusList { get; set; }
+        public bool? IsArchieved { get; set; }
         public bool? IsVideo { get; set; }
     }
 

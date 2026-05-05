@@ -107,7 +107,7 @@ try
 
     builder.Services.AddAppConfigurations(builder.Configuration)
                  .AddAuthorizationPolicies()
-                 .AddCoreServices()
+                 .AddCoreServices(builder.Environment.WebRootPath)
                  .AddApplicationService()
                  .AddSharedService();
 

@@ -38,11 +38,11 @@ namespace DoohClick.API.Controller.Application.cms.media
 
         [HttpPost]
         [Authorize(AppPolicy.ALL)]
-        public async Task<IActionResult> Add([FromForm] MvFileUploadParam param)
+        public async Task<IActionResult> Add([FromBody] MvMedia  param)
         {
-            int userId = ClaimsPrincipalExtensions.GetUserId(User);
-            int tenantId = ClaimsPrincipalExtensions.GetTenantId(User);
-            MvMedia? result = await _mediaService.Add(param, tenantId, userId);
+            param.CreatedBy = ClaimsPrincipalExtensions.GetUserId(User);
+            param.TenantId = ClaimsPrincipalExtensions.GetTenantId(User);
+            MvMedia? result = await _mediaService.Add(param);
 
             return Ok(ApiResponse.Success(result));
         }
@@ -58,9 +58,9 @@ namespace DoohClick.API.Controller.Application.cms.media
 
         [HttpGet("ddl")]
         [Authorize(AppPolicy.ALL)]
-        public async Task<IActionResult> GetDdl(MvTenantIdParam param)
+        public async Task<IActionResult> GetDdl([FromQuery]MvTenantIdParam param)
         {
-            MvMediaDdl? result = await _mediaService.GetDdl(param);
+            List<MvMediaDdl>? result = await _mediaService.GetDdl(param);
 
             return Ok(ApiResponse.Success(result));
         }

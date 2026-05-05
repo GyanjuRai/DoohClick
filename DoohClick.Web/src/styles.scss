@@ -5,6 +5,11 @@
 
 :root {
   --sidebar-width: 15rem;
+  --scrollbar-size: 6px;
+  --scrollbar-radius: 8px;
+  --scrollbar-thumb: var(--surface-200);;
+  --scrollbar-thumb-hover: var(--surface-300);
+  --scrollbar-track: transparent;
 }
 
 html {
@@ -53,4 +58,29 @@ body {
   font-weight: 600;
   color: var(--surface-600);
   padding: 0.6rem;
+}
+
+::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: var(--scrollbar-radius);
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 }

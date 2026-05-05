@@ -1,1 +1,278 @@
-<p>media-add-edit works!</p>
+<p-dialog
+  [modal]="true"
+  [(visible)]="isDialogOpen"
+  [maximizable]="true"
+  [draggable]="false"
+  position="top"
+  [draggable]="false"
+  [style]="{ width: '50rem', height: '82vh', marginTop: '0.5rem' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  (onHide)="close()"
+>
+  <ng-template pTemplate="header">
+    <span>{{ "Add media" }}</span>
+  </ng-template>
+
+  <p-stepper>
+    <p-stepperPanel>
+      <ng-template pTemplate="header">
+        <span class="p-stepper-number">
+          <i class="pi pi-upload"></i>
+        </span>
+        <span
+          class="p-stepper-tittle flex align-items-center pl-2 font-semibold text-sm"
+        >
+          Upload & Name
+        </span>
+      </ng-template>
+
+      <ng-template
+        pTemplate="content"
+        let-nextCallback="nextCallback"
+        let-index="index"
+      >
+        <div class="flex flex-column">
+          <div class="my-3">
+            <label
+              class="align-items-center font-semibold text-sm"
+              [style.color]="'var(--text-color-secondary)'"
+              >Name</label
+            >
+            <input [(ngModel)]="displayName" pInputText class="w-full mt-2" />
+          </div>
+          <p-fileUpload
+            [multiple]="false"
+            accept=".jpg,.jpeg,.png,.mp4,.webm"
+            maxFileSize="100000000"
+            [customUpload]="true"
+            (uploadHandler)="onUpload($event)"
+          >
+            <ng-template
+              pTemplate="header"
+              let-files
+              let-chooseCallback="chooseCallback"
+              let-clearCallback="clearCallback"
+              let-uploadCallBack="uploadCallback"
+            >
+              <div class="align-items-center gap-2">
+                <div class="flex gap-2">
+                  <p-button
+                    (onClick)="choose(chooseCallback)"
+                    icon="pi pi-images"
+                    [rounded]="true"
+                    [outlined]="true"
+                  />
+                  <p-button
+                    (onClick)="uploadEvent(uploadCallBack)"
+                    icon="pi pi-cloud-upload"
+                    [rounded]="true"
+                    [outlined]="true"
+                    severity="success"
+                    [disabled]="!files || files.length === 0"
+                  />
+                  <p-button
+                    (onClick)="clearCallback()"
+                    icon="pi pi-times"
+                    [rounded]="true"
+                    [outlined]="true"
+                    severity="danger"
+                    [disabled]="!files || files.length === 0"
+                  />
+                </div>
+              </div>
+            </ng-template>
+
+            <ng-template
+              pTemplate="content"
+              let-files
+              let-uploadedFiles="uploadedFiles"
+              let-removeFileCallback="removeFileCallback"
+              let-removeUploadedFileCallback="removeUploadedFileCallback"
+            >
+              <div *ngIf="files?.length > 0">
+                <h5>Pending</h5>
+                <div class="flex flex-wrap p-0 sm:p-5 gap-5">
+                  <div
+                    *ngFor="let file of files; let i = index"
+                    class="card m-0 px-6 flex flex-column border-1 surface-border align-items-center gap-3"
+                  >
+                    <div>
+                      <img
+                        *ngIf="!isVideo(file)"
+                        role="presentation"
+                        [alt]="file.name"
+                        [src]="file.objectURL"
+                        width="100"
+                        height="50"
+                      />
+                      <video
+                        *ngIf="isVideo(file)"
+                        [src]="file.objectURL"
+                        width="100"
+                        height="50"
+                        controls
+                        preload="metadata"
+                      ></video>
+                    </div>
+                    <span class="font-semibold">{{ file.name }}</span>
+                    <p-badge value="Pending" severity="warning" />
+                    <p-button
+                      icon="pi pi-times"
+                      (onClick)="
+                        onRemoveTemplatingFile(
+                          $event,
+                          removeFileCallback,
+                          index
+                        )
+                      "
+                      [outlined]="true"
+                      [rounded]="true"
+                      severity="danger"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="uploadedFiles?.length > 0">
+                <h5>Completed</h5>
+                <div class="flex flex-wrap p-0 sm:p-5 gap-5">
+                  <div
+                    *ngFor="let file of uploadedFiles; let i = index"
+                    class="card m-0 px-6 flex flex-column border-1 surface-border align-items-center gap-3"
+                  >
+                    <div>
+                      <img
+                        *ngIf="!isVideo(file)"
+                        role="presentation"
+                        [alt]="file.name"
+                        [src]="file.objectURL"
+                        width="100"
+                        height="50"
+                      />
+                      <video
+                        *ngIf="isVideo(file)"
+                        [src]="file.objectURL"
+                        width="100"
+                        height="50"
+                        controls
+                        preload="metadata"
+                      ></video>
+                    </div>
+                    <span class="font-semibold">{{ file.name }}</span>
+                    <p-badge
+                      value="Completed"
+                      class="mt-3"
+                      severity="success"
+                    />
+                    <p-button
+                      icon="pi pi-times"
+                      (onClick)="removeUploadedFileCallback(index)"
+                      [outlined]="true"
+                      [rounded]="true"
+                      severity="danger"
+                    />
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+
+            <ng-template pTemplate="file"> </ng-template>
+            <ng-template pTemplate="empty">
+              <div
+                class="flex align-items-center justify-content-center flex-column"
+              >
+                <i
+                  class="pi pi-cloud-upload border-2 border-circle p-5 text-8xl text-400 border-400"
+                ></i>
+                <p class="mt-4 mb-0">Drag and drop files here to upload.</p>
+              </div>
+            </ng-template>
+          </p-fileUpload>
+        </div>
+        <div class="flex pt-4 justify-content-end">
+          <p-button
+            label="Next"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            [disabled]="!isFormValid"
+            (onClick)="nextCallback.emit()"
+          />
+        </div>
+      </ng-template>
+    </p-stepperPanel>
+
+    <p-stepperPanel>
+      <ng-template pTemplate="header">
+        <span class="p-stepper-number">
+          <i class="pi pi-eye"></i>
+        </span>
+        <span
+          class="p-stepper-tittle flex align-items-center pl-2 font-semibold text-sm"
+        >
+          Review & Save 
+        </span>
+      </ng-template>
+      <ng-template
+        pTemplate="content"
+        let-prevCallback="prevCallback"
+        let-nextCallback="nextCallback"
+        let-index="index"
+      >
+        <div class="grid border-2 surface-border">
+          <div class="col-3 font-semibold">Display Name</div>
+          <div class="col-9">{{ displayName }}</div>
+
+          <div class="col-3 font-semibold">Resolution</div>
+          <div class="col-9">{{ file.resolution }}</div>
+
+          <div class="col-3 font-semibold">Duration</div>
+          <div class="col-9">{{ (file.durationSec ?? 0) + "s" }}</div>
+
+          <div class="col-3 font-semibold">Size</div>
+          <div class="col-9">
+            {{ (file.fileSizeBytes ?? 0) / 1000000 | number: "1.2-2" }} MB
+          </div>
+        </div>
+
+        <div class="flex align-items-center gap-3 mb-3">
+          <ng-container [ngSwitch]="fileType">
+            <video
+              *ngSwitchCase="'video'"
+              [src]="apiUrl + file.fileUrl"
+              width="80"
+              height="60"
+              style="object-fit: cover; border-radius: 4px"
+              preload="metadata"
+            ></video>
+
+            <p-image
+              *ngSwitchCase="'image'"
+              [src]="apiUrl + file.fileUrl"
+              [alt]="displayName"
+              width="80"
+              height="60"
+              [imageStyle]="{
+                'object-fit': 'cover',
+                'border-radius': '4px',
+                cursor: 'pointer',
+              }"
+            >
+            </p-image>
+          </ng-container>
+        </div>
+        <div class="flex pt-4 justify-content-between">
+          <p-button
+            label="Back"
+            icon="pi pi-arrow-left"
+            (onClick)="prevCallback.emit()"
+          />
+          <p-button
+            label="Next"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            (onClick)="nextCallback.emit()"
+          />
+        </div>
+      </ng-template>
+    </p-stepperPanel>
+  </p-stepper>
+</p-dialog>

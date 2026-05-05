@@ -5,7 +5,7 @@ import { AdvertiserAddEditComponent } from './advertiser/component/advertiser-ad
 import { RouterModule } from '@angular/router';
 import { crmRoutes } from './crm.routes';
 import { SharedUiModule } from '../shared/module/shared-ui.module';
-import { FormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 
 
@@ -18,7 +18,7 @@ import { FormsModule } from "@angular/forms";
     CommonModule,
     SharedUiModule,
     RouterModule.forChild(crmRoutes),
-    FormsModule
+    FormsModule,
 ]
 })
 export class CrmModule { }

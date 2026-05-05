@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application\cms\media\" />
     <Folder Include="Application\commercial\campaign\" />
   </ItemGroup>
 

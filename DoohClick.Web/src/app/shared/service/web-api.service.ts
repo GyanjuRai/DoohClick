@@ -44,6 +44,7 @@ export class WebApiService {
 
   private buildHttpParams(params: any, data: any, currentPath: string) {
     Object.keys(data).forEach((key) => {
+      if (data[key] === null || data[key] === undefined) return;
       if (data[key] instanceof Object && !(data[key] instanceof Array)) {
         this.buildHttpParams(params, data[key], `${currentPath}${key}.`);
       } else {

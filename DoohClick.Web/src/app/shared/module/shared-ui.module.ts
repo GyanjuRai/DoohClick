@@ -33,6 +33,9 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { ToggleButtonModule } from 'primeng/togglebutton';
+import { ImageModule } from 'primeng/image'
+import { FileUploadModule } from 'primeng/fileupload';
+import { StepperModule } from 'primeng/stepper';
 
 import { ConfirmationService, MessageService } from "primeng/api";
 
@@ -71,6 +74,9 @@ const PRIME_NG_MODULES = [
         InputTextareaModule,
         InputSwitchModule,
         ToggleButtonModule,
+        ImageModule,
+        FileUploadModule,
+        StepperModule,
 ];
  
 @NgModule({

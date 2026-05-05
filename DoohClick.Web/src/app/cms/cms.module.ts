@@ -5,6 +5,7 @@ import { MediaListComponent } from './media/component/media-list/media-list.comp
 import { RouterModule } from '@angular/router';
 import { crmRoutes } from './crm.routes';
 import { SharedUiModule } from '../shared/module/shared-ui.module';
+import { FormsModule } from "@angular/forms";
 
 
 
@@ -17,6 +18,7 @@ import { SharedUiModule } from '../shared/module/shared-ui.module';
     CommonModule,
     RouterModule.forChild(crmRoutes),
     SharedUiModule,
-  ]
+    FormsModule,
+]
 })
 export class CmsModule { }

@@ -37,7 +37,8 @@ BEGIN
         UPDATE m
         SET m.is_deleted = 1,
             m.deleted_by = 1,
-            m.deleted_at = GETUTCDATE()
+            m.deleted_at = GETUTCDATE(),
+            m.[status] = 'ARCHIVED'
         FROM dbo.media_library AS m
         WHERE m.id = @Id AND m.tenant_id = @TenantId;
 

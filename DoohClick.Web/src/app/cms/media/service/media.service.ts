@@ -22,12 +22,12 @@ export class MediaService {
         return this.api.get('cms/media/grid', param, true);
     }
 
-    upload(param: MvFileUploadParam): Observable<MvResponse<MvMedia>> {
+    add(param: MvMedia): Observable<MvResponse<MvMedia>> {
         return this.api.post('cms/media', param);
     }
 
-    remove(param: MvMediaDel): Observable<MvResponse<MvMediaDel>> {
-        return this.api.post('cms/media', param);
+    remove(param: MvMediaDel): Observable<MvResponse<MvMedia>> {
+        return this.api.delete('cms/media', param);
     }
 
     getDdl(param: MvTenantIdParam): Observable<MvResponse<MvMediaDdl[]>> {

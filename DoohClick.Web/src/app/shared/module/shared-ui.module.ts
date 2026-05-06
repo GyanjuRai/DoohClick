@@ -36,6 +36,7 @@ import { ToggleButtonModule } from 'primeng/togglebutton';
 import { ImageModule } from 'primeng/image'
 import { FileUploadModule } from 'primeng/fileupload';
 import { StepperModule } from 'primeng/stepper';
+import { Divider, DividerModule } from 'primeng/divider';
 
 import { ConfirmationService, MessageService } from "primeng/api";
 
@@ -77,6 +78,7 @@ const PRIME_NG_MODULES = [
         ImageModule,
         FileUploadModule,
         StepperModule,
+        DividerModule,
 ];
  
 @NgModule({

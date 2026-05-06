@@ -8,11 +8,12 @@ import {
   MvGridResponse,
   MvResponse,
 } from '../../../../shared/model/response.model';
-import { MvMedia } from '../../model/media.model';
+import { MvMedia, MvMediaDel } from '../../model/media.model';
 import { ResponseStatusEnum } from '../../../../shared';
 import { AppConst } from '../../../../app-const';
 import { MenuItem } from 'primeng/api';
 import { mediaMenuItem } from '../../model/media-list-action-items';
+import { ConfirmationOptions } from '../../../../shared/model/confirmation.model';
 
 @Component({
   selector: 'media-list',
@@ -86,11 +87,87 @@ export class MediaListComponent
   }
 
   openActionMenu(event: Event, menu: any, media: MvMedia) {
-    this.actionMenuItems = mediaMenuItem((m) => this.onArchive(m), media);
+    this.actionMenuItems = mediaMenuItem(
+      (m) => this.onArchive(m),
+      (m) => this.onUnarchive(m),
+      media,
+    );
     menu.toggle(event);
   }
 
-  onArchive(media: MvMedia) {}
+  afterDialogClose(media: MvMedia | null) {
+    if (media) {
+      this.gridConfig.dataSource.data = [
+        media,
+        ...this.gridConfig.dataSource.data,
+      ];
+      this.gridConfig.dataSource.totalRows++;
+      this.showToast(
+        'success',
+        'Media saved',
+        `Media ${media.displayName} save sucessfully!`,
+      );
+    }
+  }
+
+  onArchive(media: MvMedia) {
+    const confirmationOptions = {
+      message: `Are you sure you want to archive <b>${media.displayName}</b>? It will no longer be available for scheduling.`,
+      header: 'Archive Media',
+      icon: 'pi pi-inbox',
+      acceptButtonStyleClass: 'p-button-warning',
+      onAccept: () => {
+        const param = {
+          id: media.id,
+          tenantId: media.tenantId,
+          deletedBy: this.auth.getUserId(),
+        } as MvMediaDel;
+
+        this._mediaService
+          .remove(param)
+          .pipe(takeUntil(this.__unSubscribeAll))
+          .subscribe((response: MvResponse<MvMedia>) => {
+            if (response.type === ResponseStatusEnum.success && response.data) {
+              const index = this.gridConfig.dataSource.data.findIndex(
+                (m) => m.id === response.data?.id,
+              );
+
+              if (index !== -1) {
+                this.gridConfig.dataSource.data.splice(index, 1);
+                this.gridConfig.dataSource.data = [
+                  ...this.gridConfig.dataSource.data,
+                ]; //refresh grid
+                this.gridConfig.dataSource.totalRows--;
+
+                this.showToast(
+                  'success',
+                  'Archived',
+                  `${media.displayName} has been archived.`,
+                );
+              }
+            }
+          });
+      },
+    } as ConfirmationOptions;
+    this.openConfirmationBox(confirmationOptions);
+  }
+
+  onUnarchive(media: MvMedia) {
+    const confirmationOptions = {
+      message: `Restore <b>${media.displayName}</b> and make it available for scheduling again?`,
+      header: 'Unarchive Media',
+      icon: 'pi pi-inbox',
+      acceptButtonStyleClass: 'p-button-success',
+      onAccept: () => {
+        this.showToast(
+          'info',
+          'Coming Soon',
+          `Restore feature is not yet available.`,
+        );
+      },
+    } as ConfirmationOptions;
+    this.openConfirmationBox(confirmationOptions);
+  }
 
   protected onSearchText() {
     this.gridConfig.options.offset = 0;

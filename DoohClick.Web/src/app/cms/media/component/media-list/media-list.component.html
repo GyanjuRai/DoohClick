@@ -1,3 +1,4 @@
+<p-confirmDialog></p-confirmDialog>
 <div class="flex align-items-center gap-2 my-3 pl-3">
   <h2 class="text-2xl font-semibold m-0" style="color: var(--surface-600)">
     Media
@@ -199,7 +200,11 @@
           </ng-template>
 
           <ng-template #defaultCell>
-            {{ media[col.name] }}
+            {{
+              col.name !== "durationSec"
+                ? media[col.name]
+                : (media[col.name] ?? 0) + "s"
+            }}
           </ng-template>
         </td>
       </tr>
@@ -249,4 +254,7 @@
   </ng-template>
 </p-dialog>
 
-<media-add-edit #mediaAddEdit></media-add-edit>
+<media-add-edit
+  #mediaAddEdit
+  (afterClose)="afterDialogClose($event)"
+></media-add-edit>

@@ -9,7 +9,8 @@
 =====================================================================
 
 DECLARE @Json NVARCHAR(MAX) = N'{
-                                    "TenantId": 1
+                                    "TenantId": 1,
+                                    "AdvertiserId": 2
                                  }';
 
 EXEC dbo.sp_media_ddl @Json = @Json;
@@ -22,7 +23,8 @@ CREATE OR ALTER PROCEDURE dbo.sp_media_ddl
 )
 AS
 BEGIN
-    DECLARE @TenantId INT = ISNULL(JSON_VALUE(@Json, '$.TenantId'), 0);
+    DECLARE @TenantId INT = ISNULL(JSON_VALUE(@Json, '$.TenantId'), 0),
+            @AdvertiserId INT = ISNULL(JSON_VALUE(@Json, '$.AdvertiserId'), 0);
 
     SELECT ISNULL(
         (
@@ -32,6 +34,7 @@ BEGIN
                     ml.file_size_bytes
             FROM dbo.media_library AS ml
             WHERE   ml.tenant_id = @TenantId AND
+                    ml.advertiser_id = @AdvertiserId AND
                     ml.[status] = 'READY' AND
                     ml.is_deleted = 0
             FOR JSON PATH

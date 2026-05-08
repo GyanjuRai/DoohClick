@@ -11,7 +11,7 @@
 
 DECLARE @Json NVARCHAR(MAX) = N'{
                                     "Id": 2,
-                                    "CampaignCode": "CAMP-LAMAR-2026Q2",
+                                    "CampaignCode": "CAMP-AMZ-2026Q2",
                                     "TenantId": 1,
                                     "AdvertiserId": 2,
                                     "Name": "Amazon Prime Day Awareness 2026",
@@ -22,43 +22,15 @@ DECLARE @Json NVARCHAR(MAX) = N'{
                                     "CreatedBy": 1,
                                     "ModifiedBy": 1,
                                     "CampaignFlight": [
-                                                {
-                                                    "Id": null,
-                                                    "StartDate": "2026-06-01",
-                                                    "EndDate": "2026-06-15",
-                                                    "Screens": [
-                                                        { 
-                                                            "Id":  null,
-                                                            "CampaignFlightId": 5,
-                                                            "ScreenId": 1 
-                                                                
-                                                        }   
-                                                    ]
-                                                },
-                                                {
-                                                    "Id": 5,
-                                                    "StartDate": "2026-06-16",
-                                                    "EndDate": "2026-06-30",
-                                                    "Screens": [
-                                                        { 
-                                                            "Id": null,
-                                                            "CampaignFlightId": 5,
-                                                            "ScreenId": 2
-                                                        }   
-                                                    ]
-                                                },
-                                                {
-                                                  "Id": 4,
-                                                  "StartDate": "2026-07-01",
-                                                  "EndDate": "2026-07-15",
-                                                  "Screens": [
-                                                        { 
-                                                            "Id": 1,
-                                                            "CampaignFlightId": 5,
-                                                            "ScreenId": 1 
-                                                        }   
-                                                    ]
-                                                }
+                                        {
+                                            "Id": null,
+                                            "StartDate": "2026-06-01",
+                                            "EndDate": "2026-06-15",
+                                            "Screens": [
+                                                { "Id": null, "CampaignFlightId": null, "ScreenId": 1 },
+                                                { "Id": null, "CampaignFlightId": null, "ScreenId": 3 }
+                                            ]
+                                        }
                                     ]
                                 }';
 
@@ -123,7 +95,8 @@ SET NOCOUNT ON
             [start_date], 
             end_date,
             remarks, 
-            created_by, 
+            created_by,
+            modified_by,
             campaign_flight
         )
         SELECT  oj.Id,
@@ -136,6 +109,7 @@ SET NOCOUNT ON
                 oj.EndDate,
                 oj.Remarks,
                 oj.CreatedBy,
+                oj.ModifiedBy,
                 oj.CampaignFlight
         FROM OPENJSON(@Json)
         WITH
@@ -229,68 +203,142 @@ SET NOCOUNT ON
             )
         ) AS ca;
 
-        
-        DECLARE @CampaignFlightInsJson NVARCHAR(MAX) = ISNULL((
-                        SELECT  tcf.campaign_id AS CampaignId,
-                                tcf.[start_date] AS StartDate,
-                                tcf.end_date AS EndDate
-                        FROM #campaign_flight AS tcf
-                        WHERE tcf.Id IS NULL
-                        FOR JSON PATH,
-                        INCLUDE_NULL_VALUES
-                    ), '[]');
+        -- ======================
+        -- FLIGHT DELETE JSON
+        -- ======================
 
-        EXEC dbo.sp_campaign_flight_ins @Json = @CampaignFlightInsJson OUT;
-
-        UPDATE  tcf 
-        SET tcf.id = ins.id
-        FROM #campaign_flight As tcf
-        INNER JOIN OPENJSON(@CampaignFlightInsJson)
-        WITH (
-                id INT, 
-                [start_date] DATE,
-                end_date DATE 
-        ) AS ins 
-        ON  tcf.[start_date] = ins.[start_date] AND
-            tcf.end_date = ins.end_date AND
-            tcf.id IS NULL;
-
-        SET @CampaignId = (SELECT   DISTINCT 
-                                    campaign_id 
-                            FROM #campaign_flight
-                            );
+        SET @CampaignId = ( SELECT id FROM #campaign);
 
         DECLARE @CampaignFlightDelJson NVARCHAR(MAX) = ISNULL((
-                            SELECT  cf.id AS [Id],
-                                    tc.modified_by AS DeletedBy
-                            FROM dbo.campaign_flight AS cf
-                            INNER JOIN #campaign AS tc ON cf.campaign_id = @CampaignId
-                            WHERE cf.campaign_id = @CampaignId AND
-                            NOT EXISTS (
-                                SELECT 1 FROM #campaign_flight AS tcf
-                                WHERE tcf.id = cf.id
-                            )
-                            FOR JSON PATH,
-                            INCLUDE_NULL_VALUES
-                        ), '[]');
+            SELECT  cf.id AS Id,
+                    tc.modified_by AS DeletedBy
+            FROM dbo.campaign_flight AS cf
+            INNER JOIN #campaign AS tc ON tc.id = @CampaignId
+            WHERE cf.campaign_id = @CampaignId AND
+            cf.is_deleted = 0
+            AND NOT EXISTS (
+                SELECT 1 FROM #campaign_flight AS tcf
+                WHERE tcf.id = cf.id
+            )
+            FOR JSON PATH, INCLUDE_NULL_VALUES
+        ), '[]');
 
-        IF @CampaignFlightDelJson != '[]'
-        BEGIN
+        -- ======================
+        -- SCREEN DELETE JSON
+        -- ======================
+
+        DECLARE @CampaignFlightScreenDelJson NVARCHAR(MAX) = ISNULL((
+            SELECT  cfs.id AS Id,
+                    tc.modified_by AS DeletedBy
+            FROM dbo.campaign_flight_screen AS cfs
+            INNER JOIN dbo.campaign_flight AS cf ON cf.id = cfs.campaign_flight_id
+            INNER JOIN #campaign AS tc ON tc.id = @CampaignId
+            WHERE cfs.is_deleted = 0
+            AND cf.campaign_id = @CampaignId 
+            AND NOT EXISTS (
+                SELECT 1 FROM #campaign_flight AS tcf
+                CROSS APPLY OPENJSON(tcf.screens) WITH (Id INT) AS s
+                WHERE s.Id = cfs.id
+            )
+            FOR JSON PATH, INCLUDE_NULL_VALUES
+        ), '[]');
+
+        IF @CampaignFlightDelJson <> '[]'
             EXEC dbo.sp_campaign_flight_del @Json = @CampaignFlightDelJson OUT;
-            
-        END;
-        -- campaign screen
-        --SELECT *
-        --FROM #campaign_flight AS tcf
-        --CROSS APPLY
-        --(
-        --    SELECT  
-        --    FROM OPENJSON()
-        --) AS ca;
 
-        ROLLBACK TRANSACTION;
+        IF @CampaignFlightScreenDelJson <> '[]'
+            EXEC dbo.sp_campaign_flight_screen_del @Json = @CampaignFlightScreenDelJson OUT;
 
-        DROP TABLE IF EXISTS #campaign, #campaign_flight, #inserted;
+        -- ======================
+        -- CAMPAIGN FLIGHT INS
+        -- ======================
+
+        DECLARE @CampaignFlightInsJson NVARCHAR(MAX) = ISNULL((
+            SELECT  tcf.campaign_id AS CampaignId,
+                    tcf.[start_date] AS StartDate,
+                    tcf.end_date AS EndDate
+            FROM #campaign_flight AS tcf
+            WHERE tcf.id IS NULL
+            FOR JSON PATH, INCLUDE_NULL_VALUES
+        ), '[]');
+
+        IF @CampaignFlightInsJson <> '[]'
+        BEGIN
+            EXEC dbo.sp_campaign_flight_ins @Json = @CampaignFlightInsJson OUT;
+
+            UPDATE tcf
+            SET tcf.id = ins.id
+            FROM #campaign_flight AS tcf
+            INNER JOIN OPENJSON(@CampaignFlightInsJson)
+            WITH (id INT, [start_date] DATE, end_date DATE) AS ins
+            ON  tcf.[start_date] = ins.[start_date]
+            AND tcf.end_date = ins.end_date
+            AND tcf.id IS NULL;
+        END
+
+        -- ===========================
+        -- CAMPAIGN FLIGHT SCREEN INS
+        -- ===========================
+
+        DECLARE @CampaignFlightScreenInsJson NVARCHAR(MAX) = ISNULL((
+            SELECT  tcf.id AS CampaignFlightId,
+                    ca.ScreenId
+            FROM #campaign_flight AS tcf
+            CROSS APPLY OPENJSON(tcf.screens)
+            WITH (Id INT, ScreenId INT) AS ca
+            WHERE ca.Id IS NULL
+            FOR JSON PATH, INCLUDE_NULL_VALUES
+        ), '[]');
+
+        IF @CampaignFlightScreenInsJson <> '[]'
+            EXEC dbo.sp_campaign_flight_screen_ins @Json = @CampaignFlightScreenInsJson OUT;
+
+        SELECT @Json = ISNULL((
+                SELECT	c.id,
+			            c.campaign_code,
+			            c.tenant_id,
+			            c.advertiser_id,
+			            a.[name] AS advertiser,
+			            c.[name],
+			            c.[status],
+			            c.[start_date],
+			            c.end_date,
+			            c.duration_in_days,
+			            c.remarks,
+			            c.is_locked,
+			            c.created_by,
+			            c.created_at,
+			            ( RTRIM (
+				            LTRIM (
+				            CONCAT (
+					            COALESCE (cu.[name] + ' ', ''),
+					            COALESCE (cu.sur_name, '')
+				            )
+			            ))) AS creator,
+			            c.modified_by,
+			            c.modified_at,
+			            ( RTRIM (
+				            LTRIM (
+				            CONCAT (
+					            COALESCE (mu.[name] + ' ', ''),
+					            COALESCE (mu.sur_name, '')
+				            )
+			            ))) AS modifier,
+			            JSON_QUERY(ISNULL(cf.campaign_flight, '[]')) AS campaign_flight,
+			            JSON_QUERY(ISNULL(cfs.campaign_flight_screen, '[]')) AS campaign_flight_screen
+	            FROM dbo.campaign AS c
+                INNER JOIN #campaign AS tc ON c.id = tc.id
+	            LEFT JOIN dbo.tf_campaign_flight() AS cf ON c.id = cf.campaign_id
+	            LEFT JOIN dbo.tf_campaign_flight_screen() AS cfs ON c.id = cfs.campaign_id
+	            INNER JOIN crm.advertiser AS a ON c.advertiser_id = a.id
+	            INNER JOIN [identity].[user] AS cu ON c.created_by = cu.id
+	            LEFT JOIN [identity].[user] AS mu ON c.modified_by = mu.id
+                FOR JSON PATH, INCLUDE_NULL_VALUES, WITHOUT_ARRAY_WRAPPER
+                ), '[]');
+
+        COMMIT TRANSACTION;
+
+    DROP TABLE IF EXISTS #campaign, #campaign_flight, #inserted;
     END TRY
     BEGIN CATCH
         

@@ -2,6 +2,7 @@
 using DoohClick.DataAccess.Dapper;
 using DoohClick.Interface.Application.Inv.Screen;
 using DoohClick.Interface.Shared.JsonSerializer;
+using DoohClick.Model.Application.crm.advertiser;
 using DoohClick.Model.Application.Inv.Screen;
 using DoohClick.Model.Shared.AppClaim;
 using DoohClick.Model.Shared.Param;
@@ -35,6 +36,12 @@ namespace DoohClick.Service.Application.Inv.Screen
         {
             string result = await _dataAccessService.ActionProcedure("inv.sp_screen_del", JsonConvert.SerializeObject(param));
             return _jsonSerializer.DeserializeObject<MvScreen>(result);
+        }
+
+        public async Task<List<MvScreenDdl>?> GetDdl(MvTenantIdParam param)
+        {
+            string result = await _dataAccessService.RetrievalProcedure("inv.sp_screen_ddl", JsonConvert.SerializeObject(param));
+            return _jsonSerializer.DeserializeObject<List<MvScreenDdl>>(result);
         }
     }
 }

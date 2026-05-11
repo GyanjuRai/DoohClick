@@ -7,6 +7,7 @@ namespace DoohClick.Model.Application.cms.media
     {
         public int? Id { get; set; }
         public required int TenantId { get; set; }
+        public int? AdvertiserId {  get; set; }
         public required string DisplayName { get; set; }
         public string? FileName { get; set; }
         public string? FileUrl { get; set; }

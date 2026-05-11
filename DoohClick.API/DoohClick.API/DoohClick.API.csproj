@@ -23,8 +23,4 @@
     <ProjectReference Include="..\DoohClick.Service\DoohClick.Service.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Controller\Application\commercial\campaign\" />
-  </ItemGroup>
-
 </Project>

@@ -64,8 +64,7 @@ BEGIN
 		modified_by INT NULL,
 		modified_at DATETIME2 NULL,
 		modifier NVARCHAR(100) NULL,
-		campaign_flight NVARCHAR(MAX) NULL,
-		campaign_flight_screen NVARCHAR(MAX) NULL
+		campaign_flight NVARCHAR(MAX) NULL
     );
 
 	INSERT INTO #campaign
@@ -88,8 +87,7 @@ BEGIN
 		modified_by,
 		modified_at,
 		modifier,
-		campaign_flight,
-		campaign_flight_screen
+		campaign_flight
 	)
 	SELECT	c.id,
 			c.campaign_code,
@@ -121,10 +119,8 @@ BEGIN
 					COALESCE (mu.sur_name, '')
 				)
 			))) AS modifier,
-			ISNULL(cf.campaign_flight, '[]'),
-			ISNULL(cfs.campaign_flight_screen, '[]')
+			ISNULL(cfs.campaign_flight, '[]') AS campaign_flight
 	FROM dbo.campaign AS c
-	LEFT JOIN dbo.tf_campaign_flight() AS cf ON c.id = cf.campaign_id
 	LEFT JOIN dbo.tf_campaign_flight_screen() AS cfs ON c.id = cfs.campaign_id
 	INNER JOIN crm.advertiser AS a ON c.advertiser_id = a.id
 	INNER JOIN [identity].[user] AS cu ON c.created_by = cu.id
@@ -171,8 +167,7 @@ BEGIN
 											tc.modified_by,
 											tc.modified_at,
 											tc.modifier,
-											JSON_QUERY(tc.campaign_flight)        AS campaign_flight,
-											JSON_QUERY(tc.campaign_flight_screen) AS campaign_flight_screen
+											JSON_QUERY(tc.campaign_flight)        AS campaign_flight
 									FROM #campaign AS tc
 									ORDER BY tc.[name]
 									OFFSET ' + CAST(@Offset AS VARCHAR(20)) + N' ROWS

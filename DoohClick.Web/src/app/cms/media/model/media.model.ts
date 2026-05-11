@@ -2,6 +2,7 @@
 export interface MvMedia {
   id?: number;
   tenantId: number;
+  advertiserId?: number;
   displayName: string;
   fileName?: string;
   fileUrl?: string;

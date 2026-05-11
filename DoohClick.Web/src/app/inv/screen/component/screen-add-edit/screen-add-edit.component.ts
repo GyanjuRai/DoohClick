@@ -247,7 +247,7 @@ export class ScreenAddEditComponent
   }
 
   protected get dialogHeader(): string {
-    return this.screen?.id ? 'Screen details' : 'Create new screen';
+    return this.screen?.id ? 'Screen details' : 'Add new screen';
   }
 
   protected get action(): string {

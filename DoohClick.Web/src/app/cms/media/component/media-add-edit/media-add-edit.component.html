@@ -6,8 +6,8 @@
   [draggable]="false"
   position="top"
   [draggable]="false"
-  [style]="{ width: '50rem', height: '82vh', marginTop: '0.5rem' }"
-  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  [style]="{ width: '50rem', height: '90vh', marginTop: '0.5rem' }"
+  [breakpoints]="{ '1199px': '85vw', '575px': '90vw' }"
   (onHide)="close()"
 >
   <ng-template pTemplate="header">
@@ -33,13 +33,28 @@
         let-index="index"
       >
         <div class="flex flex-column">
-          <div class="my-3">
+          <div class="my-2">
             <label
               class="align-items-center font-semibold text-sm"
               [style.color]="'var(--text-color-secondary)'"
               >Name</label
             >
             <input [(ngModel)]="displayName" pInputText class="w-full mt-2" />
+          </div>
+          <div class="flex flex-column my-2">
+            <label
+              class="font-semibold text-sm mb-2"
+              [style.color]="'var(--text-color-secondary)'"
+              >Advertiser</label
+            >
+            <p-dropdown
+              [(ngModel)]="selectedAdvertiserId"
+              [options]="advertiserDdl"
+              optionLabel="name"
+              optionValue="id"
+              class="w-full"
+              [style]="{ width: '100%' }"
+            />
           </div>
           <ng-container *ngIf="!file.fileUrl; else uploadedState">
             <p-fileUpload

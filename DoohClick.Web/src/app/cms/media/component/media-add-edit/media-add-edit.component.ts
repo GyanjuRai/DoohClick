@@ -18,6 +18,8 @@ import { ResponseStatusEnum } from '../../../../shared';
 import { AppConst } from '../../../../app-const';
 import { AppComponent } from '../../../../app.component';
 import { MediaService } from '../../service/media.service';
+import { MvAdvertiserDdl, MvTenantIdParam } from '../../../../crm/advertiser/model/advertiser.model';
+import { AdvertiserService } from '../../../../crm/advertiser/service/advertiser.service';
 
 @Component({
   selector: 'media-add-edit',
@@ -35,18 +37,38 @@ export class MediaAddEditComponent
   protected displayName: string = '';
   protected file: MvFileUploadResult = {} as MvFileUploadResult;
   protected apiUrl: string = '';
+  protected advertiserDdl: MvAdvertiserDdl[] = [];
+  protected selectedAdvertiserId?: number;
 
   constructor(
     private injector: Injector,
     private _fileService: FileService,
     private _mediaService: MediaService,
+    private _advertiserService: AdvertiserService
   ) {
     super(injector);
     this.__unSubscribeAll$ = new Subject();
     this.apiUrl = AppConst?.data.apiUrl;
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.getAdvertiserDdl();
+  }
+
+  protected getAdvertiserDdl() {
+
+    const param = {
+      tenantId: this.auth.getTenantId()
+    } as MvTenantIdParam;
+
+    this._advertiserService.getDdl(param)
+    .pipe(takeUntil(this.__unSubscribeAll$))
+    .subscribe((response: MvResponse<MvAdvertiserDdl[]>) => {
+      if (response.type === ResponseStatusEnum.success && response.data) {
+        this.advertiserDdl = [...response.data];
+      }
+    })
+  }
 
   public open() {
     this.isDialogOpen = true;
@@ -75,6 +97,7 @@ export class MediaAddEditComponent
     const param = {
       displayName: this.displayName,
       ...this.file,
+      advertiserId: this.selectedAdvertiserId,
       uploadedBy: this.auth.getUserId(),
     } as MvMedia;
 

@@ -1,4 +1,4 @@
-import { NgModule } from "@angular/core";
+import { NgModule } from '@angular/core';
 import { StyleClassModule } from 'primeng/styleclass';
 import { MenubarModule } from 'primeng/menubar';
 import { BadgeModule } from 'primeng/badge';
@@ -13,11 +13,11 @@ import { TableModule } from 'primeng/table';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { TagModule } from 'primeng/tag';
-import { DialogModule } from 'primeng/dialog'
+import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DropdownModule } from 'primeng/dropdown';
 import { FieldsetModule } from 'primeng/fieldset';
-import { ChipModule } from 'primeng/chip'
+import { ChipModule } from 'primeng/chip';
 import { MenuModule } from 'primeng/menu';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { CardModule } from 'primeng/card';
@@ -33,65 +33,65 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { InputTextareaModule } from 'primeng/inputtextarea';
 import { InputSwitchModule } from 'primeng/inputswitch';
 import { ToggleButtonModule } from 'primeng/togglebutton';
-import { ImageModule } from 'primeng/image'
+import { ImageModule } from 'primeng/image';
 import { FileUploadModule } from 'primeng/fileupload';
 import { StepperModule } from 'primeng/stepper';
-import { Divider, DividerModule } from 'primeng/divider';
+import { DividerModule } from 'primeng/divider';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
+import { TreeModule } from 'primeng/tree';
+import { OverlayModule } from 'primeng/overlay';
+import { OverlayPanelModule } from 'primeng/overlaypanel';
 
-import { ConfirmationService, MessageService } from "primeng/api";
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 const PRIME_NG_MODULES = [
-        StyleClassModule,
-        AvatarModule,
-        BadgeModule,
-        MenubarModule,
-        RippleModule,
-        ButtonModule,
-        InputTextModule,
-        SidebarModule,
-        ConfirmDialogModule,
-        ToastModule,
-        TableModule,
-        IconFieldModule,
-        InputIconModule,
-        TagModule,
-        DialogModule,
-        InputNumberModule,
-        DropdownModule,
-        FieldsetModule,
-        ChipModule,
-        MenuModule,
-        SpeedDialModule,
-        CardModule,
-        ToolbarModule,
-        BlockUIModule,
-        ProgressSpinnerModule,
-        PasswordModule,
-        MultiSelectModule,
-        TabViewModule,
-        CalendarModule,
-        InputGroupModule,
-        InputGroupAddonModule,
-        InputTextareaModule,
-        InputSwitchModule,
-        ToggleButtonModule,
-        ImageModule,
-        FileUploadModule,
-        StepperModule,
-        DividerModule,
+  StyleClassModule,
+  AvatarModule,
+  BadgeModule,
+  MenubarModule,
+  RippleModule,
+  ButtonModule,
+  InputTextModule,
+  SidebarModule,
+  ConfirmDialogModule,
+  ToastModule,
+  TableModule,
+  IconFieldModule,
+  InputIconModule,
+  TagModule,
+  DialogModule,
+  InputNumberModule,
+  DropdownModule,
+  FieldsetModule,
+  ChipModule,
+  MenuModule,
+  SpeedDialModule,
+  CardModule,
+  ToolbarModule,
+  BlockUIModule,
+  ProgressSpinnerModule,
+  PasswordModule,
+  MultiSelectModule,
+  TabViewModule,
+  CalendarModule,
+  InputGroupModule,
+  InputGroupAddonModule,
+  InputTextareaModule,
+  InputSwitchModule,
+  ToggleButtonModule,
+  ImageModule,
+  FileUploadModule,
+  StepperModule,
+  DividerModule,
+  BreadcrumbModule,
+  TreeModule,
+  OverlayModule,
+  OverlayPanelModule,
 ];
- 
-@NgModule({
-    imports: [
-        ...PRIME_NG_MODULES
-    ],
-    providers: [
-        ConfirmationService,
-        MessageService
-    ],
-    exports: [
-        ...PRIME_NG_MODULES
-    ]
-})
 
+@NgModule({
+  imports: [...PRIME_NG_MODULES],
+  providers: [ConfirmationService, MessageService],
+  exports: [...PRIME_NG_MODULES],
+})
 export class SharedUiModule {}

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CampaignBaseClass } from '../../campaign';
 
 @Component({
@@ -6,6 +6,13 @@ import { CampaignBaseClass } from '../../campaign';
   templateUrl: './scheduled-list.component.html',
   styleUrl: './scheduled-list.component.scss'
 })
-export class ScheduledListComponent extends CampaignBaseClass {
+export class ScheduledListComponent extends CampaignBaseClass implements OnInit {
 
+  constructor() {
+    super();
+  }
+
+  ngOnInit(): void {
+    this.loadCampaing('SCHEDULED');
+  }
 }

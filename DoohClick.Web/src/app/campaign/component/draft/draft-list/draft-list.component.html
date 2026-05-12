@@ -1,3 +1,4 @@
+<p-toast></p-toast>
 <p-breadcrumb [model]="breadcrumbItems" class="mb-3" />
 
 <p-confirmDialog></p-confirmDialog>
@@ -18,9 +19,10 @@
     [rows]="gridConfig.options.pageSize"
     [totalRecords]="gridConfig.dataSource.totalRows"
     [showCurrentPageReport]="true"
-    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} screens"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} campaigns"
     [rowsPerPageOptions]="[10, 20, 30]"
     [lazy]="true"
+    (onLazyLoad)="onPageChange($event, 'DRAFT')"
   >
     <ng-template pTemplate="caption">
       <div class="flex align-items-center justify-content-between gap-3">
@@ -34,7 +36,7 @@
                 type="text"
                 placeholder="Search..."
                 class="w-full"
-                (keyup.enter)="onSearchText()"
+                (keyup.enter)="onSearchText('DRAFT')"
               />
             </span>
           </div>
@@ -52,7 +54,7 @@
             label="Refresh"
             size="small"
             severity="secondary"
-            (onClick)="onRefresh()"
+            (onClick)="onRefresh('DRAFT')"
           >
           </p-button>
         </div>
@@ -126,4 +128,4 @@
   </p-table>
 </div>
 
-<draft-add-edit #draftAddEdit></draft-add-edit>
+<draft-add-edit #draftAddEdit (afterClosed)="afterFormClose($event)"></draft-add-edit>

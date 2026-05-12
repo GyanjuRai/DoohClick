@@ -3,17 +3,13 @@ using System.Collections.Generic;
 
 namespace DoohClick.DataAccess.Entity;
 
-public partial class ScreenSupportedMedium
+public partial class CampaignFlightScreen
 {
     public int Id { get; set; }
 
+    public int CampaignFlightId { get; set; }
+
     public int ScreenId { get; set; }
-
-    public string MediaType { get; set; } = null!;
-
-    public int CreatedBy { get; set; }
-
-    public DateTime CreatedAt { get; set; }
 
     public bool IsDeleted { get; set; }
 
@@ -21,7 +17,9 @@ public partial class ScreenSupportedMedium
 
     public DateTime? DeletedAt { get; set; }
 
-    public virtual User CreatedByNavigation { get; set; } = null!;
+    public virtual CampaignFlight CampaignFlight { get; set; } = null!;
+
+    public virtual ICollection<CampaignScreenSchedule> CampaignScreenSchedules { get; set; } = new List<CampaignScreenSchedule>();
 
     public virtual User? DeletedByNavigation { get; set; }
 

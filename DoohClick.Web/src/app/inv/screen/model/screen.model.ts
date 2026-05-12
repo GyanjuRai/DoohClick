@@ -46,8 +46,8 @@ export interface MvScreenSupportedMedia {
 
 export interface MvScreenDelParam {
   uuid: string;
-  tenantId: number;
-  deletedBy: number;
+  tenantId?: number;
+  deletedBy?: number;
 }
 
 export interface MvScreenFilterOptions {

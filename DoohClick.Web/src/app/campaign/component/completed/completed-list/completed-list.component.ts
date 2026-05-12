@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CampaignBaseClass } from '../../campaign';
 
 @Component({
@@ -6,6 +6,13 @@ import { CampaignBaseClass } from '../../campaign';
   templateUrl: './completed-list.component.html',
   styleUrl: './completed-list.component.scss'
 })
-export class CompletedListComponent extends CampaignBaseClass {
+export class CompletedListComponent extends CampaignBaseClass implements OnInit {
 
+  constructor() {
+    super();
+  }
+
+  ngOnInit(): void {
+    this.loadCampaing('COMPLETED');
+  }
 }

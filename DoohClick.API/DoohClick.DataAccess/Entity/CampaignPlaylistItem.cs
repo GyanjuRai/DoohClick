@@ -3,13 +3,17 @@ using System.Collections.Generic;
 
 namespace DoohClick.DataAccess.Entity;
 
-public partial class ScreenSupportedMedium
+public partial class CampaignPlaylistItem
 {
     public int Id { get; set; }
 
-    public int ScreenId { get; set; }
+    public int ScheduleId { get; set; }
 
-    public string MediaType { get; set; } = null!;
+    public int MediaId { get; set; }
+
+    public int PlayOrder { get; set; }
+
+    public int DurationSeconds { get; set; }
 
     public int CreatedBy { get; set; }
 
@@ -25,5 +29,7 @@ public partial class ScreenSupportedMedium
 
     public virtual User? DeletedByNavigation { get; set; }
 
-    public virtual Screen Screen { get; set; } = null!;
+    public virtual MediaLibrary Media { get; set; } = null!;
+
+    public virtual CampaignScreenSchedule Schedule { get; set; } = null!;
 }

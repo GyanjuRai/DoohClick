@@ -7,7 +7,7 @@
   position="top"
   [style]="{ width: '75rem', height: '95vh', marginTop: '0.5rem' }"
   [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
-  (onHide)="_afterClose('cancel')"
+  (onHide)="onDialogHidden()"
 >
   <ng-template pTemplate="header">
     <span>{{ dialogHeader }}</span>
@@ -36,7 +36,17 @@
               [style.color]="'var(--text-color-secondary)'"
               >Name</label
             >
-            <input [(ngModel)]="campaign.name" pInputText class="w-full" />
+            <input
+              [(ngModel)]="campaign.name"
+              pInputText
+              class="w-full"
+              (ngModelChange)="markTouched('name')"
+              [class.ng-invalid]="touched['name'] && !campaign.name"
+              [class.ng-dirty]="touched['name']"
+            />
+            <small class="p-error" *ngIf="touched['name'] && !campaign.name">
+              Name is required
+            </small>
           </div>
 
           <div class="col-6 flex flex-column gap-1">
@@ -48,10 +58,21 @@
             <p-dropdown
               [options]="advertiserDdl"
               [(ngModel)]="campaign.advertiserId"
+              (ngModelChange)="markTouched('advertiserId')"
+              [class.ng-invalid]="
+                touched['advertiserId'] && !campaign.advertiserId
+              "
+              [class.ng-dirty]="touched['advertiserId']"
               optionLabel="name"
               optionValue="id"
               [style]="{ width: '100%' }"
             />
+            <small
+              class="p-error"
+              *ngIf="touched['advertiserId'] && !campaign.advertiserId"
+            >
+              Name is required
+            </small>
           </div>
 
           <div class="col-6 flex flex-column gap-1">
@@ -62,9 +83,18 @@
             >
             <p-calendar
               [(ngModel)]="campaign.startDate"
+              (ngModelChange)="markTouched('startDate')"
+              [class.ng-invalid]="touched['startDate'] && !campaign.startDate"
+              [class.ng-dirty]="touched['startDate']"
               class="w-full"
               [style]="{ width: '100%' }"
             />
+            <small
+              class="p-error"
+              *ngIf="touched['startDate'] && !campaign.startDate"
+            >
+              Name is required
+            </small>
           </div>
 
           <div class="col-6 flex flex-column gap-1">
@@ -77,7 +107,18 @@
               [(ngModel)]="campaign.endDate"
               class="w-full"
               [style]="{ width: '100%' }"
+              (ngModelChange)="markTouched('endDate')"
+              [class.ng-invalid]="touched['endDate'] && !campaign.endDate"
+              [class.ng-dirty]="touched['endDate']"
+              class="w-full"
+              [style]="{ width: '100%' }"
             />
+            <small
+              class="p-error"
+              *ngIf="touched['endDate'] && !campaign.endDate"
+            >
+              Name is required
+            </small>
           </div>
 
           <div class="col-12 flex flex-column gap-1">
@@ -205,7 +246,7 @@
                 </tr>
               </ng-template>
 
-              <ng-template pTemplate="body" let-flight>
+              <ng-template pTemplate="body" let-flight let-i="rowIndex">
                 <tr>
                   <td *ngFor="let col of columns">
                     <ng-container *ngIf="col.type === 'action'; else dateCheck">
@@ -213,6 +254,7 @@
                         icon="pi pi-trash"
                         severity="danger"
                         [text]="true"
+                        (onClick)="removeFlight(i)"
                       />
                     </ng-container>
 
@@ -265,6 +307,8 @@
       />
       <p-button
         label="Save"
+        [disabled]="_closing"
+        [loading]="_closing"
         (onClick)="_afterClose(action)"
         icon="pi pi-save"
       />

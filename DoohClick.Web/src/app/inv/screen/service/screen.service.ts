@@ -6,7 +6,7 @@ import {
   MvResponse,
 } from '../../../shared/model/response.model';
 import { MvGridParamOption } from '../../../shared/model/param.model';
-import { MvScreen, MvScreenDdl, MvScreenFilterOptions } from '../model/screen.model';
+import { MvScreen, MvScreenDdl, MvScreenDelParam, MvScreenFilterOptions } from '../model/screen.model';
 import { MvTenantIdParam } from '../../../crm/advertiser/model/advertiser.model';
 
 @Injectable({ providedIn: 'root' })
@@ -23,8 +23,8 @@ export class ScreenService {
     return this.api.post('inv/screens', param);
   }
 
-  remove(id: number): Observable<MvResponse<MvScreen>> {
-    return this.api.delete(`inv/screen/${id}`);
+  remove(param: MvScreenDelParam): Observable<MvResponse<MvScreen>> {
+    return this.api.delete(`inv/screen/${param.uuid}`);
   }
 
   getDdl(param: MvTenantIdParam): Observable<MvResponse<MvScreenDdl[]>> {

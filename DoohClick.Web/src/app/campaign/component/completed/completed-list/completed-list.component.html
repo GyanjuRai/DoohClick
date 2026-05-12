@@ -34,28 +34,20 @@
                 type="text"
                 placeholder="Search..."
                 class="w-full"
-                (keyup.enter)="onSearchText()"
+                (keyup.enter)="onSearchText('')"
               />
             </span>
           </div>
         </div>
 
         <div class="flex gap-2 flex-shrink-0">
-          <p-button
-            icon="pi pi-upload"
-            label="Export"
-            severity="secondary"
-            size="small"
-            [outlined]="true"
-            [disabled]="true"
-          />
-          <p-button icon="pi pi-plus" label="Create Campaign" size="small" />
+          
           <p-button
             icon="pi pi-refresh"
             label="Refresh"
             size="small"
             severity="secondary"
-            (onClick)="onRefresh()"
+            (onClick)="onRefresh('')"
           >
           </p-button>
         </div>

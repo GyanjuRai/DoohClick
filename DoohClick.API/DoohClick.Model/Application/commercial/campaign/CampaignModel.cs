@@ -10,8 +10,8 @@ namespace DoohClick.Model.Application.commercial.campaign
         public string? Advertiser { get; set; }
         public required string Name { get; set; }
         public string? Status { get; set; }
-        public DateOnly StartDate { get; set; }
-        public DateOnly EndDate { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
         public int? DurationInDays { get; set; }
         public string? Remarks { get; set; }
         public required int CreatedBy { get; set; }
@@ -28,8 +28,8 @@ namespace DoohClick.Model.Application.commercial.campaign
     { 
         public int? Id { get; set; }
         public int? CampaignId { get; set; }
-        public DateOnly StartDate { get; set; }
-        public DateOnly EndDate { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
         public List<MvCampaignFlightScreen>? Screens { get; set; }
     }
 
@@ -44,6 +44,7 @@ namespace DoohClick.Model.Application.commercial.campaign
     {
         public required int Id { get; set; }
         public int? DeletedBy { get; set; }
+        public int? UpdatedBy { get; set; }
     }
 
     public record MvCampaignFilterOptionParam
@@ -51,7 +52,7 @@ namespace DoohClick.Model.Application.commercial.campaign
         public required int TenantId { get; set; }
         public required string Status { get; set; }
         public List<int>? AdvertiserIdList { get; set; }
-        public DateOnly? StartDate { get; set; }
-        public DateOnly? EndDate { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
     }
 }

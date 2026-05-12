@@ -16,7 +16,7 @@ import {
   MvTenantIdParam,
 } from '../../../../crm/advertiser/model/advertiser.model';
 import { MvScreenDdl } from '../../../../inv/screen/model/screen.model';
-import { Subject, takeUntil } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 import { ScreenService } from '../../../../inv/screen/service/screen.service';
 import { AppComponent } from '../../../../app.component';
 import { MvResponse } from '../../../../shared/model/response.model';
@@ -25,6 +25,7 @@ import { AdvertiserService } from '../../../../crm/advertiser/service/advertiser
 import { TreeNode } from 'primeng/api';
 import { GridColumn } from '../../../../shared/model/grid-config.model';
 import { campaignAddEditColumn } from '../../../model/campaing-add-edit.column';
+import { CampaignService } from '../../../service/campaign.service';
 
 @Component({
   selector: 'draft-add-edit',
@@ -39,6 +40,7 @@ export class DraftAddEditComponent
     new EventEmitter<MvCampaign | null>();
 
   private __unSubscribeAll$: Subject<any>;
+  protected _closing: boolean = false;
   protected isDialogOpen: boolean = false;
   protected columns: GridColumn[] = campaignAddEditColumn;
   protected activeIndex: number = 0;
@@ -50,11 +52,13 @@ export class DraftAddEditComponent
   protected hoveredScreen?: MvScreenDdl;
   protected currentFlight: MvCampaignFlight = {} as MvCampaignFlight;
   protected flightList: MvCampaignFlight[] = [];
+  protected touched: Record<string, boolean> = {};
 
   constructor(
     private injector: Injector,
     private _screenService: ScreenService,
     private _advertiserService: AdvertiserService,
+    private _campaignService: CampaignService,
   ) {
     super(injector);
     this.__unSubscribeAll$ = new Subject();
@@ -131,7 +135,9 @@ export class DraftAddEditComponent
 
   public open(campaign?: MvCampaign) {
     this.campaign = campaign ?? ({} as MvCampaign);
-    this.flightList = campaign?.campaignFlight ?? [];
+    this.flightList = campaign?.campaignFlight
+      ? [...campaign.campaignFlight]
+      : [];
     this.isDialogOpen = true;
   }
 
@@ -139,7 +145,35 @@ export class DraftAddEditComponent
     this.hoveredScreen = this.screenDdl.find((s) => s.id === node.data);
   }
 
-  protected addFlight() {}
+  protected markTouched(field: string) {
+    this.touched[field] = true;
+  }
+
+  protected markAllTouched() {
+    ['name', 'advertiserId', 'startDate', 'endDate'].forEach(
+      (f) => (this.touched[f] = true),
+    );
+  }
+
+  protected addFlight() {
+    if (!this.isValidFlight()) return;
+
+    let flight = {
+      startDate: this.currentFlight.startDate,
+      endDate: this.currentFlight.endDate,
+      screens: this.selectedNodes
+        .filter((n) => n.data != null)
+        .map((n) => ({ screenId: n.data as number })),
+    } as MvCampaignFlight;
+
+    this.flightList.push(flight);
+    this.currentFlight = {} as MvCampaignFlight;
+    this.selectedNodes = [];
+  }
+
+  protected removeFlight(index: number) {
+    this.flightList.splice(index, 1);
+  }
 
   protected getScreenNames(screens?: MvCampaignFlightScreen[]): string {
     if (!screens?.length) return '-';
@@ -148,9 +182,97 @@ export class DraftAddEditComponent
       .filter(Boolean)
       .join(', ');
   }
-  
+
   protected _afterClose(action: string) {
+    if (this._closing) {
+      return;
+    }
+    if (action === 'cancel') {
+      this._closing = false;
+      this.close();
+      return;
+    }
+
+    this.markAllTouched();
+    if (!this.isValid()) {
+      this._closing = false;
+      return;
+    }
+
+    this._closing = true;
+
+    const param = {
+      ...this.campaign,
+      startDate: this.campaign.startDate,
+      endDate: this.campaign.endDate,
+      campaignFlight: this.flightList.map((f) => ({
+        ...f,
+        startDate: f.startDate,
+        endDate: f.endDate,
+      })),
+    } as MvCampaign;
+
+    this._campaignService
+      .save(param)
+      .pipe(
+        takeUntil(this.__unSubscribeAll$),
+        finalize(() => {
+          this._closing = false;
+        }),
+      )
+      .subscribe((response: MvResponse<MvCampaign>) => {
+        if (response.type === ResponseStatusEnum.success && response.data) {
+          this.close(response.data);
+        }
+      });
+
     this.close();
+  }
+
+  private isValid(): boolean {
+    return !!(
+      this.campaign.name?.trim() &&
+      this.campaign.advertiserId &&
+      this.campaign.startDate &&
+      this.campaign.endDate
+    );
+  }
+
+  private isValidFlight(): boolean {
+    const start = new Date(this.currentFlight.startDate);
+    const end = new Date(this.currentFlight.endDate);
+
+    const overlaps = this.flightList.some((f) => {
+      const fStart = new Date(f.startDate);
+      const fEnd = new Date(f.endDate);
+      return start <= fEnd && end >= fStart;
+    });
+
+    if (overlaps) {
+      this.showToast(
+        'error',
+        'Overlap Detected',
+        'Flight dates overlap with an existing flight.',
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  protected onDialogHidden() {
+    this.activeIndex = 0;
+    this.touched = {};
+
+    if (!this._closing) {
+      this.close();
+    }
+
+    this._closing = false;
+  }
+
+  protected toDateOnly(date: string): Date {
+    return new Date(date);
   }
 
   private close(screen: MvCampaign | null = null) {
@@ -159,8 +281,6 @@ export class DraftAddEditComponent
     this.selectedNodes = [];
     this.flightList = [];
     this.isDialogOpen = false;
-    this.screenDdl = [];
-    this.advertiserDdl = [];
   }
 
   ngOnDestroy(): void {

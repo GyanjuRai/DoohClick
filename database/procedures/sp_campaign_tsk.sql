@@ -10,28 +10,25 @@
 ==========================================================================================
 
 DECLARE @Json NVARCHAR(MAX) = N'{
-                                    "Id": 2,
-                                    "CampaignCode": "CAMP-AMZ-2026Q2",
+                                    "Id": 3,
+                                    "CampaignCode": "CMP-LAMAR-FC6PGG",
                                     "TenantId": 1,
-                                    "AdvertiserId": 2,
-                                    "Name": "Amazon Prime Day Awareness 2026",
+                                    "AdvertiserId": 3,
+                                    "Advertiser": "Geico Insurance",
+                                    "Name": "Geico 15 Minutes Could Save You 2026",
                                     "Status": "DRAFT",
-                                    "StartDate": "2026-06-01",
-                                    "EndDate": "2026-08-31",
-                                    "Remarks": "Prime Day countdown and awareness campaign",
+                                    "StartDate": "2026-08-31",
+                                    "EndDate": "2026-11-29",
+                                    "DurationInDays": 90,
+                                    "Remarks": "Q3 brand awareness across urban screens",
                                     "CreatedBy": 1,
-                                    "ModifiedBy": 1,
-                                    "CampaignFlight": [
-                                        {
-                                            "Id": null,
-                                            "StartDate": "2026-06-01",
-                                            "EndDate": "2026-06-15",
-                                            "Screens": [
-                                                { "Id": null, "CampaignFlightId": null, "ScreenId": 1 },
-                                                { "Id": null, "CampaignFlightId": null, "ScreenId": 3 }
-                                            ]
-                                        }
-                                    ]
+                                    "CreatedAt": "2026-05-07T13:59:35",
+                                    "Creator": "John Lamar",
+                                    "ModifiedBy": null,
+                                    "ModifiedAt": null,
+                                    "Modifier": null,
+                                    "IsLocked": false,
+                                    "CampaignFlight": []
                                 }';
 
 EXEC dbo.sp_campaign_tsk @Json = @Json OUTPUT;
@@ -104,7 +101,7 @@ SET NOCOUNT ON
                 oj.TenantId,
                 oj.AdvertiserId,
                 oj.[Name],
-                oj.[Status],
+                ISNULL([status], 'DRAFT'),
                 oj.StartDate,
                 oj.EndDate,
                 oj.Remarks,
@@ -324,11 +321,9 @@ SET NOCOUNT ON
 					            COALESCE (mu.sur_name, '')
 				            )
 			            ))) AS modifier,
-			            JSON_QUERY(ISNULL(cf.campaign_flight, '[]')) AS campaign_flight,
-			            JSON_QUERY(ISNULL(cfs.campaign_flight_screen, '[]')) AS campaign_flight_screen
+			            ISNULL(cfs.campaign_flight, '[]') AS campaign_flight
 	            FROM dbo.campaign AS c
                 INNER JOIN #campaign AS tc ON c.id = tc.id
-	            LEFT JOIN dbo.tf_campaign_flight() AS cf ON c.id = cf.campaign_id
 	            LEFT JOIN dbo.tf_campaign_flight_screen() AS cfs ON c.id = cfs.campaign_id
 	            INNER JOIN crm.advertiser AS a ON c.advertiser_id = a.id
 	            INNER JOIN [identity].[user] AS cu ON c.created_by = cu.id

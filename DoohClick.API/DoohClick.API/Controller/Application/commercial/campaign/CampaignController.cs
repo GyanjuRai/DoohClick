@@ -1,8 +1,10 @@
 ﻿using DoohClick.API.Helper;
 using DoohClick.Interface.Application.commercial.campaign;
 using DoohClick.Model.Application.commercial.campaign;
+using DoohClick.Model.Shared.CodePrefix;
 using DoohClick.Model.Shared.Param;
 using DoohClick.Model.Shared.Response;
+using DoohClick.Service.Shared.Helper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DoohClick.API.Controller.Application.commercial.campaign
@@ -28,6 +30,10 @@ namespace DoohClick.API.Controller.Application.commercial.campaign
         [HttpPost("campaign")]
         public async Task<IActionResult> Save([FromBody] MvCampaign param)
         {
+            param.CampaignCode = CodeGenerator.Generate(CodePrefix.Campaign, ClaimsPrincipalExtensions.GetTenantCode(User));
+            param.CreatedBy = ClaimsPrincipalExtensions.GetUserId(User);
+            param.ModifiedBy = ClaimsPrincipalExtensions.GetUserId(User);
+            param.TenantId = ClaimsPrincipalExtensions.GetTenantId(User);
             MvCampaign? result = await _campaignService.Save(param);
  
             return Ok(ApiResponse.Success(result));
@@ -42,6 +48,19 @@ namespace DoohClick.API.Controller.Application.commercial.campaign
                 DeletedBy = ClaimsPrincipalExtensions.GetUserId(User)
             };
             MvCampaignIdParam? result = await _campaignService.Remove(param);
+
+            return Ok(ApiResponse.Success(result));
+        }
+
+        [HttpPost("campaign/approve/{id}")]
+        public async Task<IActionResult> Approve(int id)
+        {
+            MvCampaignIdParam param = new MvCampaignIdParam 
+            { 
+                Id = id, 
+                UpdatedBy =  ClaimsPrincipalExtensions.GetUserId(User) 
+            };
+            MvCampaignIdParam? result = await _campaignService.Approve(param);
 
             return Ok(ApiResponse.Success(result));
         }

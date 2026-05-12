@@ -8,15 +8,17 @@
 =====================================================================
 
 DECLARE @Json NVARCHAR(MAX) = N'{
-                                    "Id": 2,
+                                    "Id": 12,
                                     "DeletedBy": 1
                                 }';
 
-EXEC dbo.sp_campaing_del @Json = @Json;
+EXEC dbo.sp_campaign_del @Json = @Json OUT;
+
+SELECT @Json;
 
 */
 
-CREATE OR ALTER PROCEDURE dbo.sp_campaing_del
+CREATE OR ALTER PROCEDURE dbo.sp_campaign_del
 (
     @Json NVARCHAR(MAX) OUT
 )
@@ -33,7 +35,7 @@ BEGIN
         c.deleted_by = @DeletedBy,
         c.deleted_at = GETUTCDATE()
     FROM dbo.campaign AS c
-    WHERE c.id = @Id;
+    WHERE c.id = @Id AND c.is_deleted = 0;
     
     DECLARE @CampaingFlightDelJson NVARCHAR(MAX) = ISNULL((
         SELECT  cf.id AS Id,
@@ -65,5 +67,5 @@ BEGIN
         WITHOUT_ARRAY_WRAPPER
     ), '[]');
 
-    ROLLBACK TRANSACTION;
+    COMMIT TRANSACTION;
 END

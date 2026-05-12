@@ -1,22 +1,28 @@
 ﻿
 using DoohClick.DataAccess.Dapper;
+using DoohClick.DataAccess.Data;
+using DoohClick.DataAccess.Entity;
 using DoohClick.Interface.Application.commercial.campaign;
 using DoohClick.Interface.Shared.JsonSerializer;
 using DoohClick.Model.Application.commercial.campaign;
 using DoohClick.Model.Shared.Param;
 using DoohClick.Model.Shared.Response;
 using DoohClick.Service.Shared.Base;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace DoohClick.Service.Application.commercial.campaign
 {
-    public class CampaignService: BaseService, ICampaignService
+    public class CampaignService : BaseService, ICampaignService
     {
+        private readonly AppDbContext _dbContext;
         public CampaignService(
             IDataAccessService dataAccessService,
-            IJsonSerializer jsonSerializer
-            ): base(dataAccessService, jsonSerializer)
-        { 
+            IJsonSerializer jsonSerializer,
+            AppDbContext dbContext
+            ) : base(dataAccessService, jsonSerializer)
+        {
+            _dbContext = dbContext;
         }
 
         public async Task<MvGridResponse<MvCampaign>?> GetGrid(MvGridParamOption<MvCampaignFilterOptionParam> param)
@@ -35,6 +41,22 @@ namespace DoohClick.Service.Application.commercial.campaign
         {
             string result = await _dataAccessService.ActionProcedure("dbo.sp_campaign_del", JsonConvert.SerializeObject(param));
             return _jsonSerializer.DeserializeObject<MvCampaignIdParam>(result);
+        }
+
+        public async Task<MvCampaignIdParam?> Approve(MvCampaignIdParam param)
+        {
+            Campaign? result = await _dbContext.Campaigns
+            .FirstOrDefaultAsync(c => c.Id == param.Id);
+
+            if (result == null) return null;
+
+            result.Status = "ACTIVE";
+            result.ModifiedBy = param.UpdatedBy;
+            result.ModifiedAt = DateTime.UtcNow;
+
+            await _dbContext.SaveChangesAsync();
+
+            return new MvCampaignIdParam { Id = result.Id };
         }
     }
 }

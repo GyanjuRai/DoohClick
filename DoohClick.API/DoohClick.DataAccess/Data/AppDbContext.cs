@@ -22,17 +22,19 @@ public partial class AppDbContext : DbContext
 
     public virtual DbSet<Campaign> Campaigns { get; set; }
 
-    public virtual DbSet<CampaignPlaylist> CampaignPlaylists { get; set; }
+    public virtual DbSet<CampaignFlight> CampaignFlights { get; set; }
 
-    public virtual DbSet<CampaignSchedule> CampaignSchedules { get; set; }
+    public virtual DbSet<CampaignFlightScreen> CampaignFlightScreens { get; set; }
+
+    public virtual DbSet<CampaignPlaylistItem> CampaignPlaylistItems { get; set; }
+
+    public virtual DbSet<CampaignScreenSchedule> CampaignScreenSchedules { get; set; }
 
     public virtual DbSet<Listitem> Listitems { get; set; }
 
     public virtual DbSet<ListitemCategory> ListitemCategories { get; set; }
 
     public virtual DbSet<MediaLibrary> MediaLibraries { get; set; }
-
-    public virtual DbSet<PlaylistItem> PlaylistItems { get; set; }
 
     public virtual DbSet<Screen> Screens { get; set; }
 
@@ -45,6 +47,10 @@ public partial class AppDbContext : DbContext
     public virtual DbSet<Tenant> Tenants { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=192.168.1.112,1433;Database=DoohClick;MultipleActiveResultSets=true;user id=gyanju;password=gyanju##;TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -137,160 +143,208 @@ public partial class AppDbContext : DbContext
 
         modelBuilder.Entity<Campaign>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__campaign__3213E83FDDD2CC5C");
+            entity.HasKey(e => e.Id).HasName("PK__campaign__3213E83FDC75E978");
 
             entity.ToTable("campaign");
 
-            entity.HasIndex(e => new { e.TenantId, e.CampaignCode }, "UQ__campaign__1B1708E42D93AEF4").IsUnique();
+            entity.HasIndex(e => new { e.TenantId, e.CampaignCode }, "UQ__campaign__1B1708E48C8027AD").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.AdvertiserId).HasColumnName("advertiser_id");
             entity.Property(e => e.CampaignCode)
-                .HasMaxLength(40)
+                .HasMaxLength(50)
                 .HasColumnName("campaign_code");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnName("created_at");
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.DeletedBy).HasColumnName("deleted_by");
+            entity.Property(e => e.DurationInDays)
+                .HasComputedColumnSql("(datediff(day,[start_date],[end_date]))", true)
+                .HasColumnName("duration_in_days");
             entity.Property(e => e.EndDate).HasColumnName("end_date");
-            entity.Property(e => e.IsDeleted)
-                .HasDefaultValue(false)
-                .HasColumnName("is_deleted");
+            entity.Property(e => e.IsDeleted).HasColumnName("is_deleted");
+            entity.Property(e => e.IsLocked).HasColumnName("is_locked");
+            entity.Property(e => e.ModifiedAt).HasColumnName("modified_at");
+            entity.Property(e => e.ModifiedBy).HasColumnName("modified_by");
             entity.Property(e => e.Name)
-                .HasMaxLength(100)
+                .HasMaxLength(150)
                 .HasColumnName("name");
-            entity.Property(e => e.Note)
+            entity.Property(e => e.Remarks)
                 .HasMaxLength(255)
-                .HasColumnName("note");
+                .HasColumnName("remarks");
             entity.Property(e => e.StartDate).HasColumnName("start_date");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
+                .HasDefaultValue("DRAFT")
                 .HasColumnName("status");
             entity.Property(e => e.TenantId).HasColumnName("tenant_id");
-            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
-            entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
-            entity.Property(e => e.Uuid)
-                .HasDefaultValueSql("(newid())")
-                .HasColumnName("uuid");
 
             entity.HasOne(d => d.Advertiser).WithMany(p => p.Campaigns)
                 .HasForeignKey(d => d.AdvertiserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__campaign__advert__0A9D95DB");
+                .HasConstraintName("FK__campaign__advert__70A8B9AE");
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.CampaignCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__campaign__create__0C85DE4D");
+                .HasConstraintName("FK__campaign__create__73852659");
 
             entity.HasOne(d => d.DeletedByNavigation).WithMany(p => p.CampaignDeletedByNavigations)
                 .HasForeignKey(d => d.DeletedBy)
-                .HasConstraintName("FK__campaign__delete__0E6E26BF");
+                .HasConstraintName("FK__campaign__delete__7755B73D");
+
+            entity.HasOne(d => d.ModifiedByNavigation).WithMany(p => p.CampaignModifiedByNavigations)
+                .HasForeignKey(d => d.ModifiedBy)
+                .HasConstraintName("FK__campaign__modifi__756D6ECB");
 
             entity.HasOne(d => d.Tenant).WithMany(p => p.Campaigns)
                 .HasForeignKey(d => d.TenantId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__campaign__tenant__09A971A2");
-
-            entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.CampaignUpdatedByNavigations)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__campaign__update__0D7A0286");
+                .HasConstraintName("FK__campaign__tenant__6FB49575");
         });
 
-        modelBuilder.Entity<CampaignPlaylist>(entity =>
+        modelBuilder.Entity<CampaignFlight>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("PK__campaign__3213E83F04EAD6F9");
+            entity.HasKey(e => e.Id).HasName("PK__campaign__3213E83F57820129");
 
-            entity.ToTable("campaign_playlist");
+            entity.ToTable("campaign_flight");
 
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.CampaignScheduleId).HasColumnName("campaign_schedule_id");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-            entity.Property(e => e.CreatedBy).HasColumnName("created_by");
-            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
-            entity.Property(e => e.DeletedBy).HasColumnName("deleted_by");
-            entity.Property(e => e.IsActive)
-                .HasDefaultValue(true)
-                .HasColumnName("is_active");
-            entity.Property(e => e.IsDeleted).HasColumnName("is_deleted");
-            entity.Property(e => e.Name)
-                .HasMaxLength(100)
-                .HasColumnName("name");
-            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
-            entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
-            entity.Property(e => e.Version)
-                .HasDefaultValue(1)
-                .HasColumnName("version");
-
-            entity.HasOne(d => d.CampaignSchedule).WithMany(p => p.CampaignPlaylists)
-                .HasForeignKey(d => d.CampaignScheduleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__campaign___campa__208CD6FA");
-
-            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.CampaignPlaylistCreatedByNavigations)
-                .HasForeignKey(d => d.CreatedBy)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__campaign___creat__245D67DE");
-
-            entity.HasOne(d => d.DeletedByNavigation).WithMany(p => p.CampaignPlaylistDeletedByNavigations)
-                .HasForeignKey(d => d.DeletedBy)
-                .HasConstraintName("FK__campaign___delet__2645B050");
-
-            entity.HasOne(d => d.UpdatedByNavigation).WithMany(p => p.CampaignPlaylistUpdatedByNavigations)
-                .HasForeignKey(d => d.UpdatedBy)
-                .HasConstraintName("FK__campaign___updat__25518C17");
-        });
-
-        modelBuilder.Entity<CampaignSchedule>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__campaign__3213E83F23332A65");
-
-            entity.ToTable("campaign_schedule");
+            entity.HasIndex(e => new { e.CampaignId, e.StartDate }, "UQ_campaign_flight")
+                .IsUnique()
+                .HasFilter("([is_deleted]=(0))");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CampaignId).HasColumnName("campaign_id");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-            entity.Property(e => e.CreatedBy).HasColumnName("created_by");
-            entity.Property(e => e.Currency)
-                .HasMaxLength(10)
-                .HasColumnName("currency");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
             entity.Property(e => e.DeletedBy).HasColumnName("deleted_by");
-            entity.Property(e => e.EndDateTime).HasColumnName("end_date_time");
-            entity.Property(e => e.EstimatedImpressions).HasColumnName("estimated_impressions");
+            entity.Property(e => e.EndDate).HasColumnName("end_date");
             entity.Property(e => e.IsDeleted).HasColumnName("is_deleted");
-            entity.Property(e => e.RatePerHour)
-                .HasColumnType("decimal(10, 2)")
-                .HasColumnName("rate_per_hour");
-            entity.Property(e => e.ScreenId).HasColumnName("screen_id");
-            entity.Property(e => e.StartDateTime).HasColumnName("start_date_time");
-            entity.Property(e => e.TotalAmount)
-                .HasComputedColumnSql("(CONVERT([decimal](10,2),(datediff(minute,[start_date_time],[end_date_time])/(60.0))*[rate_per_hour]))", true)
-                .HasColumnType("decimal(10, 2)")
-                .HasColumnName("total_amount");
-            entity.Property(e => e.TotalHours)
-                .HasComputedColumnSql("(CONVERT([decimal](10,2),datediff(minute,[start_date_time],[end_date_time])/(60.0)))", true)
-                .HasColumnType("decimal(10, 2)")
-                .HasColumnName("total_hours");
+            entity.Property(e => e.StartDate).HasColumnName("start_date");
 
-            entity.HasOne(d => d.Campaign).WithMany(p => p.CampaignSchedules)
+            entity.HasOne(d => d.Campaign).WithMany(p => p.CampaignFlights)
                 .HasForeignKey(d => d.CampaignId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__campaign___campa__114A936A");
+                .HasConstraintName("FK__campaign___campa__7A3223E8");
 
-            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.CampaignScheduleCreatedByNavigations)
-                .HasForeignKey(d => d.CreatedBy)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__campaign___creat__14270015");
-
-            entity.HasOne(d => d.DeletedByNavigation).WithMany(p => p.CampaignScheduleDeletedByNavigations)
+            entity.HasOne(d => d.DeletedByNavigation).WithMany(p => p.CampaignFlights)
                 .HasForeignKey(d => d.DeletedBy)
-                .HasConstraintName("FK__campaign___delet__151B244E");
+                .HasConstraintName("FK__campaign___delet__7C1A6C5A");
+        });
 
-            entity.HasOne(d => d.Screen).WithMany(p => p.CampaignSchedules)
+        modelBuilder.Entity<CampaignFlightScreen>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__campaign__3213E83F3328E7B8");
+
+            entity.ToTable("campaign_flight_screen");
+
+            entity.HasIndex(e => new { e.CampaignFlightId, e.ScreenId }, "UQ_campaign_flight_screen")
+                .IsUnique()
+                .HasFilter("([is_deleted]=(0))");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CampaignFlightId).HasColumnName("campaign_flight_id");
+            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+            entity.Property(e => e.DeletedBy).HasColumnName("deleted_by");
+            entity.Property(e => e.IsDeleted).HasColumnName("is_deleted");
+            entity.Property(e => e.ScreenId).HasColumnName("screen_id");
+
+            entity.HasOne(d => d.CampaignFlight).WithMany(p => p.CampaignFlightScreens)
+                .HasForeignKey(d => d.CampaignFlightId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__campaign___campa__7EF6D905");
+
+            entity.HasOne(d => d.DeletedByNavigation).WithMany(p => p.CampaignFlightScreens)
+                .HasForeignKey(d => d.DeletedBy)
+                .HasConstraintName("FK__campaign___delet__01D345B0");
+
+            entity.HasOne(d => d.Screen).WithMany(p => p.CampaignFlightScreens)
                 .HasForeignKey(d => d.ScreenId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__campaign___scree__123EB7A3");
+                .HasConstraintName("FK__campaign___scree__7FEAFD3E");
+        });
+
+        modelBuilder.Entity<CampaignPlaylistItem>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__campaign__3213E83FAD389C0D");
+
+            entity.ToTable("campaign_playlist_item");
+
+            entity.HasIndex(e => new { e.ScheduleId, e.PlayOrder }, "UQ_playlist_order").IsUnique();
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+            entity.Property(e => e.DeletedBy).HasColumnName("deleted_by");
+            entity.Property(e => e.DurationSeconds)
+                .HasDefaultValue(30)
+                .HasColumnName("duration_seconds");
+            entity.Property(e => e.IsDeleted).HasColumnName("is_deleted");
+            entity.Property(e => e.MediaId).HasColumnName("media_id");
+            entity.Property(e => e.PlayOrder).HasColumnName("play_order");
+            entity.Property(e => e.ScheduleId).HasColumnName("schedule_id");
+
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.CampaignPlaylistItemCreatedByNavigations)
+                .HasForeignKey(d => d.CreatedBy)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__campaign___creat__10216507");
+
+            entity.HasOne(d => d.DeletedByNavigation).WithMany(p => p.CampaignPlaylistItemDeletedByNavigations)
+                .HasForeignKey(d => d.DeletedBy)
+                .HasConstraintName("FK__campaign___delet__12FDD1B2");
+
+            entity.HasOne(d => d.Media).WithMany(p => p.CampaignPlaylistItems)
+                .HasForeignKey(d => d.MediaId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__campaign___media__0E391C95");
+
+            entity.HasOne(d => d.Schedule).WithMany(p => p.CampaignPlaylistItems)
+                .HasForeignKey(d => d.ScheduleId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__campaign___sched__0D44F85C");
+        });
+
+        modelBuilder.Entity<CampaignScreenSchedule>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK__campaign__3213E83FF7E344AB");
+
+            entity.ToTable("campaign_screen_schedule");
+
+            entity.HasIndex(e => new { e.CampaignFlightScreenId, e.DayOfWeek, e.StartTime }, "UQ_screen_schedule")
+                .IsUnique()
+                .HasFilter("([is_deleted]=(0))");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CampaignFlightScreenId).HasColumnName("campaign_flight_screen_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(getutcdate())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+            entity.Property(e => e.DayOfWeek)
+                .HasMaxLength(50)
+                .HasColumnName("day_of_week");
+            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+            entity.Property(e => e.DeletedBy).HasColumnName("deleted_by");
+            entity.Property(e => e.EndTime).HasColumnName("end_time");
+            entity.Property(e => e.IsDeleted).HasColumnName("is_deleted");
+            entity.Property(e => e.StartTime).HasColumnName("start_time");
+
+            entity.HasOne(d => d.CampaignFlightScreen).WithMany(p => p.CampaignScreenSchedules)
+                .HasForeignKey(d => d.CampaignFlightScreenId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__campaign___campa__04AFB25B");
+
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.CampaignScreenScheduleCreatedByNavigations)
+                .HasForeignKey(d => d.CreatedBy)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK__campaign___creat__05A3D694");
+
+            entity.HasOne(d => d.DeletedByNavigation).WithMany(p => p.CampaignScreenScheduleDeletedByNavigations)
+                .HasForeignKey(d => d.DeletedBy)
+                .HasConstraintName("FK__campaign___delet__09746778");
         });
 
         modelBuilder.Entity<Listitem>(entity =>
@@ -351,6 +405,7 @@ public partial class AppDbContext : DbContext
             entity.HasIndex(e => new { e.TenantId, e.DisplayName }, "UQ__media_li__B437EAB85C37AD40").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.AdvertiserId).HasColumnName("advertiser_id");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
             entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
@@ -358,10 +413,13 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.DisplayName)
                 .HasMaxLength(100)
                 .HasColumnName("display_name");
-            entity.Property(e => e.DurationSec).HasColumnName("duration_sec");
+            entity.Property(e => e.DurationSec)
+                .HasColumnType("decimal(10, 3)")
+                .HasColumnName("duration_sec");
             entity.Property(e => e.FileName)
                 .HasMaxLength(255)
                 .HasColumnName("file_name");
+            entity.Property(e => e.FileSizeBytes).HasColumnName("file_size_bytes");
             entity.Property(e => e.FileUrl)
                 .HasMaxLength(500)
                 .HasColumnName("file_url");
@@ -380,6 +438,10 @@ public partial class AppDbContext : DbContext
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("uuid");
 
+            entity.HasOne(d => d.Advertiser).WithMany(p => p.MediaLibraries)
+                .HasForeignKey(d => d.AdvertiserId)
+                .HasConstraintName("FK__media_lib__adver__6BE40491");
+
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.MediaLibraryCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -397,45 +459,6 @@ public partial class AppDbContext : DbContext
             entity.HasOne(d => d.UploadedByNavigation).WithMany(p => p.MediaLibraryUploadedByNavigations)
                 .HasForeignKey(d => d.UploadedBy)
                 .HasConstraintName("FK__media_lib__uploa__1BC821DD");
-        });
-
-        modelBuilder.Entity<PlaylistItem>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__playlist__3213E83F9FBA6D8F");
-
-            entity.ToTable("playlist_item");
-
-            entity.HasIndex(e => new { e.PlaylistId, e.PlaySequence }, "uq_playlist_sequence").IsUnique();
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
-            entity.Property(e => e.CreatedBy).HasColumnName("created_by");
-            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
-            entity.Property(e => e.DeletedBy).HasColumnName("deleted_by");
-            entity.Property(e => e.DurationOverrideSec).HasColumnName("duration_override_sec");
-            entity.Property(e => e.IsDeleted).HasColumnName("is_deleted");
-            entity.Property(e => e.MediaId).HasColumnName("media_id");
-            entity.Property(e => e.PlaySequence).HasColumnName("play_sequence");
-            entity.Property(e => e.PlaylistId).HasColumnName("playlist_id");
-
-            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.PlaylistItemCreatedByNavigations)
-                .HasForeignKey(d => d.CreatedBy)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__playlist___creat__2CF2ADDF");
-
-            entity.HasOne(d => d.DeletedByNavigation).WithMany(p => p.PlaylistItemDeletedByNavigations)
-                .HasForeignKey(d => d.DeletedBy)
-                .HasConstraintName("FK__playlist___delet__2DE6D218");
-
-            entity.HasOne(d => d.Media).WithMany(p => p.PlaylistItems)
-                .HasForeignKey(d => d.MediaId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__playlist___media__2B0A656D");
-
-            entity.HasOne(d => d.Playlist).WithMany(p => p.PlaylistItems)
-                .HasForeignKey(d => d.PlaylistId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__playlist___playl__2A164134");
         });
 
         modelBuilder.Entity<Screen>(entity =>
@@ -472,6 +495,9 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValue(false)
+                .HasColumnName("is_deleted");
             entity.Property(e => e.Location)
                 .HasMaxLength(100)
                 .HasColumnName("location");
@@ -491,7 +517,7 @@ public partial class AppDbContext : DbContext
                 .HasMaxLength(40)
                 .HasColumnName("screen_code");
             entity.Property(e => e.Tag)
-                .HasMaxLength(50)
+                .HasMaxLength(500)
                 .HasColumnName("tag");
             entity.Property(e => e.TenantId).HasColumnName("tenant_id");
             entity.Property(e => e.Timezone)
@@ -528,6 +554,10 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("screen_operating_hour", "inv");
 
+            entity.HasIndex(e => new { e.ScreenId, e.DayOfWeek, e.OpenTime }, "UQ_screen_operating_hour_screen_day")
+                .IsUnique()
+                .HasFilter("([is_deleted]=(0))");
+
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.AudienceSource)
                 .HasMaxLength(50)
@@ -538,17 +568,21 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.DayOfWeek)
                 .HasMaxLength(50)
                 .HasColumnName("day_of_week");
+            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+            entity.Property(e => e.DeletedBy).HasColumnName("deleted_by");
             entity.Property(e => e.EstimatedImpression).HasColumnName("estimated_impression");
+            entity.Property(e => e.IsDeleted).HasColumnName("is_deleted");
             entity.Property(e => e.OpenTime).HasColumnName("open_time");
-            entity.Property(e => e.RatePerHr)
-                .HasColumnType("decimal(10, 2)")
-                .HasColumnName("rate_per_hr");
             entity.Property(e => e.ScreenId).HasColumnName("screen_id");
 
-            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ScreenOperatingHours)
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ScreenOperatingHourCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__screen_op__creat__7C4F7684");
+
+            entity.HasOne(d => d.DeletedByNavigation).WithMany(p => p.ScreenOperatingHourDeletedByNavigations)
+                .HasForeignKey(d => d.DeletedBy)
+                .HasConstraintName("FK__screen_op__delet__47A6A41B");
 
             entity.HasOne(d => d.Screen).WithMany(p => p.ScreenOperatingHours)
                 .HasForeignKey(d => d.ScreenId)
@@ -562,18 +596,29 @@ public partial class AppDbContext : DbContext
 
             entity.ToTable("screen_supported_media", "inv");
 
+            entity.HasIndex(e => new { e.ScreenId, e.MediaType }, "UQ_screen_supported_media_screen_media")
+                .IsUnique()
+                .HasFilter("([is_deleted]=(0))");
+
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+            entity.Property(e => e.DeletedAt).HasColumnName("deleted_at");
+            entity.Property(e => e.DeletedBy).HasColumnName("deleted_by");
+            entity.Property(e => e.IsDeleted).HasColumnName("is_deleted");
             entity.Property(e => e.MediaType)
                 .HasMaxLength(50)
                 .HasColumnName("media_type");
             entity.Property(e => e.ScreenId).HasColumnName("screen_id");
 
-            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ScreenSupportedMedia)
+            entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ScreenSupportedMediumCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__screen_su__creat__787EE5A0");
+
+            entity.HasOne(d => d.DeletedByNavigation).WithMany(p => p.ScreenSupportedMediumDeletedByNavigations)
+                .HasForeignKey(d => d.DeletedBy)
+                .HasConstraintName("FK__screen_su__delet__498EEC8D");
 
             entity.HasOne(d => d.Screen).WithMany(p => p.ScreenSupportedMedia)
                 .HasForeignKey(d => d.ScreenId)
@@ -718,6 +763,10 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(20)
                 .HasColumnName("phone_number");
+            entity.Property(e => e.RefreshToken)
+                .HasMaxLength(500)
+                .HasColumnName("refresh_token");
+            entity.Property(e => e.RefreshTokenExpiry).HasColumnName("refresh_token_expiry");
             entity.Property(e => e.SurName)
                 .HasMaxLength(50)
                 .HasColumnName("sur_name");
@@ -735,15 +784,6 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Uuid)
                 .HasDefaultValueSql("(newid())")
                 .HasColumnName("uuid");
-
-            entity.Property(u => u.RefreshToken)
-                .HasColumnName("refresh_token")
-                .HasMaxLength(500)
-                .IsRequired(false);
-
-            entity.Property(u => u.RefreshTokenExpiry)
-                .HasColumnName("refresh_token_expiry")
-                .IsRequired(false);
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.InverseCreatedByNavigation)
                 .HasForeignKey(d => d.CreatedBy)

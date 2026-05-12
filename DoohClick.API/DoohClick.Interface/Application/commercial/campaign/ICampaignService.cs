@@ -24,6 +24,13 @@ namespace DoohClick.Interface.Application.commercial.campaign
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<MvCampaignIdParam?> Remove(MvCampaignIdParam param); 
+        Task<MvCampaignIdParam?> Remove(MvCampaignIdParam param);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+
+        Task<MvCampaignIdParam?> Approve(MvCampaignIdParam param);
     }
 }

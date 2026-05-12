@@ -6,6 +6,7 @@ import { MvGridParamOption } from '../../shared/model/param.model';
 import {
   MvCampaign,
   MvCampaignFilterOptionParam,
+  MvCampaignIdParam,
 } from '../model/campaign.model';
 import { finalize, Subject, takeUntil } from 'rxjs';
 import { MvGridResponse, MvResponse } from '../../shared/model/response.model';
@@ -13,6 +14,7 @@ import { ResponseStatusEnum, ROUTE_PATHS } from '../../shared';
 import { AuthService } from '../../core/service/auth.service';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { ConfirmationOptions } from '../../shared/model/confirmation.model';
+import { TableLazyLoadEvent } from 'primeng/table';
 
 @Directive({
   selector: 'campaing-base',
@@ -20,7 +22,7 @@ import { ConfirmationOptions } from '../../shared/model/confirmation.model';
 export abstract class CampaignBaseClass implements OnDestroy {
   private __unSubscribeAll$: Subject<any>;
   private _authSerivce: AuthService;
-  private _campaignService: CampaignService;
+  protected _campaignService: CampaignService;
   private _confirmationService: ConfirmationService;
   private _messageService: MessageService;
   protected gridConfig: GridConfig = {
@@ -51,19 +53,11 @@ export abstract class CampaignBaseClass implements OnDestroy {
     this._messageService = inject(MessageService);
   }
 
-  loadCampaing(
-    status: string = 'DRAFT',
-    endDate?: string,
-    startDate?: string,
-    advertiserIdList?: number[],
-  ) {
+  loadCampaing(status: string) {
     this.isTableLoading = true;
 
-    this.gridConfig.options.filter.Status = status;
+    this.gridConfig.options.filter.status = status;
     this.gridConfig.options.filter.tenantId = this._authSerivce.getTenantId();
-    this.gridConfig.options.filter.endDate = endDate;
-    this.gridConfig.options.filter.startDate = startDate;
-    this.gridConfig.options.filter.advertiserIdList = advertiserIdList;
 
     const param = {
       filter: this.gridConfig.options.filter,
@@ -85,7 +79,7 @@ export abstract class CampaignBaseClass implements OnDestroy {
           response.type === ResponseStatusEnum.success &&
           response.data?.data
         ) {
-          this.gridConfig.dataSource.data = [...response.data.data ];
+          this.gridConfig.dataSource.data = [...response.data.data];
           this.gridConfig.dataSource.totalRows = response.data.totalRows;
         }
       });
@@ -98,14 +92,14 @@ export abstract class CampaignBaseClass implements OnDestroy {
     ];
   }
 
-  protected onSearchText() {
+  protected onSearchText(status: string) {
     this.gridConfig.options.offset = 0;
-    this.loadCampaing();
+    this.loadCampaing(status);
   }
 
-  protected onRefresh() {
+  protected onRefresh(status: string) {
     this.gridConfig.options.offset = 0;
-    this.loadCampaing();
+    this.loadCampaing(status);
   }
 
   /**
@@ -145,6 +139,73 @@ export abstract class CampaignBaseClass implements OnDestroy {
       accept: confirmationOptions.onAccept,
       reject: confirmationOptions.onReject,
     });
+  }
+
+  protected approveCampaing(campaign: MvCampaign) {
+    const param = {
+      id: campaign.id,
+    } as MvCampaignIdParam;
+    this._campaignService
+      .approve(param)
+      .pipe(takeUntil(this.__unSubscribeAll$))
+      .subscribe((response: MvResponse<MvCampaignIdParam>) => {
+        if (response.type === ResponseStatusEnum.success && response.data) {
+          const index = this.gridConfig.dataSource.data.findIndex(
+            (m) => m.id === response.data?.id,
+          );
+
+          if (index !== -1) {
+            this.gridConfig.dataSource.data.splice(index, 1);
+            this.gridConfig.dataSource.data = [
+              ...this.gridConfig.dataSource.data,
+            ]; //refresh grid
+            this.gridConfig.dataSource.totalRows--;
+
+            this.showToast(
+              'success',
+              'Approved',
+              `${campaign.campaignCode} has been Approved.`,
+            );
+          }
+        }
+      });
+  }
+
+  protected removeCampaing(campaign: MvCampaign) {
+    const param = {
+      id: campaign.id,
+    } as MvCampaignIdParam;
+
+    this._campaignService
+      .remove(param)
+      .pipe(takeUntil(this.__unSubscribeAll$))
+      .subscribe((response: MvResponse<MvCampaignIdParam>) => {
+        if (response.type === ResponseStatusEnum.success && response.data) {
+          const index = this.gridConfig.dataSource.data.findIndex(
+            (m) => m.id === response.data?.id,
+          );
+
+          if (index !== -1) {
+            this.gridConfig.dataSource.data.splice(index, 1);
+            this.gridConfig.dataSource.data = [
+              ...this.gridConfig.dataSource.data,
+            ]; //refresh grid
+            this.gridConfig.dataSource.totalRows--;
+
+            this.showToast(
+              'success',
+              'Archived',
+              `${campaign.campaignCode} has been archived.`,
+            );
+          }
+        }
+      });
+  }
+
+  onPageChange(event: TableLazyLoadEvent, status: string) {
+    this.gridConfig.options.offset = event.first ?? 0;
+    this.gridConfig.options.pageSize = event.rows ?? 10;
+    this.loadCampaing(status);
   }
 
   ngOnDestroy(): void {

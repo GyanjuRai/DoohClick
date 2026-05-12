@@ -14,6 +14,7 @@ import { AppConst } from '../../../../app-const';
 import { MenuItem } from 'primeng/api';
 import { mediaMenuItem } from '../../model/media-list-action-items';
 import { ConfirmationOptions } from '../../../../shared/model/confirmation.model';
+import { TableLazyLoadEvent } from 'primeng/table';
 
 @Component({
   selector: 'media-list',
@@ -203,6 +204,12 @@ export class MediaListComponent
     if (!this.mediaTypeList || this.mediaTypeList.length === 0) return null;
     if (this.mediaTypeList.length === 2) return null;
     return this.mediaTypeList[0];
+  }
+
+  onPageChange(event: TableLazyLoadEvent) {
+    this.gridConfig.options.offset = event.first ?? 0;
+    this.gridConfig.options.pageSize = event.rows ?? 10;
+    this.loadMedia();
   }
 
   ngOnDestroy(): void {

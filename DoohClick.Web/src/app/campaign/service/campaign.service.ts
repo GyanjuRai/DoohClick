@@ -29,11 +29,22 @@ export class CampaignService {
   }
 
   save(param: MvCampaign): Observable<MvResponse<MvCampaign>> {
-    return this.api.post('commercial/campaign', param);
+    return this.api.post('commercial/campaign', param).pipe(
+      map((response) => {
+        if (response.data?.data) {
+          response.data.data = this.mapDates(response.data.data);
+        }
+        return response;
+      }),
+    );
   }
 
   remove(param: MvCampaignIdParam): Observable<MvResponse<MvCampaignIdParam>> {
-    return this.api.delete('commercial/campaign/{id}', param);
+    return this.api.delete(`commercial/campaign/${param.id}`);
+  }
+
+  approve(param: MvCampaignIdParam): Observable<MvResponse<MvCampaignIdParam>> {
+    return this.api.post(`commercial/campaign/approve/${param.id}`, {});
   }
 
   private mapDates(c: MvCampaign): MvCampaign {

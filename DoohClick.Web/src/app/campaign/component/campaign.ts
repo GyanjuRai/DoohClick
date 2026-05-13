@@ -15,16 +15,18 @@ import { AuthService } from '../../core/service/auth.service';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { ConfirmationOptions } from '../../shared/model/confirmation.model';
 import { TableLazyLoadEvent } from 'primeng/table';
+import { Router } from '@angular/router';
 
 @Directive({
   selector: 'campaing-base',
 })
 export abstract class CampaignBaseClass implements OnDestroy {
-  private __unSubscribeAll$: Subject<any>;
+  protected __unSubscribeAll$: Subject<any>;
   private _authSerivce: AuthService;
   protected _campaignService: CampaignService;
   private _confirmationService: ConfirmationService;
   private _messageService: MessageService;
+  protected router: Router;
   protected gridConfig: GridConfig = {
     column: campaignColumns,
     dataSource: {
@@ -51,6 +53,7 @@ export abstract class CampaignBaseClass implements OnDestroy {
     this._campaignService = inject(CampaignService);
     this._confirmationService = inject(ConfirmationService);
     this._messageService = inject(MessageService);
+    this.router = inject(Router);
   }
 
   loadCampaing(status: string) {

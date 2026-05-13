@@ -9,7 +9,7 @@
 =====================================================================
 
 DECLARE @Json NVARCHAR(MAX) = N'{
-                                    "CampaignId": 2
+                                    "Id": 2
                                 }';
 
 EXEC dbo.sp_campaign_screen_schedule_sel @Json = @Json;
@@ -24,7 +24,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    DECLARE @CampaignId INT = JSON_VALUE(@Json, '$.CampaignId');
+    DECLARE @CampaignId INT = JSON_VALUE(@Json, '$.Id');
    
    WITH campaign_flights AS (
     SELECT 
@@ -41,7 +41,7 @@ BEGIN
         cf.end_date,
 
         s.id                        AS screen_id,
-        s.name                      AS screen_name,
+        s.[name]                     AS screen_name,
         s.default_resolution        AS screen_resolution,
         s.country_code              AS screen_country,
         s.city                      AS screen_city,
@@ -52,6 +52,7 @@ BEGIN
                     css.id          AS schedule_id,
                     css.start_time,
                     css.end_time,
+                    css.day_of_week,
 
                     ISNULL(
                         JSON_QUERY((

@@ -1,1 +1,118 @@
-<p>campaign-screen-list works!</p>
+<p-toast></p-toast>
+<p-breadcrumb [model]="breadcrumbItems" class="mb-3" />
+
+<div class="flex align-items-center gap-2 my-3 pl-3">
+  <h2 class="text-2xl font-semibold m-0" style="color: var(--surface-600)">
+    Campaign Media
+  </h2>
+  <p-badge [value]="screens.length" severity="secondary" />
+</div>
+
+<div class="card grid-wrapper">
+  <div class="flex flex-column gap-4">
+    <div
+      *ngFor="let screen of screens"
+      class="border-1 border-200 p-2 border-round-lg overflow-hidden"
+    >
+      <div class="flex align-items-center gap-3 p-3">
+        <div class="flex flex-column gap-1 flex-1">
+          <p-tag [value]="flightDateLabel(screen)" />
+          <div class="flex align-items-center gap-4">
+            <span class="font-semibold">{{ screen.screenName }}</span>
+
+            <p-button icon="pi pi-plus" pTooltip="Manage schedule & playlist" tooltipPosition="bottom" (onClick)="campaignScreenAddEdit.open(screen, advertiserId)" pRipple> </p-button>
+          </div>
+
+          <div class="flex flex-column gap-3 text-color-secondary text-sm">
+            <span class="font-semibold">
+              <i class="pi pi-map-marker mr-1"></i>
+              {{ screen.screenCity }}, {{ screen.screenCountry }}
+            </span>
+            <span class="font-semibold">
+              <i class="pi pi-desktop mr-1"></i>
+              {{ screen.screenResolution }}
+            </span>
+            <p-tag
+              *ngIf="screen.campaignScreenSchedules.length"
+              [value]="
+                screen.campaignScreenSchedules.length +
+                ' schedule' +
+                (screen.campaignScreenSchedules.length !== 1 ? 's' : '')
+              "
+              severity="success"
+              icon="pi pi-calendar"
+            />
+            <p-tag
+              *ngIf="!screen.campaignScreenSchedules.length"
+              value="No schedule"
+              severity="warning"
+              icon="pi pi-exclamation-triangle"
+            />
+          </div>
+        </div>
+
+        <div class="border-top-1 surface-border p-3">
+          <p-table
+            [value]="screen.campaignScreenSchedules"
+            styleClass="p-datatable-sm"
+            [tableStyle]="{ 'min-width': '100%' }"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th *ngFor="let col of columns" [style.width]="col.width">
+                  {{ col.displayName }}
+                </th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-schedule>
+              <tr>
+                <td *ngFor="let col of columns">
+                  <ng-container [ngSwitch]="col.name">
+                    <ng-container *ngSwitchCase="'dayOfWeek'">
+                      <p-tag
+                        [value]="schedule.dayOfWeek"
+                        severity="secondary"
+                      />
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'timeSlot'">
+                      {{ schedule.startTime | slice: 0 : 5 }} –
+                      {{ schedule.endTime | slice: 0 : 5 }}
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="'playlist'">
+                      <p-tag
+                        [value]="
+                          schedule.playlist.length +
+                          ' item' +
+                          (schedule.playlist.length !== 1 ? 's' : '')
+                        "
+                        severity="info"
+                        icon="pi pi-list"
+                      />
+                    </ng-container>
+                  </ng-container>
+                </td>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td [attr.colspan]="columns.length" class="text-center p-4">
+                  <span class="text-color-secondary">No entries</span>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </div>
+
+    <div class="justify-content-center" *ngIf="screens.length === 0">
+      <span class="text-color-secondary">No Screen Medias</span>
+    </div>
+  </div>
+</div>
+
+<campaign-screen-add-edit #campaignScreenAddEdit></campaign-screen-add-edit>

@@ -41,6 +41,7 @@ import { BreadcrumbModule } from 'primeng/breadcrumb';
 import { TreeModule } from 'primeng/tree';
 import { OverlayModule } from 'primeng/overlay';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
+import { PanelModule } from 'primeng/panel';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
 
@@ -87,6 +88,7 @@ const PRIME_NG_MODULES = [
   TreeModule,
   OverlayModule,
   OverlayPanelModule,
+  PanelModule,
 ];
 
 @NgModule({

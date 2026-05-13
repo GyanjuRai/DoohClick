@@ -42,3 +42,50 @@ export interface MvCampaignIdParam {
   id: number;
   deletedBy?: number;
 }
+
+export interface MvCampaignScreenSchedule {
+  flightId?: number;
+  startDate: string;
+  endDate: string;
+  screenId?: number;
+  screenName?: string;
+  screenResolution?: string;
+  screenCountry?: string;
+  screenCity?: string;
+  campaignScreenSchedules: MvScreenSchedule[];
+}
+
+export interface MvScreenSchedule {
+  scheduleId?: number;
+  startTime: string;
+  endTime: string;
+  dayOfWeek?: string;
+  playlist: MvPlaylistItem[];
+}
+
+export interface MvPlaylistItem {
+  playlistItemId?: number;
+  durationSeconds: number;
+  playOrder: number;
+  displayName?: string;
+  fileUrl?: string;
+  fileSizeBytes: number;
+}
+
+export interface MvCampaignScreenScheduleParam {
+  id?: number;
+  campaignFlightScreenId: number;
+  dayOfWeek: string;
+  startTime: string;
+  endTime: string;
+  createdBy?: number;
+  deletedBy?: number;
+  playlistItem: MvPlaylistItemParam[];
+}
+
+export interface MvPlaylistItemParam {
+  id?: number;
+  mediaId: number;
+  playOrder: number;
+  durationSeconds: number;
+}

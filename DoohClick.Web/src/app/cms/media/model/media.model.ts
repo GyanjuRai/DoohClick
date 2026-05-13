@@ -26,6 +26,11 @@ export interface MvMediaDdl {
   fileSizeBytes?: number;
 }
 
+export interface MvMediaDdlParam {
+  tenantId?: number;
+  advertiserId: number;
+}
+
 export interface MvMediaFilterOptions {
   tenantId: number;
   isArchieved?: boolean;

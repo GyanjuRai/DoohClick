@@ -27,6 +27,14 @@ namespace DoohClick.API.Controller.Application.commercial.campaign
             return Ok(ApiResponse.Success(result));
         }
 
+        [HttpGet("campaign/schedules")]
+        public async Task<IActionResult> GetSchedules([FromQuery] MvCampaignIdParam param)
+        {
+            List<MvCampaignScreenSchedule>? result = await _campaignService.GetSchedules(param);
+            
+            return Ok(ApiResponse.Success(result));
+        }
+
         [HttpPost("campaign")]
         public async Task<IActionResult> Save([FromBody] MvCampaign param)
         {
@@ -36,6 +44,14 @@ namespace DoohClick.API.Controller.Application.commercial.campaign
             param.TenantId = ClaimsPrincipalExtensions.GetTenantId(User);
             MvCampaign? result = await _campaignService.Save(param);
  
+            return Ok(ApiResponse.Success(result));
+        }
+
+        [HttpPost("campaign/schedule")]
+        public async Task<IActionResult> SaveSchedule([FromBody] MvCampaignScreenScheduleParam param)
+        {
+            MvCampaignScreenSchedule? result = await _campaignService.SaveSchedule(param);
+
             return Ok(ApiResponse.Success(result));
         }
 

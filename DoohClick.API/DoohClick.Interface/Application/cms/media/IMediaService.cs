@@ -34,6 +34,6 @@ namespace DoohClick.Interface.Application.cms.media
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<List<MvMediaDdl>?> GetDdl(MvTenantIdParam param);
+        Task<List<MvMediaDdl>?> GetDdl(MvMediaDdlParam param);
     }
 }

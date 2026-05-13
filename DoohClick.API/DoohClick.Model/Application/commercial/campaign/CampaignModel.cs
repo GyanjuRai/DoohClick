@@ -55,4 +55,56 @@ namespace DoohClick.Model.Application.commercial.campaign
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
     }
+
+    public record MvCampaignScreenSchedule
+    {
+        public int? FlightId{ get; set; }
+        public required DateTime StartDate { get; set; }
+        public required DateTime EndDate { get; set; }
+        public int? ScreenId { get; set; }
+        public string? ScreenName { get; set; }
+        public string? ScreenResolution { get; set; }
+        public string? ScreenCountry { get; set; }
+        public string? ScreenCity { get; set; }
+        public List<MvScreenSchedule>? CampaignScreenSchedules { get; set; }
+    }
+
+    public record MvScreenSchedule
+    {
+        public int? ScheduleId { get; set; }
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
+        public string? DayOfWeek { get; set; }
+        public List<MvPlaylistItem> Playlist { get; set; } = [];
+    }
+
+    public record MvPlaylistItem
+    {
+        public int? PlaylistItemId { get; set; }
+        public int DurationSeconds { get; set; }
+        public int PlayOrder { get; set; }
+        public string? DisplayName { get; set; }
+        public string? FileUrl { get; set; }
+        public long FileSizeBytes { get; set; }
+    }
+
+    public record MvCampaignScreenScheduleParam
+    {
+        public int? Id { get; set; }
+        public int CampaignFlightScreenId { get; set; }
+        public string DayOfWeek { get; set; } = string.Empty;
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
+        public int? CreatedBy { get; set; }
+        public int? DeletedBy { get; set; }
+        public List<MvPlaylistItemParam> PlaylistItem { get; set; } = [];
+    }
+
+    public record MvPlaylistItemParam
+    {
+        public int? Id { get; set; }
+        public int MediaId { get; set; }
+        public int PlayOrder { get; set; }
+        public int DurationSeconds { get; set; }
+    }
 }

@@ -18,7 +18,19 @@ namespace DoohClick.Interface.Application.commercial.campaign
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
+        Task<List<MvCampaignScreenSchedule>?> GetSchedules(MvCampaignIdParam param);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
         Task<MvCampaign?> Save(MvCampaign param);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="param"></param>
+        /// <returns></returns>
+        Task<MvCampaignScreenSchedule?> SaveSchedule(MvCampaignScreenScheduleParam param);
         /// <summary>
         /// 
         /// </summary>

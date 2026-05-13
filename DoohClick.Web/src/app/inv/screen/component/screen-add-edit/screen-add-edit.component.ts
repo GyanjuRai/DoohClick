@@ -12,7 +12,12 @@ import {
   MvScreenSupportedMedia,
 } from '../../model/screen.model';
 import { from, Subject, takeUntil } from 'rxjs';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { ScreenService } from '../../service/screen.service';
 import { GridColumn } from '../../../../shared/model/grid-config.model';
 import { screenAddEditColumn } from '../../model/screen-add-edit.column';
@@ -53,6 +58,7 @@ export class ScreenAddEditComponent
   protected currencyListItemList!: MvListitemDdl[];
   protected mediaTypeListItemList!: MvListitemDdl[];
   protected supportedMediaList: MvScreenSupportedMedia[] = [];
+  protected submitted = false;
 
   constructor(
     private fb: FormBuilder,
@@ -78,6 +84,9 @@ export class ScreenAddEditComponent
   }
 
   protected initForm() {
+    const coordinateRegex =
+      /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)\s*,\s*-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
+
     this.formGroup = this.fb.group({
       name: [this.screen.name ?? '', Validators.required],
       description: [this.screen.description ?? ''],
@@ -89,7 +98,10 @@ export class ScreenAddEditComponent
       timezone: [this.screen?.timezone ?? '', Validators.required],
       countryCode: [this.screen?.countryCode ?? '', Validators.required],
       city: [this.screen?.city ?? '', Validators.required],
-      location: [this.screen?.location ?? '', Validators.required],
+      location: [
+        this.screen?.location ?? '',
+        [Validators.required, Validators.pattern(coordinateRegex)],
+      ],
       addressLine: [this.screen?.addressLine ?? ''],
       tag: [this.screen?.tag ?? []],
       isActive: [this.screen?.isActive ?? true],
@@ -100,7 +112,10 @@ export class ScreenAddEditComponent
         dayOfWeek: [null],
         openTime: [this.getDefaultTime()],
         closeTime: [this.getDefaultTime()],
-        estimatedImpression: [null],
+        estimatedImpression: [
+          null,
+          [Validators.min(0), Validators.pattern(/^\d+$/)],
+        ],
         audienceSource: [null],
       }),
     });
@@ -280,12 +295,13 @@ export class ScreenAddEditComponent
   }
 
   protected _afterClose(action: string) {
+    this.submitted = true;
     if (action === 'cancel') {
       this.close();
       return;
     } else {
       if (this.formGroup.valid && (this.formGroup.dirty || action === 'edit')) {
-        let param: MvScreen = this.buildPayload(); 
+        let param: MvScreen = this.buildPayload();
 
         this._screenService
           .save(param)
@@ -410,12 +426,35 @@ export class ScreenAddEditComponent
     return `${h}:${m}:00`;
   }
 
+  protected isInvalid(controlName: string, group?: string): boolean {
+    const control = group
+      ? this.formGroup.get(group)?.get(controlName)
+      : this.formGroup.get(controlName);
+
+    return !!control && control.invalid && (control.touched || this.submitted);
+  }
+
+  protected isRequired(controlName: string, group?: string): boolean {
+    const control = group
+      ? this.formGroup.get(group)?.get(controlName)
+      : this.formGroup.get(controlName);
+
+    if (!control?.validator) {
+      return false;
+    }
+
+    const validator = control.validator({} as AbstractControl);
+
+    return !!validator?.['required'];
+  }
+
   private close(screen: MvScreen | null = null) {
     this.afterClosed.emit(screen);
     this.screen = {} as MvScreen;
     this.isDialogOpen = false;
     this.operatingHourList = [];
     this.supportedMediaList = [];
+    this.submitted = false;
   }
 
   ngOnDestroy(): void {

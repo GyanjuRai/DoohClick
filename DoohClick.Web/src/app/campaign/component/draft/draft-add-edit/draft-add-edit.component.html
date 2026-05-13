@@ -45,7 +45,7 @@
               [class.ng-dirty]="touched['name']"
             />
             <small class="p-error" *ngIf="touched['name'] && !campaign.name">
-              Name is required
+              Campaign name is required
             </small>
           </div>
 
@@ -71,7 +71,7 @@
               class="p-error"
               *ngIf="touched['advertiserId'] && !campaign.advertiserId"
             >
-              Name is required
+              Advertiser is required
             </small>
           </div>
 
@@ -93,7 +93,7 @@
               class="p-error"
               *ngIf="touched['startDate'] && !campaign.startDate"
             >
-              Name is required
+              Start date is required
             </small>
           </div>
 
@@ -117,7 +117,7 @@
               class="p-error"
               *ngIf="touched['endDate'] && !campaign.endDate"
             >
-              Name is required
+              End date is required
             </small>
           </div>
 

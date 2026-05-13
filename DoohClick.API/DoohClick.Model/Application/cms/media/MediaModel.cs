@@ -32,6 +32,12 @@ namespace DoohClick.Model.Application.cms.media
         public long? FileSizeBytes { get; set; }
     }
 
+    public record MvMediaDdlParam
+    {
+        public int? TenantId { get; set; }
+        public required int AdvertiserId { get; set; }
+    }
+
     public record MvMediaFilterOptions
     {
         public required int TenantId { get; set; }

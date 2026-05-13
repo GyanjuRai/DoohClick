@@ -31,12 +31,24 @@ namespace DoohClick.Service.Application.commercial.campaign
             return _jsonSerializer.DeserializeObject<MvGridResponse<MvCampaign>>(result);
         }
 
+        public async Task<List<MvCampaignScreenSchedule>?> GetSchedules(MvCampaignIdParam param)
+        {
+            string result = await _dataAccessService.RetrievalProcedure("dbo.sp_campaign_screen_schedule_sel", JsonConvert.SerializeObject(param));
+            return _jsonSerializer.DeserializeObject<List<MvCampaignScreenSchedule>>(result);
+        }
+
         public async Task<MvCampaign?> Save(MvCampaign param)
         {
             string result = await _dataAccessService.ActionProcedure("dbo.sp_campaign_tsk", JsonConvert.SerializeObject(param));
             return _jsonSerializer.DeserializeObject<MvCampaign>(result);
         }
 
+        public async Task<MvCampaignScreenSchedule?> SaveSchedule(MvCampaignScreenScheduleParam param)
+        {
+            string result = await _dataAccessService.ActionProcedure("dbo.sp_campaign_screen_schedule_tsk", JsonConvert.SerializeObject(param));
+            return _jsonSerializer.DeserializeObject<MvCampaignScreenSchedule>(result);
+        }
+        
         public async Task<MvCampaignIdParam?> Remove(MvCampaignIdParam param)
         {
             string result = await _dataAccessService.ActionProcedure("dbo.sp_campaign_del", JsonConvert.SerializeObject(param));

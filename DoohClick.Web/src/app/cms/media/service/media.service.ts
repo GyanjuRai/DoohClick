@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { WebApiService } from "../../../shared/service/web-api.service";
 import { MvGridParamOption } from "../../../shared/model/param.model";
-import { MvMedia, MvMediaDdl, MvMediaDel, MvMediaFilterOptions } from "../model/media.model";
+import { MvMedia, MvMediaDdl, MvMediaDdlParam, MvMediaDel, MvMediaFilterOptions } from "../model/media.model";
 import { Observable } from "rxjs";
 import { MvGridResponse, MvResponse } from "../../../shared/model/response.model";
 import { MvFileUploadParam } from "../../../shared/model/file.model";
@@ -30,7 +30,7 @@ export class MediaService {
         return this.api.delete('cms/media', param);
     }
 
-    getDdl(param: MvTenantIdParam): Observable<MvResponse<MvMediaDdl[]>> {
+    getDdl(param: MvMediaDdlParam): Observable<MvResponse<MvMediaDdl[]>> {
         return this.api.get('cms/media/ddl', param);
     }
 }

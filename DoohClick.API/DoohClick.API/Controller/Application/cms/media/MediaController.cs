@@ -58,8 +58,9 @@ namespace DoohClick.API.Controller.Application.cms.media
 
         [HttpGet("ddl")]
         [Authorize(AppPolicy.ALL)]
-        public async Task<IActionResult> GetDdl([FromQuery]MvTenantIdParam param)
+        public async Task<IActionResult> GetDdl([FromQuery]MvMediaDdlParam param)
         {
+            param.TenantId = ClaimsPrincipalExtensions.GetTenantId(User);
             List<MvMediaDdl>? result = await _mediaService.GetDdl(param);
 
             return Ok(ApiResponse.Success(result));

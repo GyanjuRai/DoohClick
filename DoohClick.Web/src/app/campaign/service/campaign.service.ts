@@ -5,6 +5,8 @@ import {
   MvCampaign,
   MvCampaignFilterOptionParam,
   MvCampaignIdParam,
+  MvCampaignScreenSchedule,
+  MvCampaignScreenScheduleParam,
 } from '../model/campaign.model';
 import { map, Observable } from 'rxjs';
 import { MvGridResponse, MvResponse } from '../../shared/model/response.model';
@@ -28,6 +30,10 @@ export class CampaignService {
     );
   }
 
+  getSchedules(param: MvCampaignIdParam): Observable<MvResponse<MvCampaignScreenSchedule[]>> {
+    return this.api.get('commercial/campaign/schedules', param);
+  }
+
   save(param: MvCampaign): Observable<MvResponse<MvCampaign>> {
     return this.api.post('commercial/campaign', param).pipe(
       map((response) => {
@@ -37,6 +43,10 @@ export class CampaignService {
         return response;
       }),
     );
+  }
+
+  saveSchedule(param: MvCampaignScreenScheduleParam): Observable<MvResponse<MvCampaignScreenSchedule>> {
+    return this.api.post('commercial/campaign/schedule', param);
   }
 
   remove(param: MvCampaignIdParam): Observable<MvResponse<MvCampaignIdParam>> {

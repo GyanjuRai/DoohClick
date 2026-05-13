@@ -22,6 +22,8 @@ export const ROUTE_PATHS = {
   CAMPAIGN_ACTIVE: 'active',
   CAMPAIGN_COMPLETED: 'completed',
   CAMPAIGN_CANCELLED: 'cancelled',
+
+  CAMPAIGN_MEDIA: 'campaign-media',
   
   ADVERTISER: 'advertiser',
   ADVERTISER_LIST: 'list',

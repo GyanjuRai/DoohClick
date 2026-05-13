@@ -234,7 +234,8 @@ BEGIN
         )
         SELECT @Json = ISNULL((
             SELECT  cf.id                   AS flight_id,
-                    cf.start_date,
+                    cfs.id                  AS campaign_flight_screen_id,
+                    cf.[start_date],
                     cf.end_date,
                     s.id                    AS screen_id,
                     s.[name]                AS screen_name,
@@ -243,14 +244,16 @@ BEGIN
                     s.city                  AS screen_city,
                     ISNULL(
                         JSON_QUERY((
-                            SELECT  css.id          AS schedule_id,
+                            SELECT  css.id,
+                                    css.campaign_flight_screen_id,
                                     css.start_time,
                                     css.end_time,
                                     css.day_of_week,
                                     ISNULL(
                                         JSON_QUERY((
-                                            SELECT  cpi.id              AS playlist_item_id,
+                                            SELECT  cpi.id,
                                                     cpi.duration_seconds,
+                                                    cpi.media_id,
                                                     cpi.play_order,
                                                     ml.display_name,
                                                     ml.file_url,

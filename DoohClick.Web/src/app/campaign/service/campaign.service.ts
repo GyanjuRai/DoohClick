@@ -45,7 +45,7 @@ export class CampaignService {
     );
   }
 
-  saveSchedule(param: MvCampaignScreenScheduleParam): Observable<MvResponse<MvCampaignScreenSchedule>> {
+  saveSchedule(param: MvCampaignScreenScheduleParam[]): Observable<MvResponse<MvCampaignScreenSchedule>> {
     return this.api.post('commercial/campaign/schedule', param);
   }
 

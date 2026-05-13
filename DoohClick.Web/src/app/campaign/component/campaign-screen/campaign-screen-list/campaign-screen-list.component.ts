@@ -26,7 +26,6 @@ export class CampaignScreenListComponent
   protected isLoading: boolean = false;
   protected screens: MvCampaignScreenSchedule[] = [];
   protected columns: GridColumn[] = campaignScreenColumn;
-  protected expandedScreenId: number | null = null;
 
   constructor() {
     super();
@@ -75,10 +74,17 @@ export class CampaignScreenListComponent
     return `${fmt(screen.startDate)} – ${fmt(screen.endDate)}`;
   }
 
-  protected toggleExpand(screenId: number): void {
-    this.expandedScreenId =
-      this.expandedScreenId === screenId ? null : screenId;
-  }
+  afterFormClose(screen: MvCampaignScreenSchedule | null) {
+    if(screen !== null) {
+      const index = this.screens.findIndex(s => s.flightId === screen.flightId);
 
-  onSchedule(screen: MvCampaignScreenSchedule): void {}
+      if(index > -1) {
+        this.screens[index] = screen;
+      } else {
+        this.screens.unshift(screen);
+      }
+
+      this.screens = [...this.screens]; //refresh the screens
+    }
+  }
 }

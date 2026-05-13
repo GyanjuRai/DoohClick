@@ -45,6 +45,7 @@ export interface MvCampaignIdParam {
 
 export interface MvCampaignScreenSchedule {
   flightId?: number;
+  campaignFlightScreenId: number;
   startDate: string;
   endDate: string;
   screenId?: number;
@@ -56,15 +57,18 @@ export interface MvCampaignScreenSchedule {
 }
 
 export interface MvScreenSchedule {
-  scheduleId?: number;
+  id?: number;
   startTime: string;
   endTime: string;
   dayOfWeek?: string;
+  createdBy?: number;
+  deletedBy?: number;
   playlist: MvPlaylistItem[];
 }
 
 export interface MvPlaylistItem {
-  playlistItemId?: number;
+  id?: number;
+  mediaId: number;
   durationSeconds: number;
   playOrder: number;
   displayName?: string;

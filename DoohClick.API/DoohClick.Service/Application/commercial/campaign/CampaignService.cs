@@ -43,7 +43,7 @@ namespace DoohClick.Service.Application.commercial.campaign
             return _jsonSerializer.DeserializeObject<MvCampaign>(result);
         }
 
-        public async Task<MvCampaignScreenSchedule?> SaveSchedule(MvCampaignScreenScheduleParam param)
+        public async Task<MvCampaignScreenSchedule?> SaveSchedule(List<MvCampaignScreenScheduleParam> param)
         {
             string result = await _dataAccessService.ActionProcedure("dbo.sp_campaign_screen_schedule_tsk", JsonConvert.SerializeObject(param));
             return _jsonSerializer.DeserializeObject<MvCampaignScreenSchedule>(result);

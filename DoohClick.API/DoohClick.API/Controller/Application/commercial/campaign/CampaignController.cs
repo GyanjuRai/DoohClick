@@ -48,7 +48,7 @@ namespace DoohClick.API.Controller.Application.commercial.campaign
         }
 
         [HttpPost("campaign/schedule")]
-        public async Task<IActionResult> SaveSchedule([FromBody] MvCampaignScreenScheduleParam param)
+        public async Task<IActionResult> SaveSchedule([FromBody] List<MvCampaignScreenScheduleParam> param)
         {
             MvCampaignScreenSchedule? result = await _campaignService.SaveSchedule(param);
 

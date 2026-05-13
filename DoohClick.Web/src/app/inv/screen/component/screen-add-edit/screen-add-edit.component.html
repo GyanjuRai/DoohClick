@@ -134,7 +134,10 @@
           </div>
           <div class="formgrid grid">
             <div class="field col-12 md:col-6">
-              <label> Country </label>
+              <label>
+                Country
+                <span *ngIf="isRequired('countryCode')">*</span>
+              </label>
               <p-dropdown
                 [options]="countryListItemList"
                 formControlName="countryCode"
@@ -144,10 +147,20 @@
                 [filter]="true"
                 [appendTo]="'body'"
                 styleClass="w-full"
+                [ngClass]="{
+                  'ng-invalid ng-dirty': isInvalid('countryCode'),
+                }"
               />
+
+              <small class="p-error" *ngIf="isInvalid('countryCode')">
+                Country is required.
+              </small>
             </div>
             <div class="field col-12 md:col-6">
-              <label>City</label>
+              <label>
+                City
+                <span *ngIf="isRequired('city')">*</span>
+              </label>
               <p-dropdown
                 [options]="cityListItemList"
                 formControlName="city"
@@ -157,10 +170,20 @@
                 [filter]="true"
                 [appendTo]="'body'"
                 styleClass="w-full"
+                [ngClass]="{
+                  'ng-invalid ng-dirty': isInvalid('city'),
+                }"
               />
+
+              <small class="p-error" *ngIf="isInvalid('city')">
+                City is required.
+              </small>
             </div>
             <div class="field col-12 md:col-6">
-              <label>Coordinates</label>
+              <label>
+                Coordinates
+                <span *ngIf="isRequired('location')">*</span>
+              </label>
 
               <input
                 pInputText
@@ -190,6 +213,7 @@
                   rel="noopener noreferrer"
                   class="p-button-sm p-button-outlined"
                   icon="pi pi-map-marker"
+                  0
                   pTooltip="view on map"
                   tooltipPosition="bottom"
                 ></a>
@@ -258,7 +282,10 @@
 
           <div class="operation-row" formGroupName="operatingHour">
             <div class="op-field">
-              <label class="op-label">Day</label>
+              <label class="op-label">
+                Day
+                <span class="text-secondary">*</span>
+              </label>
               <p-dropdown
                 formControlName="dayOfWeek"
                 placeholder="Select"
@@ -292,7 +319,10 @@
             </div>
 
             <div class="op-field">
-              <label class="op-label">Audience</label>
+              <label class="op-label">
+                Audience
+                <span class="text-secondary">*</span>
+              </label>
               <p-inputNumber
                 formControlName="estimatedImpression"
                 styleClass="op-input-number"
@@ -301,14 +331,17 @@
             </div>
 
             <div class="op-field">
-              <label class="op-label">Audience source</label>
+              <label class="op-label">
+                Audience source
+                <span class="text-secondary">*</span>
+              </label>
               <p-dropdown
                 [options]="audienceSourceList"
                 formControlName="audienceSource"
                 optionLabel="item"
                 optionValue="code"
                 placeholder="Select"
-                styleClass="op-dropdown"
+                [style]="{ width: '8rem', minWidth: '8rem', maxWidth: '8rem' }"
               ></p-dropdown>
             </div>
 
@@ -390,17 +423,30 @@
           </div>
           <div class="formgrid grid">
             <div class="field col-12 md:col-6">
-              <label>Rate per hour</label>
+              <label>
+                Rate per hour
+                <span *ngIf="isRequired('ratePerHour')">*</span>
+              </label>
               <p-inputNumber
                 formControlName="ratePerHour"
                 styleClass="w-full"
                 [minFractionDigits]="2"
                 [maxFractionDigits]="2"
                 [min]="1"
+                [ngClass]="{
+                  'ng-invalid ng-dirty': isInvalid('ratePerHour'),
+                }"
               />
+
+              <small class="p-error" *ngIf="isInvalid('ratePerHour')">
+                Rate per hour is required.
+              </small>
             </div>
             <div class="field col-12 md:col-6">
-              <label>Currency</label>
+              <label>
+                Currency
+                <span *ngIf="isRequired('currency')">*</span>
+              </label>
               <p-dropdown
                 [options]="currencyListItemList"
                 formControlName="currency"
@@ -410,7 +456,14 @@
                 [filter]="true"
                 [appendTo]="'body'"
                 styleClass="w-full"
+                [ngClass]="{
+                  'ng-invalid ng-dirty': isInvalid('currency'),
+                }"
               />
+
+              <small class="p-error" *ngIf="isInvalid('currency')">
+                Currency is required.
+              </small>
             </div>
           </div>
         </div>
@@ -456,6 +509,8 @@
         label="Save"
         (onClick)="_afterClose(action)"
         icon="pi pi-save"
+        [loading]="isSubmitting"
+        [disabled]="isSubmitting"
       />
     </div>
   </ng-template>

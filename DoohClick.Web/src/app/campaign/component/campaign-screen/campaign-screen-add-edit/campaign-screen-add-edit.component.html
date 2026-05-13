@@ -76,7 +76,7 @@
 
   <!-- Schedule table -->
   <p-table
-    [value]="scheduleList"
+    [value]="visibleSchedules"
     styleClass="p-datatable-sm"
     [tableStyle]="{ 'min-width': '80%' }"
   >
@@ -125,7 +125,7 @@
             severity="danger"
             [text]="true"
             size="small"
-            (onClick)="removeSchedule(schedule.tempId, $event)"
+            (onClick)="removeSchedule(schedule, $event)"
           />
         </td>
       </tr>
@@ -240,7 +240,7 @@
         icon="pi pi-times"
         severity="secondary"
       />
-      <p-button label="Save" (onClick)="_afterClose('')" icon="pi pi-save" />
+      <p-button label="Save" (onClick)="_afterClose('save')" icon="pi pi-save" />
     </div>
   </ng-template>
 </p-dialog>

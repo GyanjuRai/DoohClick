@@ -11,7 +11,7 @@ import {
   MvScreenOperatingHour,
   MvScreenSupportedMedia,
 } from '../../model/screen.model';
-import { from, Subject, takeUntil } from 'rxjs';
+import { finalize, from, Subject, takeUntil } from 'rxjs';
 import {
   AbstractControl,
   FormBuilder,
@@ -59,6 +59,7 @@ export class ScreenAddEditComponent
   protected mediaTypeListItemList!: MvListitemDdl[];
   protected supportedMediaList: MvScreenSupportedMedia[] = [];
   protected submitted = false;
+  protected isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -296,44 +297,73 @@ export class ScreenAddEditComponent
 
   protected _afterClose(action: string) {
     this.submitted = true;
+
     if (action === 'cancel') {
       this.close();
       return;
-    } else {
-      if (this.formGroup.valid && (this.formGroup.dirty || action === 'edit')) {
-        let param: MvScreen = this.buildPayload();
-
-        this._screenService
-          .save(param)
-          .pipe(takeUntil(this.__unSubscribeAll$))
-          .subscribe({
-            next: (response: MvResponse<MvScreen>) => {
-              if (
-                response.type === ResponseStatusEnum.success &&
-                response.data
-              ) {
-                this.showToast(
-                  'success',
-                  'Screen Saved',
-                  `Screen ${response.data.name} saved!`,
-                );
-                this.close(response.data);
-              }
-            },
-            error: () => {
-              this.showToast(
-                'error',
-                'Failed to save',
-                `Failed to save screen ${param.name}`,
-              );
-            },
-          });
-      }
     }
+
+    if (!this.formGroup.valid) {
+      this.showToast('warn', 'Validation', 'Please fill all required fields.');
+      return;
+    }
+
+    if (action === 'edit' && !this.formGroup.dirty) {
+      this.showToast('info', 'No changes', 'Nothing has been changed.');
+      return;
+    }
+
+    if (this.isSubmitting) return;
+    this.isSubmitting = true;
+    const param: MvScreen = this.buildPayload();
+
+    this._screenService
+      .save(param)
+      .pipe(
+        takeUntil(this.__unSubscribeAll$),
+        finalize(() => (this.isSubmitting = false)),
+      )
+      .subscribe({
+        next: (response: MvResponse<MvScreen>) => {
+          if (response.type === ResponseStatusEnum.success && response.data) {
+            this.showToast(
+              'success',
+              'Screen Saved',
+              `Screen ${response.data.name} saved!`,
+            );
+            this.close(response.data);
+          }
+        },
+        error: () => {
+          this.showToast(
+            'error',
+            'Failed to save',
+            `Failed to save screen ${param.name}`,
+          );
+        },
+      });
   }
 
   protected onAddOperatingHour() {
     const oh = this.formGroup.get('operatingHour')?.value;
+
+    if (!oh.dayOfWeek || !oh.audienceSource || !oh.openTime || !oh.closeTime) {
+      this.showToast('warn', 'Validation', 'Please fill all required fields.');
+      return;
+    }
+
+    const overlap = this.operatingHourList.some(
+      (s) => s.dayOfWeek === oh.dayOfWeek && !s.deletedBy,
+    );
+
+    if (overlap) {
+      this.showToast(
+        'error',
+        'Duplicate day',
+        'This day already has operating hours.',
+      );
+      return;
+    }
     this.operatingHourList.push({
       ...oh,
       openTime: this.toTimeString(oh.openTime),

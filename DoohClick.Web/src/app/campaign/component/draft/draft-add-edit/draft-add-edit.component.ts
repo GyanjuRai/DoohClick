@@ -220,10 +220,24 @@ export class DraftAddEditComponent
           this._closing = false;
         }),
       )
-      .subscribe((response: MvResponse<MvCampaign>) => {
-        if (response.type === ResponseStatusEnum.success && response.data) {
-          this.close(response.data);
-        }
+      .subscribe({
+        next: (response: MvResponse<MvCampaign>) => {
+          if (response.type === ResponseStatusEnum.success && response.data) {
+            this.showToast(
+              'success',
+              'Success',
+              'Campaign saved successfully.',
+            );
+            this.close(response.data);
+          }
+        },
+        error: () => {
+          this.showToast(
+            'error',
+            'Error',
+            'Failed to save campaign. Please try again.',
+          );
+        },
       });
 
     this.close();

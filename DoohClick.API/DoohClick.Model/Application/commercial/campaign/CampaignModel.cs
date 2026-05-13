@@ -59,6 +59,7 @@ namespace DoohClick.Model.Application.commercial.campaign
     public record MvCampaignScreenSchedule
     {
         public int? FlightId{ get; set; }
+        public required int CampaignFlightScreenId { get; set; }
         public required DateTime StartDate { get; set; }
         public required DateTime EndDate { get; set; }
         public int? ScreenId { get; set; }
@@ -71,16 +72,19 @@ namespace DoohClick.Model.Application.commercial.campaign
 
     public record MvScreenSchedule
     {
-        public int? ScheduleId { get; set; }
+        public int? Id { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
         public string? DayOfWeek { get; set; }
+        public int? CreatedBy { get; set; }
+        public int? DeletedBy { get; set; }
         public List<MvPlaylistItem> Playlist { get; set; } = [];
     }
 
     public record MvPlaylistItem
     {
-        public int? PlaylistItemId { get; set; }
+        public int? Id { get; set; }
+        public int MediaId { get; set; }
         public int DurationSeconds { get; set; }
         public int PlayOrder { get; set; }
         public string? DisplayName { get; set; }

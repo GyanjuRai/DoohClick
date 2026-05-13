@@ -46,8 +46,8 @@ export interface MvScreenSupportedMedia {
 
 export interface MvScreenDelParam {
   uuid: string;
-  tenantId: number;
-  deletedBy: number;
+  tenantId?: number;
+  deletedBy?: number;
 }
 
 export interface MvScreenFilterOptions {
@@ -57,4 +57,18 @@ export interface MvScreenFilterOptions {
   cityList?: string[];
   orientationList?: string[];
   resolutionList?: string[];
+}
+
+export interface MvScreenDdl {
+  id?: number;
+  name: string;
+  screenCode: string;
+  defaultResolution: string;
+  orientation: string;
+  tag?: string[];
+  countryCode: string;
+  city: string;
+  timezone: string;
+  operatingHour: MvScreenOperatingHour[];
+  supportedMedia: MvScreenSupportedMedia[];
 }

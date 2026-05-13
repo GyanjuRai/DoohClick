@@ -18,6 +18,7 @@
     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} advertisers"
     [rowsPerPageOptions]="[10, 20, 30]"
     [lazy]="true"
+    (onLazyLoad)="onPageChange($event)"
   >
     <ng-template pTemplate="caption">
       <div class="flex align-items-center justify-content-between gap-3">
@@ -96,7 +97,7 @@
             <ng-container *ngIf="col.name === 'action'; else dateCheck">
               <div class="flex justify-content-center">
                 <p-menu #menu [popup]="true" appendTo="body" />
-                <p-button pRipple size="small">
+                <p-button pRipple size="small" [disabled]="true">
                   <ng-template pTemplate="content">
                     <i class="pi pi-cog"></i>
                     <span class="mx-2">Actions</span>

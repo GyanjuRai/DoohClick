@@ -23,10 +23,10 @@ namespace DoohClick.API.worker
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                await Task.Delay(GetNextRunDelay(), stoppingToken);
                 try
                 {
                     await DoCleanUp();
+                    await Task.Delay(GetNextRunDelay(), stoppingToken);
                     _logger.LogInformation("DoCleanUp completed at {Time}", DateTime.UtcNow);
                 }
                 catch (Exception ex)

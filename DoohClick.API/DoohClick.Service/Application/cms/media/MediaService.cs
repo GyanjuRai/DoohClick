@@ -58,7 +58,7 @@ namespace DoohClick.Service.Application.cms.media
             return _jsonSerializer.DeserializeObject<MvMedia>(result);
         }
 
-        public async Task<List<MvMediaDdl>?> GetDdl(MvTenantIdParam param)
+        public async Task<List<MvMediaDdl>?> GetDdl(MvMediaDdlParam param)
         {
             string result = await _dataAccessService.RetrievalProcedure("dbo.sp_media_ddl", JsonConvert.SerializeObject(param));
             return _jsonSerializer.DeserializeObject<List<MvMediaDdl>>(result);

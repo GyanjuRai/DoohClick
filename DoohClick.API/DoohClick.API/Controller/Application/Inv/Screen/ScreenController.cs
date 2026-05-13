@@ -1,6 +1,7 @@
 ﻿using DoohClick.API.Const;
 using DoohClick.API.Helper;
 using DoohClick.Interface.Application.Inv.Screen;
+using DoohClick.Model.Application.crm.advertiser;
 using DoohClick.Model.Application.Inv.Screen;
 using DoohClick.Model.Shared.AppClaim;
 using DoohClick.Model.Shared.CodePrefix;
@@ -69,6 +70,18 @@ namespace DoohClick.API.Controller.Application.Inv.Screen
             if (result is null)
             {
                 return BadRequest(ApiResponse.Failure("Failed to remove data"));
+            }
+            return Ok(ApiResponse.Success(result));
+        }
+
+        [HttpGet("screen/ddl")]
+        [Authorize(Policy = AppPolicy.ALL)]
+        public async Task<IActionResult> GetDdl([FromQuery] MvTenantIdParam param)
+        {
+            List<MvScreenDdl>? result = await _screenService.GetDdl(param);
+            if (result is null)
+            {
+                return BadRequest(ApiResponse.Success(ResponseStatusEnum.Failure.ToString()));
             }
             return Ok(ApiResponse.Success(result));
         }

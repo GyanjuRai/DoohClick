@@ -1,0 +1,122 @@
+<p-breadcrumb [model]="breadcrumbItems" class="mb-3" />
+
+<p-confirmDialog></p-confirmDialog>
+<div class="flex align-items-center gap-2 my-3 pl-3">
+  <h2 class="text-2xl font-semibold m-0" style="color: var(--surface-600)">
+    Campaign Cancelled
+  </h2>
+  <p-badge [value]="gridConfig.dataSource.totalRows" severity="secondary" />
+</div>
+
+<div class="card grid-wrapper">
+  <p-table
+    [scrollable]="true"
+    [loading]="isTableLoading"
+    scrollHeight="flex"
+    [value]="gridConfig.dataSource.data"
+    [paginator]="true"
+    [rows]="gridConfig.options.pageSize"
+    [totalRecords]="gridConfig.dataSource.totalRows"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} campaigns"
+    [rowsPerPageOptions]="[10, 20, 30]"
+    [lazy]="true"
+    (onLazyLoad)="onPageChange($event, 'CANCELLED')"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex align-items-center justify-content-between gap-3">
+        <div class="grid flex-1" style="max-width: 800px">
+          <div class="col-12 md:col-5">
+            <span class="p-input-icon-left w-full">
+              <i class="pi pi-search"></i>
+              <input
+                pInputText
+                [(ngModel)]="gridConfig.options.searchText"
+                type="text"
+                placeholder="Search..."
+                class="w-full"
+                (keyup.enter)="onSearchText('')"
+              />
+            </span>
+          </div>
+        </div>
+
+        <div class="flex gap-2 flex-shrink-0">
+          <p-button
+            icon="pi pi-refresh"
+            label="Refresh"
+            size="small"
+            severity="secondary"
+            (onClick)="onRefresh('')"
+          >
+          </p-button>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th
+          *ngFor="let col of gridConfig.column"
+          [style.width]="col.width || '5rem'"
+        >
+          {{ col.displayName }}
+        </th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-campaign>
+      <tr>
+        <td *ngFor="let col of gridConfig.column">
+          <ng-container *ngIf="col.type === 'action'; else dateCheck">
+            <div class="flex justify-content-center">
+              <p-menu
+                #menu
+                [model]="actionMenuItems"
+                [popup]="true"
+                appendTo="body"
+                styleClass="p-2"
+              />
+              <p-button
+                pRipple
+                size="small"
+                (onClick)="openActionMenu($event, menu, campaign)"
+              >
+                <ng-template pTemplate="content">
+                  <i class="pi pi-cog"></i>
+                  <span class="mx-2">Actions</span>
+                  <i class="pi pi-chevron-down"></i>
+                </ng-template>
+              </p-button>
+            </div>
+          </ng-container>
+
+          <ng-template #dateCheck>
+            <ng-container *ngIf="col.type === 'date'; else badgeCheck">
+              {{ campaign[col.name] | date: "yyyy MMMM dd" }}
+            </ng-container>
+          </ng-template>
+
+          <ng-template #badgeCheck>
+            <ng-container *ngIf="col.type === 'badge'; else defaultCell">
+              <p-tag [value]="campaign[col.name]" severity="success" />
+            </ng-container>
+          </ng-template>
+
+          <ng-template #defaultCell>
+            {{ campaign[col.name] }}
+          </ng-template>
+        </td>
+      </tr>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="gridConfig.column.length" class="text-center p-4">
+            <div class="flex justify-content-center align-items-center w-full">
+              <p class="m-0">No Data</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </ng-template>
+  </p-table>
+</div>

@@ -53,7 +53,9 @@ public partial class Screen
 
     public DateTime? DeletedAt { get; set; }
 
-    public virtual ICollection<CampaignSchedule> CampaignSchedules { get; set; } = new List<CampaignSchedule>();
+    public bool? IsDeleted { get; set; }
+
+    public virtual ICollection<CampaignFlightScreen> CampaignFlightScreens { get; set; } = new List<CampaignFlightScreen>();
 
     public virtual User CreatedByNavigation { get; set; } = null!;
 

@@ -15,8 +15,6 @@ public partial class ScreenOperatingHour
 
     public TimeOnly CloseTime { get; set; }
 
-    public decimal RatePerHr { get; set; }
-
     public string AudienceSource { get; set; } = null!;
 
     public int? EstimatedImpression { get; set; }
@@ -25,7 +23,15 @@ public partial class ScreenOperatingHour
 
     public DateTime CreatedAt { get; set; }
 
+    public bool IsDeleted { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public DateTime? DeletedAt { get; set; }
+
     public virtual User CreatedByNavigation { get; set; } = null!;
+
+    public virtual User? DeletedByNavigation { get; set; }
 
     public virtual Screen Screen { get; set; } = null!;
 }

@@ -53,7 +53,11 @@ try
     {
         option.UseSqlServer(
             CONNECTION_STRING,
-            SqlOptions => SqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)
+            SqlOptions =>
+            {
+                SqlOptions.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName);
+                SqlOptions.EnableRetryOnFailure(maxRetryCount: 5, maxRetryDelay: TimeSpan.FromSeconds(10), errorNumbersToAdd: null);
+            }
         )
         .UseSnakeCaseNamingConvention();
     });
@@ -93,11 +97,11 @@ try
                 context.HandleResponse();
 
                 bool tokenExpired = context.AuthenticateFailure is SecurityTokenExpiredException;
-                
+
                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 context.Response.ContentType = "application/json";
-                
-                if(tokenExpired)
+
+                if (tokenExpired)
                     context.Response.Headers.Append("Token-Expired", "true");
 
                 return context.Response.WriteAsJsonAsync(ApiResponse.Failure(tokenExpired ? "Session has expired" : "Invalid token"));

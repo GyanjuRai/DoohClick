@@ -41,6 +41,8 @@ public partial class Advertiser
 
     public virtual User? DeletedByNavigation { get; set; }
 
+    public virtual ICollection<MediaLibrary> MediaLibraries { get; set; } = new List<MediaLibrary>();
+
     public virtual Tenant Tenant { get; set; } = null!;
 
     public virtual User? UpdatedByNavigation { get; set; }

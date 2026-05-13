@@ -32,8 +32,8 @@ namespace DoohClick.Model.Application.Inv.Screen
         public bool IsActive { get; set; }
         public decimal RatePerHour { get; set; }
         public required string Currency { get; set; }
-        public List<MvScreenOperatingHour>? OperatingHour { get; set; } = [];
-        public List<MvScreenSupportedMedia>? SupportedMedia { get; set; } = [];
+        public List<MvScreenOperatingHour>? OperatingHour { get; set; }
+        public List<MvScreenSupportedMedia>? SupportedMedia { get; set; }
         public int? CreatedBy { get; set; }
         public string? Creator { get; set; }
         public int? UpdatedBy { get; set; }
@@ -65,5 +65,20 @@ namespace DoohClick.Model.Application.Inv.Screen
         public required Guid Uuid { get; set; }
         public required int TenantId { get; set; }
         public required int DeletedBy { get; set; }
+    }
+
+    public record MvScreenDdl
+    {
+        public int? Id { get; set; }
+        public required string Name { get; set; }
+        public required string ScreenCode { get; set; }
+        public required string DefaultResolution { get; set; }
+        public required string Orientation { get; set; }
+        public List<string>? Tag { get; set; }
+        public required string CountryCode { get; set; }
+        public required string City { get; set; }
+        public required string Timezone { get; set; }
+        public List<MvScreenOperatingHour>? OperatingHour { get; set; }
+        public List<MvScreenSupportedMedia>? SupportedMedia { get; set; }
     }
 }

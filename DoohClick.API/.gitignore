@@ -38,3 +38,6 @@ appsettings.Local.json
 publish/
 
 Logs/
+
+# wwwroot uploads
+wwwroot/

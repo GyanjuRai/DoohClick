@@ -2,6 +2,7 @@
 export interface MvMedia {
   id?: number;
   tenantId: number;
+  advertiserId?: number;
   displayName: string;
   fileName?: string;
   fileUrl?: string;
@@ -23,6 +24,11 @@ export interface MvMediaDdl {
   displayName: string;
   fileUrl?: string;
   fileSizeBytes?: number;
+}
+
+export interface MvMediaDdlParam {
+  tenantId?: number;
+  advertiserId: number;
 }
 
 export interface MvMediaFilterOptions {

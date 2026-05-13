@@ -31,10 +31,6 @@ public partial class User
 
     public bool IsActive { get; set; }
 
-    public string? RefreshToken { get; set; }
-
-    public DateTime? RefreshTokenExpiry { get; set; }
-
     public bool IsDeleted { get; set; }
 
     public int CreatedBy { get; set; }
@@ -49,6 +45,10 @@ public partial class User
 
     public DateTime? DeletedAt { get; set; }
 
+    public string? RefreshToken { get; set; }
+
+    public DateTime? RefreshTokenExpiry { get; set; }
+
     public virtual ICollection<Advertiser> AdvertiserCreatedByNavigations { get; set; } = new List<Advertiser>();
 
     public virtual ICollection<Advertiser> AdvertiserDeletedByNavigations { get; set; } = new List<Advertiser>();
@@ -61,17 +61,19 @@ public partial class User
 
     public virtual ICollection<Campaign> CampaignDeletedByNavigations { get; set; } = new List<Campaign>();
 
-    public virtual ICollection<CampaignPlaylist> CampaignPlaylistCreatedByNavigations { get; set; } = new List<CampaignPlaylist>();
+    public virtual ICollection<CampaignFlightScreen> CampaignFlightScreens { get; set; } = new List<CampaignFlightScreen>();
 
-    public virtual ICollection<CampaignPlaylist> CampaignPlaylistDeletedByNavigations { get; set; } = new List<CampaignPlaylist>();
+    public virtual ICollection<CampaignFlight> CampaignFlights { get; set; } = new List<CampaignFlight>();
 
-    public virtual ICollection<CampaignPlaylist> CampaignPlaylistUpdatedByNavigations { get; set; } = new List<CampaignPlaylist>();
+    public virtual ICollection<Campaign> CampaignModifiedByNavigations { get; set; } = new List<Campaign>();
 
-    public virtual ICollection<CampaignSchedule> CampaignScheduleCreatedByNavigations { get; set; } = new List<CampaignSchedule>();
+    public virtual ICollection<CampaignPlaylistItem> CampaignPlaylistItemCreatedByNavigations { get; set; } = new List<CampaignPlaylistItem>();
 
-    public virtual ICollection<CampaignSchedule> CampaignScheduleDeletedByNavigations { get; set; } = new List<CampaignSchedule>();
+    public virtual ICollection<CampaignPlaylistItem> CampaignPlaylistItemDeletedByNavigations { get; set; } = new List<CampaignPlaylistItem>();
 
-    public virtual ICollection<Campaign> CampaignUpdatedByNavigations { get; set; } = new List<Campaign>();
+    public virtual ICollection<CampaignScreenSchedule> CampaignScreenScheduleCreatedByNavigations { get; set; } = new List<CampaignScreenSchedule>();
+
+    public virtual ICollection<CampaignScreenSchedule> CampaignScreenScheduleDeletedByNavigations { get; set; } = new List<CampaignScreenSchedule>();
 
     public virtual User CreatedByNavigation { get; set; } = null!;
 
@@ -89,17 +91,17 @@ public partial class User
 
     public virtual ICollection<MediaLibrary> MediaLibraryUploadedByNavigations { get; set; } = new List<MediaLibrary>();
 
-    public virtual ICollection<PlaylistItem> PlaylistItemCreatedByNavigations { get; set; } = new List<PlaylistItem>();
-
-    public virtual ICollection<PlaylistItem> PlaylistItemDeletedByNavigations { get; set; } = new List<PlaylistItem>();
-
     public virtual ICollection<Screen> ScreenCreatedByNavigations { get; set; } = new List<Screen>();
 
     public virtual ICollection<Screen> ScreenDeletedByNavigations { get; set; } = new List<Screen>();
 
-    public virtual ICollection<ScreenOperatingHour> ScreenOperatingHours { get; set; } = new List<ScreenOperatingHour>();
+    public virtual ICollection<ScreenOperatingHour> ScreenOperatingHourCreatedByNavigations { get; set; } = new List<ScreenOperatingHour>();
 
-    public virtual ICollection<ScreenSupportedMedium> ScreenSupportedMedia { get; set; } = new List<ScreenSupportedMedium>();
+    public virtual ICollection<ScreenOperatingHour> ScreenOperatingHourDeletedByNavigations { get; set; } = new List<ScreenOperatingHour>();
+
+    public virtual ICollection<ScreenSupportedMedium> ScreenSupportedMediumCreatedByNavigations { get; set; } = new List<ScreenSupportedMedium>();
+
+    public virtual ICollection<ScreenSupportedMedium> ScreenSupportedMediumDeletedByNavigations { get; set; } = new List<ScreenSupportedMedium>();
 
     public virtual ICollection<Screen> ScreenUpdatedByNavigations { get; set; } = new List<Screen>();
 

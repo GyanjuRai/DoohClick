@@ -21,7 +21,7 @@ public partial class MediaLibrary
 
     public string Status { get; set; } = null!;
 
-    public int? DurationSec { get; set; }
+    public decimal? DurationSec { get; set; }
 
     public bool? IsVideo { get; set; }
 
@@ -39,11 +39,17 @@ public partial class MediaLibrary
 
     public DateTime? DeletedAt { get; set; }
 
+    public long? FileSizeBytes { get; set; }
+
+    public int? AdvertiserId { get; set; }
+
+    public virtual Advertiser? Advertiser { get; set; }
+
+    public virtual ICollection<CampaignPlaylistItem> CampaignPlaylistItems { get; set; } = new List<CampaignPlaylistItem>();
+
     public virtual User CreatedByNavigation { get; set; } = null!;
 
     public virtual User? DeletedByNavigation { get; set; }
-
-    public virtual ICollection<PlaylistItem> PlaylistItems { get; set; } = new List<PlaylistItem>();
 
     public virtual Tenant Tenant { get; set; } = null!;
 

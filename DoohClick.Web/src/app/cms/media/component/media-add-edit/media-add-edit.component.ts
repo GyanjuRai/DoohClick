@@ -1,6 +1,7 @@
 import {
   Component,
   EventEmitter,
+  Injector,
   OnDestroy,
   OnInit,
   Output,
@@ -10,18 +11,25 @@ import {
   MvFileUploadParam,
   MvFileUploadResult,
 } from '../../../../shared/model/file.model';
-import { Subject, takeUntil } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 import { MvMedia } from '../../model/media.model';
 import { MvResponse } from '../../../../shared/model/response.model';
 import { ResponseStatusEnum } from '../../../../shared';
 import { AppConst } from '../../../../app-const';
+import { AppComponent } from '../../../../app.component';
+import { MediaService } from '../../service/media.service';
+import { MvAdvertiserDdl, MvTenantIdParam } from '../../../../crm/advertiser/model/advertiser.model';
+import { AdvertiserService } from '../../../../crm/advertiser/service/advertiser.service';
 
 @Component({
   selector: 'media-add-edit',
   templateUrl: './media-add-edit.component.html',
   styleUrl: './media-add-edit.component.scss',
 })
-export class MediaAddEditComponent implements OnInit, OnDestroy {
+export class MediaAddEditComponent
+  extends AppComponent
+  implements OnInit, OnDestroy
+{
   @Output() afterClose: EventEmitter<MvMedia | null> = new EventEmitter<any>();
 
   private readonly __unSubscribeAll$: Subject<any>;
@@ -29,13 +37,38 @@ export class MediaAddEditComponent implements OnInit, OnDestroy {
   protected displayName: string = '';
   protected file: MvFileUploadResult = {} as MvFileUploadResult;
   protected apiUrl: string = '';
+  protected advertiserDdl: MvAdvertiserDdl[] = [];
+  protected selectedAdvertiserId?: number;
 
-  constructor(private _fileService: FileService) {
+  constructor(
+    private injector: Injector,
+    private _fileService: FileService,
+    private _mediaService: MediaService,
+    private _advertiserService: AdvertiserService
+  ) {
+    super(injector);
     this.__unSubscribeAll$ = new Subject();
     this.apiUrl = AppConst?.data.apiUrl;
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.getAdvertiserDdl();
+  }
+
+  protected getAdvertiserDdl() {
+
+    const param = {
+      tenantId: this.auth.getTenantId()
+    } as MvTenantIdParam;
+
+    this._advertiserService.getDdl(param)
+    .pipe(takeUntil(this.__unSubscribeAll$))
+    .subscribe((response: MvResponse<MvAdvertiserDdl[]>) => {
+      if (response.type === ResponseStatusEnum.success && response.data) {
+        this.advertiserDdl = [...response.data];
+      }
+    })
+  }
 
   public open() {
     this.isDialogOpen = true;
@@ -51,8 +84,39 @@ export class MediaAddEditComponent implements OnInit, OnDestroy {
       .subscribe((response: MvResponse<MvFileUploadResult>) => {
         if (response.type === ResponseStatusEnum.success && response.data) {
           this.file = response.data;
+          this.showToast(
+            'success',
+            'Uploaded',
+            `${response.data.fileName} uploaded !`,
+          );
         }
       });
+  }
+
+  protected save() {
+    const param = {
+      displayName: this.displayName,
+      ...this.file,
+      advertiserId: this.selectedAdvertiserId,
+      uploadedBy: this.auth.getUserId(),
+    } as MvMedia;
+
+    this._mediaService
+      .add(param)
+      .pipe(takeUntil(this.__unSubscribeAll$))
+      .subscribe((response: MvResponse<MvMedia>) => {
+        if (response.type === ResponseStatusEnum.success && response.data) {
+          this.close(response.data);
+        }
+      });
+  }
+
+  protected get isFormValid(): boolean {
+    return !!this.file?.fileUrl && !!this.displayName?.trim();
+  }
+
+  protected get fileType(): 'video' | 'image' | 'unknown' {
+    return this.file?.isVideo ? 'video' : 'image';
   }
 
   protected choose(callback: () => void) {
@@ -75,16 +139,15 @@ export class MediaAddEditComponent implements OnInit, OnDestroy {
     return file.type.startsWith('video/');
   }
 
-  protected get isFormValid(): boolean {
-    return !!this.file?.fileUrl && !!this.displayName?.trim();
+  protected clearUpload() {
+    this.file = {} as MvFileUploadResult;
   }
 
-  protected get fileType(): 'video' | 'image' | 'unknown' {
-    return this.file?.isVideo ? 'video' : 'image';
-  }
-
-  protected close() {
+  protected close(media: MvMedia | null = null) {
+    this.afterClose.emit(media);
     this.isDialogOpen = false;
+    this.file = {} as MvFileUploadResult;
+    this.displayName = '';
   }
 
   ngOnDestroy(): void {

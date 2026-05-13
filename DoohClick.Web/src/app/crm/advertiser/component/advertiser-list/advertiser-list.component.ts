@@ -10,6 +10,7 @@ import {
 } from '../../../../shared/model/response.model';
 import { MvAdvertiser } from '../../model/advertiser.model';
 import { ResponseStatusEnum } from '../../../../shared';
+import { TableLazyLoadEvent } from 'primeng/table';
 
 @Component({
   selector: 'advertiser-list',
@@ -85,12 +86,18 @@ export class AdvertiserListComponent
   }
 
   protected onStatusChange() {
-    this.gridConfig.options.offset = 0; 
+    this.gridConfig.options.offset = 0;
     this.loadAdvertiser();
   }
 
   protected onRefresh() {
-    this.gridConfig.options.offset = 0; 
+    this.gridConfig.options.offset = 0;
+    this.loadAdvertiser();
+  }
+
+  onPageChange(event: TableLazyLoadEvent) {
+    this.gridConfig.options.offset = event.first ?? 0;
+    this.gridConfig.options.pageSize = event.rows ?? 10;
     this.loadAdvertiser();
   }
 

@@ -11,8 +11,13 @@ import {
   MvScreenOperatingHour,
   MvScreenSupportedMedia,
 } from '../../model/screen.model';
-import { from, Subject, takeUntil } from 'rxjs';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { finalize, from, Subject, takeUntil } from 'rxjs';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { ScreenService } from '../../service/screen.service';
 import { GridColumn } from '../../../../shared/model/grid-config.model';
 import { screenAddEditColumn } from '../../model/screen-add-edit.column';
@@ -53,6 +58,8 @@ export class ScreenAddEditComponent
   protected currencyListItemList!: MvListitemDdl[];
   protected mediaTypeListItemList!: MvListitemDdl[];
   protected supportedMediaList: MvScreenSupportedMedia[] = [];
+  protected submitted = false;
+  protected isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -78,6 +85,9 @@ export class ScreenAddEditComponent
   }
 
   protected initForm() {
+    const coordinateRegex =
+      /^-?([1-8]?\d(\.\d+)?|90(\.0+)?)\s*,\s*-?(180(\.0+)?|((1[0-7]\d)|([1-9]?\d))(\.\d+)?)$/;
+
     this.formGroup = this.fb.group({
       name: [this.screen.name ?? '', Validators.required],
       description: [this.screen.description ?? ''],
@@ -89,7 +99,10 @@ export class ScreenAddEditComponent
       timezone: [this.screen?.timezone ?? '', Validators.required],
       countryCode: [this.screen?.countryCode ?? '', Validators.required],
       city: [this.screen?.city ?? '', Validators.required],
-      location: [this.screen?.location ?? '', Validators.required],
+      location: [
+        this.screen?.location ?? '',
+        [Validators.required, Validators.pattern(coordinateRegex)],
+      ],
       addressLine: [this.screen?.addressLine ?? ''],
       tag: [this.screen?.tag ?? []],
       isActive: [this.screen?.isActive ?? true],
@@ -100,7 +113,10 @@ export class ScreenAddEditComponent
         dayOfWeek: [null],
         openTime: [this.getDefaultTime()],
         closeTime: [this.getDefaultTime()],
-        estimatedImpression: [null],
+        estimatedImpression: [
+          null,
+          [Validators.min(0), Validators.pattern(/^\d+$/)],
+        ],
         audienceSource: [null],
       }),
     });
@@ -247,7 +263,7 @@ export class ScreenAddEditComponent
   }
 
   protected get dialogHeader(): string {
-    return this.screen?.id ? 'Screen details' : 'Create new screen';
+    return this.screen?.id ? 'Screen details' : 'Add new screen';
   }
 
   protected get action(): string {
@@ -280,44 +296,74 @@ export class ScreenAddEditComponent
   }
 
   protected _afterClose(action: string) {
+    this.submitted = true;
+
     if (action === 'cancel') {
       this.close();
       return;
-    } else {
-      if (this.formGroup.valid && (this.formGroup.dirty || action === 'edit')) {
-        let param: MvScreen = this.buildPayload(); 
-
-        this._screenService
-          .save(param)
-          .pipe(takeUntil(this.__unSubscribeAll$))
-          .subscribe({
-            next: (response: MvResponse<MvScreen>) => {
-              if (
-                response.type === ResponseStatusEnum.success &&
-                response.data
-              ) {
-                this.showToast(
-                  'success',
-                  'Screen Saved',
-                  `Screen ${response.data.name} saved!`,
-                );
-                this.close(response.data);
-              }
-            },
-            error: () => {
-              this.showToast(
-                'error',
-                'Failed to save',
-                `Failed to save screen ${param.name}`,
-              );
-            },
-          });
-      }
     }
+
+    if (!this.formGroup.valid) {
+      this.showToast('warn', 'Validation', 'Please fill all required fields.');
+      return;
+    }
+
+    if (action === 'edit' && !this.formGroup.dirty) {
+      this.showToast('info', 'No changes', 'Nothing has been changed.');
+      return;
+    }
+
+    if (this.isSubmitting) return;
+    this.isSubmitting = true;
+    const param: MvScreen = this.buildPayload();
+
+    this._screenService
+      .save(param)
+      .pipe(
+        takeUntil(this.__unSubscribeAll$),
+        finalize(() => (this.isSubmitting = false)),
+      )
+      .subscribe({
+        next: (response: MvResponse<MvScreen>) => {
+          if (response.type === ResponseStatusEnum.success && response.data) {
+            this.showToast(
+              'success',
+              'Screen Saved',
+              `Screen ${response.data.name} saved!`,
+            );
+            this.close(response.data);
+          }
+        },
+        error: () => {
+          this.showToast(
+            'error',
+            'Failed to save',
+            `Failed to save screen ${param.name}`,
+          );
+        },
+      });
   }
 
   protected onAddOperatingHour() {
     const oh = this.formGroup.get('operatingHour')?.value;
+
+    if (!oh.dayOfWeek || !oh.audienceSource || !oh.openTime || !oh.closeTime) {
+      this.showToast('warn', 'Validation', 'Please fill all required fields.');
+      return;
+    }
+
+    const overlap = this.operatingHourList.some(
+      (s) => s.dayOfWeek === oh.dayOfWeek && !s.deletedBy,
+    );
+
+    if (overlap) {
+      this.showToast(
+        'error',
+        'Duplicate day',
+        'This day already has operating hours.',
+      );
+      return;
+    }
     this.operatingHourList.push({
       ...oh,
       openTime: this.toTimeString(oh.openTime),
@@ -410,12 +456,35 @@ export class ScreenAddEditComponent
     return `${h}:${m}:00`;
   }
 
+  protected isInvalid(controlName: string, group?: string): boolean {
+    const control = group
+      ? this.formGroup.get(group)?.get(controlName)
+      : this.formGroup.get(controlName);
+
+    return !!control && control.invalid && (control.touched || this.submitted);
+  }
+
+  protected isRequired(controlName: string, group?: string): boolean {
+    const control = group
+      ? this.formGroup.get(group)?.get(controlName)
+      : this.formGroup.get(controlName);
+
+    if (!control?.validator) {
+      return false;
+    }
+
+    const validator = control.validator({} as AbstractControl);
+
+    return !!validator?.['required'];
+  }
+
   private close(screen: MvScreen | null = null) {
     this.afterClosed.emit(screen);
     this.screen = {} as MvScreen;
     this.isDialogOpen = false;
     this.operatingHourList = [];
     this.supportedMediaList = [];
+    this.submitted = false;
   }
 
   ngOnDestroy(): void {

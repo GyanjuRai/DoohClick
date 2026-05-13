@@ -13,7 +13,7 @@ import {
   MvListitemDdl,
   MvResponse,
 } from '../../../../shared/model/response.model';
-import { MvScreen, MvScreenFilterOptions } from '../../model/screen.model';
+import { MvScreen, MvScreenDelParam, MvScreenFilterOptions } from '../../model/screen.model';
 import { GridConfig } from '../../../../shared/model/grid-config.model';
 import { screenColumn } from '../../model/screen-column';
 import { ResponseStatusEnum } from '../../../../shared';
@@ -225,10 +225,10 @@ export class ScreenListComponent
   afterFormClose(screen: MvScreen | null) {
     if (screen !== null) {
       const index = this.gridConfig.dataSource.data.findIndex(
-        (s) => (s.id = screen.id),
+        (s) => (s.id === screen.id),
       );
       if (index > -1) {
-        this.gridConfig.dataSource.data[index] === screen;
+        this.gridConfig.dataSource.data[index] = screen;
       } else {
         this.gridConfig.dataSource.data.unshift(screen);
         this.gridConfig.dataSource.totalRows++;
@@ -244,7 +244,33 @@ export class ScreenListComponent
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       onAccept: () => {
-        this.showToast('success', 'Success', `Product ${screen.name} deleted.`);
+        const param = {
+          uuid: screen.uuid
+        } as MvScreenDelParam;
+        this._screenService
+          .remove(param)
+          .pipe(takeUntil(this.__unSubscribeAll$))
+          .subscribe((response: MvResponse<MvScreen>) => {
+            if (response.type === ResponseStatusEnum.success && response.data) {
+              const index = this.gridConfig.dataSource.data.findIndex(
+                (m) => m.id === response.data?.id,
+              );
+
+              if (index !== -1) {
+                this.gridConfig.dataSource.data.splice(index, 1);
+                this.gridConfig.dataSource.data = [
+                  ...this.gridConfig.dataSource.data,
+                ]; //refresh grid
+                this.gridConfig.dataSource.totalRows--;
+
+                this.showToast(
+                  'success',
+                  'Success',
+                  `Product ${screen.name} deleted.`,
+                );
+              }
+            }
+          });
       },
     } as ConfirmationOptions;
     this.openConfirmationBox(confirmationOptions);

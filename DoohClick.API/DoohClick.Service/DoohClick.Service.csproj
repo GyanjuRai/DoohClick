@@ -18,8 +18,4 @@
     <ProjectReference Include="..\DoohClick.Model\DoohClick.Model.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Application\commercial\" />
-  </ItemGroup>
-
 </Project>

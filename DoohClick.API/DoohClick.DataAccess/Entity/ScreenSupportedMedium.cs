@@ -15,7 +15,15 @@ public partial class ScreenSupportedMedium
 
     public DateTime CreatedAt { get; set; }
 
+    public bool IsDeleted { get; set; }
+
+    public int? DeletedBy { get; set; }
+
+    public DateTime? DeletedAt { get; set; }
+
     public virtual User CreatedByNavigation { get; set; } = null!;
+
+    public virtual User? DeletedByNavigation { get; set; }
 
     public virtual Screen Screen { get; set; } = null!;
 }

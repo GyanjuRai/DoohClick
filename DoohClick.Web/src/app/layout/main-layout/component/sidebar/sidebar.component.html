@@ -139,10 +139,13 @@
           </div>
 
           <ul class="list-none pl-2 m-0 overflow-y-auto flex-1">
-            <li>
+            <li
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
               <a
                 pRipple
-                [
+                [routerLink]="['/', routes.CAMPAIGN, routes.CAMPAIGN_DRAFT]"
                 class="flex align-items-center cursor-pointer p-3 border-round text-700 no-underline hover:surface-100 transition-duration-150 transition-colors p-ripple"
               >
                 <i class="pi pi-file-edit mr-2 text-sm"></i>
@@ -150,18 +153,26 @@
               </a>
             </li>
 
-            <li>
+            <!-- <li
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
               <a
                 pRipple
+                [routerLink]="['/', routes.CAMPAIGN, routes.CAMPAIGN_SCHEDULED]"
                 class="flex align-items-center cursor-pointer p-3 border-round text-700 no-underline hover:surface-100 transition-duration-150 transition-colors p-ripple"
               >
                 <i class="pi pi-calendar-clock mr-2 text-sm"></i>
                 <span class="font-medium text-sm">Scheduled</span>
               </a>
-            </li>
+            </li> -->
 
-            <li>
+            <li
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
               <a
+                [routerLink]="['/', routes.CAMPAIGN, routes.CAMPAIGN_ACTIVE]"
                 pRipple
                 class="flex align-items-center cursor-pointer p-3 border-round text-700 no-underline hover:surface-100 transition-duration-150 transition-colors p-ripple"
               >
@@ -169,18 +180,28 @@
                 <span class="font-medium text-sm">Active</span>
               </a>
             </li>
-            <li>
+
+            <!-- <li
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
               <a
                 pRipple
+                [routerLink]="['/', routes.CAMPAIGN, routes.CAMPAIGN_COMPLETED]"
                 class="flex align-items-center cursor-pointer p-3 border-round text-700 no-underline hover:surface-100 transition-duration-150 transition-colors p-ripple"
               >
                 <i class="pi pi-check-circle mr-2 text-sm"></i>
                 <span class="font-medium text-sm">Completed</span>
               </a>
-            </li>
-            <li>
+            </li> -->
+
+            <li
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+            >
               <a
                 pRipple
+                [routerLink]="['/', routes.CAMPAIGN, routes.CAMPAIGN_CANCELLED]"
                 class="flex align-items-center cursor-pointer p-3 border-round text-700 no-underline hover:surface-100 transition-duration-150 transition-colors p-ripple"
               >
                 <i class="pi pi-ban mr-2 text-sm"></i>
@@ -190,7 +211,7 @@
           </ul>
         </div>
 
-        <div class="flex flex-column">
+        <!-- <div class="flex flex-column">
           <div
             pRipple
             pStyleClass="@next"
@@ -222,7 +243,7 @@
               </a>
             </li>
           </ul>
-        </div>
+        </div> -->
       </div>
 
       <div class="mt-auto flex-shrink-0">
@@ -233,7 +254,7 @@
         >
           <div class="flex align-items-center gap-2">
             <p-avatar
-              image="https://i.pinimg.com/474x/bc/69/93/bc69933028de5d19088fe00d5e9aa936.jpg"
+              image="https://www.staging.artsdeko.com/build/default-profile.c2fd3cb1.png"
               shape="circle"
             />
             <div class="flex flex-column">
@@ -248,6 +269,7 @@
             pTooltip="Logout"
             tooltipPosition="top"
             severity="secondary"
+            (onClick)="logout()"
           />
         </div>
       </div>

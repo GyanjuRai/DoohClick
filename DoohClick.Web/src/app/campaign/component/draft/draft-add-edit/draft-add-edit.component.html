@@ -1,0 +1,362 @@
+<p-toast></p-toast>
+<p-dialog
+  [modal]="true"
+  [(visible)]="isDialogOpen"
+  [maximizable]="true"
+  [draggable]="false"
+  position="top"
+  [style]="{ width: '75rem', height: '95vh', marginTop: '0.5rem' }"
+  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
+  (onHide)="onDialogHidden()"
+>
+  <ng-template pTemplate="header">
+    <span>{{ dialogHeader }}</span>
+  </ng-template>
+  <p-stepper
+    [(activeStep)]="activeIndex"
+    orientation="vertical"
+    [linear]="false"
+  >
+    <p-stepperPanel>
+      <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
+        <div
+          class="chevron-header"
+          [class.active]="activeIndex === index"
+          (click)="onClick.emit()"
+        >
+          <span class="step-num">{{ index + 1 }}</span>
+          <span>Campaign Details</span>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <div class="grid p-3">
+          <div class="col-6 flex flex-column gap-1">
+            <label
+              class="font-semibold text-sm"
+              [style.color]="'var(--text-color-secondary)'"
+              >Name</label
+            >
+            <input
+              [(ngModel)]="campaign.name"
+              pInputText
+              class="w-full"
+              (ngModelChange)="markTouched('name')"
+              [class.ng-invalid]="touched['name'] && !campaign.name"
+              [class.ng-dirty]="touched['name']"
+            />
+            <small class="p-error" *ngIf="touched['name'] && !campaign.name">
+              Campaign name is required
+            </small>
+          </div>
+
+          <div class="col-6 flex flex-column gap-1">
+            <label
+              class="font-semibold text-sm"
+              [style.color]="'var(--text-color-secondary)'"
+              >Advertiser</label
+            >
+            <p-dropdown
+              [options]="advertiserDdl"
+              [(ngModel)]="campaign.advertiserId"
+              (ngModelChange)="markTouched('advertiserId')"
+              [class.ng-invalid]="
+                touched['advertiserId'] && !campaign.advertiserId
+              "
+              [class.ng-dirty]="touched['advertiserId']"
+              optionLabel="name"
+              optionValue="id"
+              [style]="{ width: '100%' }"
+            />
+            <small
+              class="p-error"
+              *ngIf="touched['advertiserId'] && !campaign.advertiserId"
+            >
+              Advertiser is required
+            </small>
+          </div>
+
+          <div class="col-6 flex flex-column gap-1">
+            <label
+              class="font-semibold text-sm"
+              [style.color]="'var(--text-color-secondary)'"
+              >Start Date</label
+            >
+            <p-calendar
+              [(ngModel)]="campaign.startDate"
+              (ngModelChange)="markTouched('startDate')"
+              [class.ng-invalid]="touched['startDate'] && !campaign.startDate"
+              [class.ng-dirty]="touched['startDate']"
+              class="w-full"
+              [style]="{ width: '100%' }"
+            />
+            <small
+              class="p-error"
+              *ngIf="touched['startDate'] && !campaign.startDate"
+            >
+              Start date is required
+            </small>
+          </div>
+
+          <div class="col-6 flex flex-column gap-1">
+            <label
+              class="font-semibold text-sm"
+              [style.color]="'var(--text-color-secondary)'"
+              >End Date</label
+            >
+            <p-calendar
+              [(ngModel)]="campaign.endDate"
+              class="w-full"
+              [style]="{ width: '100%' }"
+              (ngModelChange)="markTouched('endDate')"
+              [class.ng-invalid]="touched['endDate'] && !campaign.endDate"
+              [class.ng-dirty]="touched['endDate']"
+              class="w-full"
+              [style]="{ width: '100%' }"
+            />
+            <small
+              class="p-error"
+              *ngIf="touched['endDate'] && !campaign.endDate"
+            >
+              End date is required
+            </small>
+          </div>
+
+          <div class="col-12 flex flex-column gap-1">
+            <label
+              class="font-semibold text-sm"
+              [style.color]="'var(--text-color-secondary)'"
+              >Remarks</label
+            >
+            <textarea
+              [(ngModel)]="campaign.remarks"
+              pInputTextarea
+              class="w-full"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+      </ng-template>
+    </p-stepperPanel>
+
+    <p-stepperPanel>
+      <ng-template pTemplate="header" let-onClick="onClick" let-index="index">
+        <div
+          class="chevron-header"
+          [class.active]="activeIndex === index"
+          (click)="onClick.emit()"
+        >
+          <span class="step-num">{{ index + 1 }}</span>
+          <span>Flight & Screens</span>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <div class="grid flex flex-row p-3">
+          <div class="col-6 flex flex-column gap-1">
+            <label
+              class="font-semibold text-sm"
+              [style.color]="'var(--text-color-secondary)'"
+              >Start Date</label
+            >
+            <p-calendar
+              [(ngModel)]="currentFlight.startDate"
+              [minDate]="campaign.startDate"
+              [maxDate]="campaign.endDate"
+              class="w-full"
+              [style]="{ width: '100%' }"
+            />
+          </div>
+
+          <div class="col-6 flex flex-column gap-1">
+            <label
+              class="font-semibold text-sm"
+              [style.color]="'var(--text-color-secondary)'"
+              >End Date</label
+            >
+            <p-calendar
+              [(ngModel)]="currentFlight.endDate"
+              [minDate]="campaign.startDate"
+              [maxDate]="campaign.endDate"
+              class="w-full"
+              [style]="{ width: '100%' }"
+            />
+          </div>
+
+          <div class="col-6 card flex flex-column gap-1">
+            <label
+              class="font-semibold text-sm"
+              [style.color]="'var(--text-color-secondary)'"
+              >Screens</label
+            >
+            <div class="card">
+              <p-tree
+                [value]="nodes"
+                [(selection)]="selectedNodes"
+                selectionMode="checkbox"
+                [metaKeySelection]="false"
+                class="w-full"
+                [style]="{ width: '100%', background: 'transparent' }"
+              >
+                <ng-template let-node pTemplate="default">
+                  <ng-container *ngIf="node.children; else childNode">
+                    <span class="flex align-items-center gap-2">
+                      <i class="pi pi-folder text-yellow-500 mr-2"></i>
+                      <span class="font-semibold">{{ node.label }}</span>
+                    </span>
+                  </ng-container>
+
+                  <ng-template #childNode>
+                    <span class="flex align-items-center gap-2">
+                      <span>{{ node.label }}</span>
+                      <i
+                        class="pi pi-info-circle text-color-secondary cursor-pointer"
+                        (click)="
+                          $event.stopPropagation();
+                          showNodeDetail($event, node);
+                          op.toggle($event)
+                        "
+                      ></i>
+                    </span>
+                  </ng-template>
+                </ng-template>
+              </p-tree>
+            </div>
+          </div>
+
+          <div class="col-12 flex justify-content-end mt-2">
+            <p-button
+              label="Add Flight"
+              icon="pi pi-plus"
+              (onClick)="addFlight()"
+            />
+          </div>
+
+          <div class="col-12 mt-3">
+            <p-table
+              [value]="flightList"
+              [tableStyle]="{ 'font-size': '13px', 'font-weight': '500' }"
+            >
+              <ng-template pTemplate="header">
+                <tr>
+                  <th
+                    *ngFor="let col of columns"
+                    [style.width]="col.width || '5rem'"
+                  >
+                    {{ col.displayName }}
+                  </th>
+                </tr>
+              </ng-template>
+
+              <ng-template pTemplate="body" let-flight let-i="rowIndex">
+                <tr>
+                  <td *ngFor="let col of columns">
+                    <ng-container *ngIf="col.type === 'action'; else dateCheck">
+                      <p-button
+                        icon="pi pi-trash"
+                        severity="danger"
+                        [text]="true"
+                        (onClick)="removeFlight(i)"
+                      />
+                    </ng-container>
+
+                    <ng-template #dateCheck>
+                      <ng-container
+                        *ngIf="col.type === 'date'; else screensCheck"
+                      >
+                        {{ flight[col.name] | date: "MMM dd, yyyy" }}
+                      </ng-container>
+                    </ng-template>
+
+                    <ng-template #screensCheck>
+                      <ng-container
+                        *ngIf="col.name === 'screens'; else defaultCell"
+                      >
+                        {{ getScreenNames(flight.screens) }}
+                      </ng-container>
+                    </ng-template>
+
+                    <ng-template #defaultCell>
+                      {{ flight[col.name] }}
+                    </ng-template>
+                  </td>
+                </tr>
+              </ng-template>
+              <ng-template pTemplate="emptymessage">
+                <tr>
+                  <td [attr.colspan]="4" class="text-center p-4">
+                    <div
+                      class="flex justify-content-center align-items-center w-full"
+                    >
+                      <p class="m-0">No entries</p>
+                    </div>
+                  </td>
+                </tr>
+              </ng-template>
+            </p-table>
+          </div>
+        </div>
+      </ng-template>
+    </p-stepperPanel>
+  </p-stepper>
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <p-button
+        label="Cancel"
+        (onClick)="_afterClose('cancel')"
+        icon="pi pi-times"
+        severity="secondary"
+      />
+      <p-button
+        label="Save"
+        [disabled]="_closing"
+        [loading]="_closing"
+        (onClick)="_afterClose(action)"
+        icon="pi pi-save"
+      />
+    </div>
+  </ng-template>
+</p-dialog>
+
+<p-overlayPanel #op [dismissable]="true">
+  <div style="width: 380px">
+    <p class="font-semibold mb-2">{{ hoveredScreen?.name }}</p>
+    <p class="text-sm text-color-secondary mb-3">
+      {{ hoveredScreen?.screenCode }}
+    </p>
+    <p class="font-semibold text-sm mb-1">Supported Media</p>
+    <p-table
+      [value]="hoveredScreen?.supportedMedia || []"
+      [tableStyle]="{ 'font-size': '13px' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Type</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-media>
+        <tr>
+          <td>{{ media.mediaType }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+    <p class="font-semibold text-sm mt-3 mb-1">Operating Hours</p>
+    <p-table
+      [value]="hoveredScreen?.operatingHour || []"
+      [tableStyle]="{ 'font-size': '13px' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Day</th>
+          <th>Open</th>
+          <th>Close</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-oh>
+        <tr>
+          <td>{{ oh.dayOfWeek }}</td>
+          <td>{{ oh.openTime }}</td>
+          <td>{{ oh.closeTime }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</p-overlayPanel>

@@ -26,17 +26,7 @@ export class ActiveListComponent extends CampaignBaseClass implements OnInit {
 
   openActionMenu(event: Event, menu: any, campaign: MvCampaign) {
     this.actionMenuItems = [
-      {
-        label: 'Options',
-        items: [
-          {
-            label: 'Cancel',
-            icon: 'pi pi-ban',
-            iconClass: 'text-yellow-500',
-            command: () => this.onCancel(campaign),
-          },
-        ],
-      },
+      
     ];
     menu.toggle(event);
   }

@@ -29,7 +29,7 @@ export const campaignRoutes = [
         component: CancelledListComponent
     },
     {
-        path: `:id/:advertiserId/${ROUTE_PATHS.CAMPAIGN_MEDIA}/:mode`,
+        path: `:id/:advertiserId/:name/${ROUTE_PATHS.CAMPAIGN_MEDIA}/:mode`,
         component: CampaignScreenListComponent
     },
     {

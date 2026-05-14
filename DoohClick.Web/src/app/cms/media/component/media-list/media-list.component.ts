@@ -180,7 +180,7 @@ export class MediaListComponent
     this.loadMedia();
   }
 
-  protected onArchiveFilterChange() {
+  protected onArchiveChange() {
     this.gridConfig.options.filter.isArchieved = this.isArchived || null;
     this.loadMedia();
   }

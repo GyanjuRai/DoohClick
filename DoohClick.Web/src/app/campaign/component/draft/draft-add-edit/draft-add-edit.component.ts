@@ -194,7 +194,7 @@ export class DraftAddEditComponent
     }
 
     this.markAllTouched();
-    if (!this.isValid()) {
+    if (!this.isFormValid()) {
       this._closing = false;
       return;
     }
@@ -243,23 +243,74 @@ export class DraftAddEditComponent
     this.close();
   }
 
-  private isValid(): boolean {
-    return !!(
-      this.campaign.name?.trim() &&
-      this.campaign.advertiserId &&
-      this.campaign.startDate &&
-      this.campaign.endDate
-    );
+  private isFormValid(): boolean {
+    const { name, advertiserId, startDate, endDate } = this.campaign;
+
+    if (!name?.trim()) {
+      this.showToast('error', 'Missing Field', 'Campaign name is required.');
+      return false;
+    }
+
+    if (!advertiserId) {
+      this.showToast('error', 'Missing Field', 'Please select an advertiser.');
+      return false;
+    }
+
+    if (!startDate || !endDate) {
+      this.showToast(
+        'error',
+        'Missing Field',
+        'Please select campaign start and end dates.',
+      );
+      return false;
+    }
+
+    return true;
   }
 
   private isValidFlight(): boolean {
-    const start = new Date(this.currentFlight.startDate);
-    const end = new Date(this.currentFlight.endDate);
+    const { startDate, endDate } = this.currentFlight;
+
+    if (!startDate || !endDate) {
+      this.showToast(
+        'error',
+        'Missing Dates',
+        'Please select both start and end dates.',
+      );
+      return false;
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (start > end) {
+      this.showToast(
+        'error',
+        'Invalid Range',
+        'Start date cannot be after end date.',
+      );
+      return false;
+    }
+
+    if (!this.selectedNodes?.length) {
+      this.showToast(
+        'error',
+        'Missing Screens',
+        'Please select at least one screen.',
+      );
+      return false;
+    }
 
     const overlaps = this.flightList.some((f) => {
       const fStart = new Date(f.startDate);
       const fEnd = new Date(f.endDate);
-      return start <= fEnd && end >= fStart;
+
+      const datesOverlap = start <= fEnd && end >= fStart;
+      if (!datesOverlap) return false;
+
+      return this.selectedNodes.some((n) =>
+        f.screens?.some((s) => s.screenId === n.data),
+      );
     });
 
     if (overlaps) {

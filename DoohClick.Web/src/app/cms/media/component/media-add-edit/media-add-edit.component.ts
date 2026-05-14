@@ -5,6 +5,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  ViewChild,
 } from '@angular/core';
 import { FileService } from '../../../../shared/service/file.service';
 import {
@@ -18,8 +19,12 @@ import { ResponseStatusEnum } from '../../../../shared';
 import { AppConst } from '../../../../app-const';
 import { AppComponent } from '../../../../app.component';
 import { MediaService } from '../../service/media.service';
-import { MvAdvertiserDdl, MvTenantIdParam } from '../../../../crm/advertiser/model/advertiser.model';
+import {
+  MvAdvertiserDdl,
+  MvTenantIdParam,
+} from '../../../../crm/advertiser/model/advertiser.model';
 import { AdvertiserService } from '../../../../crm/advertiser/service/advertiser.service';
+import { FileUpload } from 'primeng/fileupload';
 
 @Component({
   selector: 'media-add-edit',
@@ -31,7 +36,7 @@ export class MediaAddEditComponent
   implements OnInit, OnDestroy
 {
   @Output() afterClose: EventEmitter<MvMedia | null> = new EventEmitter<any>();
-
+  @ViewChild('fileUpload') fileUpload!: FileUpload;
   private readonly __unSubscribeAll$: Subject<any>;
   protected isDialogOpen: boolean = false;
   protected displayName: string = '';
@@ -44,7 +49,7 @@ export class MediaAddEditComponent
     private injector: Injector,
     private _fileService: FileService,
     private _mediaService: MediaService,
-    private _advertiserService: AdvertiserService
+    private _advertiserService: AdvertiserService,
   ) {
     super(injector);
     this.__unSubscribeAll$ = new Subject();
@@ -56,18 +61,18 @@ export class MediaAddEditComponent
   }
 
   protected getAdvertiserDdl() {
-
     const param = {
-      tenantId: this.auth.getTenantId()
+      tenantId: this.auth.getTenantId(),
     } as MvTenantIdParam;
 
-    this._advertiserService.getDdl(param)
-    .pipe(takeUntil(this.__unSubscribeAll$))
-    .subscribe((response: MvResponse<MvAdvertiserDdl[]>) => {
-      if (response.type === ResponseStatusEnum.success && response.data) {
-        this.advertiserDdl = [...response.data];
-      }
-    })
+    this._advertiserService
+      .getDdl(param)
+      .pipe(takeUntil(this.__unSubscribeAll$))
+      .subscribe((response: MvResponse<MvAdvertiserDdl[]>) => {
+        if (response.type === ResponseStatusEnum.success && response.data) {
+          this.advertiserDdl = [...response.data];
+        }
+      });
   }
 
   public open() {
@@ -148,6 +153,8 @@ export class MediaAddEditComponent
     this.isDialogOpen = false;
     this.file = {} as MvFileUploadResult;
     this.displayName = '';
+    this.selectedAdvertiserId = undefined;
+    this.fileUpload?.clear();
   }
 
   ngOnDestroy(): void {

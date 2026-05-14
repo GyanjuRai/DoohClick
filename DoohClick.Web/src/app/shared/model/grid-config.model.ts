@@ -15,7 +15,7 @@ export interface GridConfig {
 export interface GridColumn {
   name: string;
   displayName: string;
-  width?: string;
+  width: string;
   type:
     | 'text'
     | 'number'

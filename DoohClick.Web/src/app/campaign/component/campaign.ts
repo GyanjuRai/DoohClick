@@ -90,7 +90,6 @@ export abstract class CampaignBaseClass implements OnDestroy {
 
   protected buildBreadcrumb(labels: MenuItem[]) {
     this.breadcrumbItems = [
-      { label: 'Campaign', routerLink: '/campaigns' },
       ...labels,
     ];
   }
@@ -197,8 +196,8 @@ export abstract class CampaignBaseClass implements OnDestroy {
 
             this.showToast(
               'success',
-              'Archived',
-              `${campaign.campaignCode} has been archived.`,
+              'Deleted',
+              `${campaign.campaignCode} has been deleted.`,
             );
           }
         }

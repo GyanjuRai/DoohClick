@@ -8,7 +8,6 @@
 <div class="card grid-wrapper">
   <p-table
     [scrollable]="true"
-    [loading]="isTableLoading"
     scrollHeight="flex"
     [value]="gridConfig.dataSource.data"
     [paginator]="true"
@@ -92,7 +91,12 @@
 
     <ng-template pTemplate="body" let-advertiser>
       <ng-container>
-        <tr>
+        <tr *ngIf="isTableLoading">
+          <td *ngFor="let col of gridConfig.column">
+            <p-skeleton [width]="col.width" height="2rem" borderRadius="6px" />
+          </td>
+        </tr>
+        <tr *ngIf="!isTableLoading">
           <td *ngFor="let col of gridConfig.column">
             <ng-container *ngIf="col.name === 'action'; else dateCheck">
               <div class="flex justify-content-center">

@@ -42,6 +42,7 @@ import { TreeModule } from 'primeng/tree';
 import { OverlayModule } from 'primeng/overlay';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 import { PanelModule } from 'primeng/panel';
+import { SkeletonModule } from 'primeng/skeleton';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
 
@@ -89,6 +90,7 @@ const PRIME_NG_MODULES = [
   OverlayModule,
   OverlayPanelModule,
   PanelModule,
+  SkeletonModule,
 ];
 
 @NgModule({

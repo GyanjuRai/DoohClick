@@ -11,6 +11,7 @@
 DECLARE @Json NVARCHAR(MAX) = '{
                                     "TenantId": 1,
                                     "DisplayName": "McDonalds Times Square 30s",
+                                    "AdvertiserId": 1,
                                     "FileName": "a3f7c821-9b2e-4d1a-bc34-7e6f09d12345.mp4",
                                     "FileUrl": "/media/videos/a3f7c821-9b2e-4d1a-bc34-7e6f09d12345.mp4",
                                     "FileSizeBytes": 4,
@@ -46,6 +47,7 @@ BEGIN
     (
 	    tenant_id		INT NOT NULL,
 	    display_name	NVARCHAR(100) NOT NULL,
+        advertiser_id    INT NULL,
 	    [file_name]		NVARCHAR(255) NULL,
 	    file_url		NVARCHAR(500) NULL,
         file_size_bytes BIGINT NULL,
@@ -64,6 +66,7 @@ BEGIN
     (
         tenant_id,
         display_name,
+        advertiser_id,
         [file_name],
         file_url,
         file_size_bytes,
@@ -78,6 +81,7 @@ BEGIN
     )
     SELECT  oj.TenantId,
             oj.DisplayName,
+            oj.AdvertiserId,
             oj.[FileName],
             oj.FileUrl,
             oj.FileSizeBytes,
@@ -94,6 +98,7 @@ BEGIN
     (
         TenantId INT,
         DisplayName NVARCHAR(100),
+        AdvertiserId INT,
         [FileName] NVARCHAR(255),
         FileUrl NVARCHAR(500),
         FileSizeBytes BIGINT,
@@ -110,6 +115,7 @@ BEGIN
     (
         tenant_id,
         display_name,
+        advertiser_id,
         [file_name],
         file_url,
         file_size_bytes,
@@ -125,6 +131,7 @@ BEGIN
     OUTPUT Inserted.id INTO #inserted ( id )
     SELECT  tm.tenant_id,
             tm.display_name,
+            tm.advertiser_id,
             tm.[file_name],
             tm.file_url,
             tm.file_size_bytes,
@@ -144,6 +151,7 @@ BEGIN
             SELECT  ml.id,
                     ml.tenant_id,
                     ml.display_name,
+                    ml.advertiser_id,
                     ml.[file_name],
                     ml.file_url,
                     ml.file_size_bytes,

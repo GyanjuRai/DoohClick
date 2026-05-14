@@ -1,60 +1,60 @@
 <p-toast></p-toast>
 <p-breadcrumb [model]="breadcrumbItems" class="mb-3" />
 
-<div class="flex align-items-center gap-2 my-3 pl-3">
-  <h2 class="text-2xl font-semibold m-0" style="color: var(--surface-600)">
-    Campaign Media
-  </h2>
-  <p-badge [value]="screens.length" severity="secondary" />
+<div class="flex align-items-center gap-3 my-3 pl-3">
+  <div class="flex align-items-center gap-2">
+    <h2 class="text-2xl font-semibold m-0" style="color: var(--surface-600)">
+      {{ "Campaign Media - " + campaignName }}
+    </h2>
+    <p-badge [value]="screens.length" severity="secondary" />
+  </div>
+  <p-button
+    icon="pi pi-arrow-left"
+    pTooltip="Back to Campaign"
+    tooltipPosition="bottom"
+    iconPos="left"
+    severity="contrast"
+    [outlined]="true"
+    (onClick)="redirectToCampaign()"
+  />
 </div>
 
-<div class="card grid-wrapper">
+<div class="grid-wrapper">
   <div class="flex flex-column gap-4">
     <div
       *ngFor="let screen of screens"
-      class="border-1 border-200 p-2 border-round-lg overflow-hidden"
+      class="border-1 border-300 surface-0 p-2 border-round-lg overflow-hidden"
     >
       <div class="flex align-items-center gap-3 p-3">
         <div class="flex flex-column gap-1 flex-1">
-          <p-tag [value]="flightDateLabel(screen)" />
+          <p-tag [value]="flightDateLabel(screen)" styleClass="tag-flight" />
           <div class="flex align-items-center gap-4">
-            <span class="font-semibold">{{ screen.screenName }}</span>
+            <span class="screen-name">{{ screen.screenName }}</span>
 
-            <p-button icon="pi pi-plus" pTooltip="Manage schedule & playlist" tooltipPosition="bottom" (onClick)="campaignScreenAddEdit.open(screen, advertiserId)" pRipple> </p-button>
+            <p-button
+              icon="pi pi-plus"
+              pTooltip="Manage schedule & playlist"
+              tooltipPosition="bottom"
+              (onClick)="campaignScreenAddEdit.open(screen, advertiserId)"
+              pRipple
+            >
+            </p-button>
           </div>
 
           <div class="flex flex-column gap-3 text-color-secondary text-sm">
-            <span class="font-semibold">
-              <i class="pi pi-map-marker mr-1"></i>
+            <span class="meta-text">
               {{ screen.screenCity }}, {{ screen.screenCountry }}
             </span>
-            <span class="font-semibold">
-              <i class="pi pi-desktop mr-1"></i>
+            <span class="meta-text">
               {{ screen.screenResolution }}
             </span>
-            <p-tag
-              *ngIf="screen.campaignScreenSchedules.length"
-              [value]="
-                screen.campaignScreenSchedules.length +
-                ' schedule' +
-                (screen.campaignScreenSchedules.length !== 1 ? 's' : '')
-              "
-              severity="success"
-              icon="pi pi-calendar"
-            />
-            <p-tag
-              *ngIf="!screen.campaignScreenSchedules.length"
-              value="No schedule"
-              severity="warning"
-              icon="pi pi-exclamation-triangle"
-            />
           </div>
         </div>
 
         <div class="border-top-1 surface-border p-3">
           <p-table
             [value]="screen.campaignScreenSchedules"
-            styleClass="p-datatable-sm"
+            styleClass="p-datatable-sm schedule-table"
             [tableStyle]="{ 'min-width': '100%' }"
           >
             <ng-template pTemplate="header">
@@ -72,7 +72,7 @@
                     <ng-container *ngSwitchCase="'dayOfWeek'">
                       <p-tag
                         [value]="schedule.dayOfWeek"
-                        severity="secondary"
+                        styleClass="tag-neutral"
                       />
                     </ng-container>
 
@@ -88,7 +88,7 @@
                           ' item' +
                           (schedule.playlist.length !== 1 ? 's' : '')
                         "
-                        severity="info"
+                        styleClass="tag-info"
                         icon="pi pi-list"
                       />
                     </ng-container>
@@ -115,4 +115,7 @@
   </div>
 </div>
 
-<campaign-screen-add-edit #campaignScreenAddEdit (afterClose)="afterFormClose($event)"></campaign-screen-add-edit>
+<campaign-screen-add-edit
+  #campaignScreenAddEdit
+  (afterClose)="afterFormClose($event)"
+></campaign-screen-add-edit>

@@ -105,14 +105,14 @@ export class ScreenAddEditComponent
       ],
       addressLine: [this.screen?.addressLine ?? ''],
       tag: [this.screen?.tag ?? []],
-      isActive: [this.screen?.isActive ?? true],
+      isActive: [this.screen.isActive ?? true],
       ratePerHour: [this.screen?.ratePerHour ?? null, Validators.required],
       currency: [this.screen?.currency ?? '', Validators.required],
 
       operatingHour: this.fb.group({
         dayOfWeek: [null],
         openTime: [this.getDefaultTime()],
-        closeTime: [this.getDefaultTime()],
+        closeTime: [this.getEndTime()],
         estimatedImpression: [
           null,
           [Validators.min(0), Validators.pattern(/^\d+$/)],
@@ -271,7 +271,7 @@ export class ScreenAddEditComponent
   }
 
   public openDialog(screen: MvScreen) {
-    if (screen) {
+    if (screen.id) {
       this.screen = screen;
       this.operatingHourList = screen.operatingHour ?? [];
       this.supportedMediaList = screen.supportedMedia ?? [];
@@ -280,7 +280,6 @@ export class ScreenAddEditComponent
       this.screen = {} as MvScreen;
       this.operatingHourList = [];
       this.supportedMediaList = [];
-      this.formGroup.reset();
     }
     this.isDialogOpen = true;
   }
@@ -289,7 +288,7 @@ export class ScreenAddEditComponent
     this.formGroup.get('operatingHour')?.patchValue({
       dayOfWeek: null,
       openTime: this.getDefaultTime(),
-      closeTime: this.getDefaultTime(),
+      closeTime: this.getEndTime(),
       estimatedImpression: null,
       audienceSource: null,
     });
@@ -373,7 +372,7 @@ export class ScreenAddEditComponent
     this.formGroup.get('operatingHour')?.reset({
       dayOfWeek: null,
       openTime: this.getDefaultTime(),
-      closeTime: this.getDefaultTime(),
+      closeTime: this.getEndTime(),
       estimatedImpression: null,
       audienceSource: null,
     });
@@ -446,6 +445,12 @@ export class ScreenAddEditComponent
   private getDefaultTime(): Date {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  private getEndTime(): Date {
+    const d = new Date();
+    d.setHours(23, 59, 0, 0);
     return d;
   }
 

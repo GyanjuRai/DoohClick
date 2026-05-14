@@ -21,7 +21,7 @@
           <span class="tab-label">General</span>
         </ng-template>
 
-        <div class="dialog-section">
+        <div class="dialog-section card">
           <div class="dialog-section-header">
             <span class="dialog-section-title">Basic information</span>
             <span class="dialog-section-sub"
@@ -127,7 +127,7 @@
           </div>
         </div>
 
-        <div class="dialog-section">
+        <div class="dialog-section card">
           <div class="dialog-section-header">
             <span class="dialog-section-title">Location</span>
             <span class="dialog-section-sub">Physical placement details</span>
@@ -226,7 +226,7 @@
           </div>
         </div>
 
-        <div class="dialog-section">
+        <div class="dialog-section card">
           <div class="dialog-section-header">
             <span class="dialog-section-title">Tags & status</span>
             <span class="dialog-section-sub"
@@ -251,7 +251,7 @@
               <label>Status</label>
               <div class="flex align-items-center gap-2 mt-1">
                 <p-inputSwitch
-                  [formControl]="$any(formGroup.get('isActive'))"
+                formControlName="isActive"
                 />
                 <span class="text-sm text-color-secondary">
                   {{ formGroup.get("isActive")?.value ? "Active" : "Inactive" }}
@@ -409,12 +409,13 @@
           </div>
         </p-card>
       </p-tabPanel>
+
       <p-tabPanel rightIcon="pi pi pi-image">
         <ng-template pTemplate="header">
           <span class="tab-label">Pricing & Media </span>
         </ng-template>
 
-        <div class="dialog-section">
+        <div class="dialog-section card">
           <div class="dialog-section-header">
             <span class="dialog-section-title">Pricing</span>
             <span class="dialog-section-sub"
@@ -424,7 +425,7 @@
           <div class="formgrid grid">
             <div class="field col-12 md:col-6">
               <label>
-                Rate per hour
+                Rate per Contact
                 <span *ngIf="isRequired('ratePerHour')">*</span>
               </label>
               <p-inputNumber
@@ -468,7 +469,7 @@
           </div>
         </div>
 
-        <div class="dialog-section">
+        <div class="dialog-section card">
           <div class="dialog-section-header">
             <span class="dialog-section-title">Supported media</span>
             <span class="dialog-section-sub"

@@ -23,6 +23,7 @@ export class CampaignScreenListComponent
   private route = inject(ActivatedRoute);
   protected campaignId!: number;
   protected advertiserId!: number;
+  protected campaignName!: string;
   protected isLoading: boolean = false;
   protected screens: MvCampaignScreenSchedule[] = [];
   protected columns: GridColumn[] = campaignScreenColumn;
@@ -43,7 +44,10 @@ export class CampaignScreenListComponent
     ]);
 
     this.campaignId = Number(this.route.snapshot.paramMap.get('id'));
-    this.advertiserId = Number(this.route.snapshot.paramMap.get('advertiserId'));
+    this.campaignName = String(this.route.snapshot.paramMap.get('name'));
+    this.advertiserId = Number(
+      this.route.snapshot.paramMap.get('advertiserId'),
+    );
     this.loadSchedule();
   }
 
@@ -75,10 +79,14 @@ export class CampaignScreenListComponent
   }
 
   afterFormClose(screen: MvCampaignScreenSchedule | null) {
-    if(screen !== null) {
-      const index = this.screens.findIndex(s => s.flightId === screen.flightId);
+    if (screen !== null) {
+      const index = this.screens.findIndex(
+        (s) =>
+          s.flightId === screen.flightId &&
+          s.campaignFlightScreenId === screen.campaignFlightScreenId,
+      );
 
-      if(index > -1) {
+      if (index > -1) {
         this.screens[index] = screen;
       } else {
         this.screens.unshift(screen);
@@ -86,5 +94,9 @@ export class CampaignScreenListComponent
 
       this.screens = [...this.screens]; //refresh the screens
     }
+  }
+
+  redirectToCampaign() {
+    this.router.navigate([this.routes.CAMPAIGN, this.routes.CAMPAIGN_DRAFT]);
   }
 }

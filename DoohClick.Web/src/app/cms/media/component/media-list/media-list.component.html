@@ -9,7 +9,6 @@
 <div class="card grid-wrapper">
   <p-table
     [scrollable]="true"
-    [loading]="isTableLoading"
     scrollHeight="flex"
     [value]="gridConfig.dataSource.data"
     [paginator]="true"
@@ -52,12 +51,23 @@
             />
           </div>
           <div class="col-12 md:col-3">
-            <p-toggleButton
+            <p-dropdown
               [(ngModel)]="isArchived"
-              (onChange)="onArchiveFilterChange()"
-              onLabel="Archived"
-              offLabel="Archived"
-            />
+              [options]="[
+                {
+                  item: 'Achieve',
+                  code: true,
+                },
+                {
+                  item: 'Ready',
+                  code: false,
+                },
+              ]"
+              optionLabel="item"
+              optionValue="code"
+              (onChange)="onArchiveChange()"
+            >
+            </p-dropdown>
           </div>
         </div>
 
@@ -100,7 +110,12 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-media>
-      <tr>
+      <tr *ngIf="isTableLoading">
+        <td *ngFor="let col of gridConfig.column">
+          <p-skeleton  [width]="col.width" height="2rem" borderRadius="6px" />
+        </td>
+      </tr>
+      <tr *ngIf="!isTableLoading">
         <td *ngFor="let col of gridConfig.column">
           <ng-container *ngIf="col.type === 'action'; else previewCheck">
             <div class="flex justify-content-center">

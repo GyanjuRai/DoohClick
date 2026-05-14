@@ -89,6 +89,7 @@ export class DraftListComponent extends CampaignBaseClass implements OnInit {
       this.routes.CAMPAIGN,
       campaign.id,
       campaign.advertiserId,
+      campaign.name,
       this.routes.CAMPAIGN_MEDIA,
       'edit',
     ]);

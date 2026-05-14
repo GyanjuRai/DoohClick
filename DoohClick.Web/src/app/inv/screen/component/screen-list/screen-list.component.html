@@ -9,7 +9,6 @@
   <p-table
     [scrollable]="true"
     scrollHeight="flex"
-    [loading]="isTableLoading"
     [value]="gridConfig.dataSource.data"
     [paginator]="true"
     [rows]="gridConfig.options.pageSize"
@@ -107,7 +106,7 @@
               icon="pi pi-filter-slash"
               severity="secondary"
               size="small"
-              (onClick)="resetFiler()"
+              (onClick)="resetFilter()"
               [outlined]="true"
               styleClass="w-full"
             />
@@ -156,7 +155,12 @@
       <ng-container
         *ngIf="gridConfig.dataSource.totalRows > 0; else noDataGrid"
       >
-        <tr>
+        <tr *ngIf="isTableLoading">
+          <td *ngFor="let col of gridConfig.column">
+            <p-skeleton [width]="col.width" height="2rem" borderRadius="6px" />
+          </td>
+        </tr>
+        <tr *ngIf="!isTableLoading">
           <td *ngFor="let col of gridConfig.column">
             <ng-container *ngIf="col.name === 'action'; else dateCheck">
               <div class="flex justify-content-center">

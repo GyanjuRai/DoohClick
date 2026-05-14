@@ -281,13 +281,13 @@ export class ScreenListComponent
     this.loadScreen();
   }
 
-  resetFiler() {
+  resetFilter() {
     this.formGroup.reset();
   }
 
   protected onRefresh() {
+    this.resetFilter();
     this.loadScreen();
-    this.resetFiler();
   }
 
   onPageChange(event: TableLazyLoadEvent) {

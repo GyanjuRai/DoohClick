@@ -34,21 +34,7 @@ namespace DoohClick.Service.Application.cms.media
 
         public async Task<MvMedia?> Add(MvMedia param)
         {
-            MvMedia media = new MvMedia
-            {
-                TenantId = param.TenantId,
-                DisplayName = param.DisplayName,
-                FileName = param.FileName,
-                FileUrl = param.FileUrl,
-                FileSizeBytes = param.FileSizeBytes,
-                Resolution = param.Resolution,
-                DurationSec = param.DurationSec,
-                IsVideo = param.IsVideo,
-                UploadedBy = param.UploadedBy,
-                CreatedBy = param.CreatedBy
-            };
-
-            string result = await _dataAccessService.ActionProcedure("dbo.sp_media_ins", JsonConvert.SerializeObject(media));
+            string result = await _dataAccessService.ActionProcedure("dbo.sp_media_ins", JsonConvert.SerializeObject(param));
             return _jsonSerializer.DeserializeObject<MvMedia>(result);
         }
 

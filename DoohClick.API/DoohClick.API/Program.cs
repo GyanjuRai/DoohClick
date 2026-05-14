@@ -7,6 +7,7 @@ using DoohClick.DataAccess.Data;
 using DoohClick.Model.Shared.Auth;
 using DoohClick.Model.Shared.Response;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -107,6 +108,21 @@ try
                 return context.Response.WriteAsJsonAsync(ApiResponse.Failure(tokenExpired ? "Session has expired" : "Invalid token"));
             }
         };
+    });
+
+    /**
+     * ===============================
+     *      Request Limits
+     * ===============================
+    */
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        options.Limits.MaxRequestBodySize = 100 * 1024 * 1024; // 100MB
+    });
+
+    builder.Services.Configure<FormOptions>(options =>
+    {
+        options.MultipartBodyLengthLimit = 100 * 1024 * 1024; // 100MB
     });
 
     builder.Services.AddAppConfigurations(builder.Configuration)

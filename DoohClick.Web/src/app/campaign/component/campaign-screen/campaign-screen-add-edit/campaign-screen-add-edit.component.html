@@ -35,6 +35,7 @@
         [(ngModel)]="selectedStartTime"
         name="startTime"
         [timeOnly]="true"
+        [showSeconds]="true"
         [hourFormat]="'24'"
         styleClass="form-calendar"
         [style]="{ width: '130px' }"
@@ -46,6 +47,7 @@
       <p-calendar
         [(ngModel)]="selectedEndTime"
         name="endTime"
+        [showSeconds]="true"
         [timeOnly]="true"
         [hourFormat]="'24'"
         styleClass="form-calendar"
@@ -74,7 +76,6 @@
     </div>
   </div>
 
-  <!-- Schedule table -->
   <p-table
     [value]="visibleSchedules"
     styleClass="p-datatable-sm"
@@ -91,7 +92,6 @@
     </ng-template>
 
     <ng-template pTemplate="body" let-schedule>
-      <!-- Schedule row -->
       <tr class="cursor-pointer" (click)="toggleSchedule(schedule.tempId)">
         <td>
           <i
@@ -105,8 +105,8 @@
         </td>
         <td><p-tag [value]="schedule.dayOfWeek" severity="secondary" /></td>
         <td class="text-color-secondary">
-          {{ schedule.startTime | slice: 0 : 5 }} –
-          {{ schedule.endTime | slice: 0 : 5 }}
+          {{ schedule.startTime | slice: 0 : 8 }} –
+          {{ schedule.endTime | slice: 0 : 8 }}
         </td>
         <td>
           <p-tag
@@ -143,7 +143,6 @@
                   <th style="width: 60px">Order</th>
                   <th style="width: 200px;">Media</th>
                   <th style="width: 10px !important">Duration</th>
-                  <!-- <th style="width: 80px"></th> -->
                 </tr>
               </ng-template>
 
@@ -198,15 +197,6 @@
                       suffix="s"
                     />
                   </td>
-                  <!-- <td>
-                    <p-button
-                      icon="pi pi-times"
-                      severity="danger"
-                      [text]="true"
-                      size="small"
-                      (onClick)="removePlaylistItem(schedule, item.mediaId)"
-                    />
-                  </td> -->
                 </tr>
               </ng-template>
 

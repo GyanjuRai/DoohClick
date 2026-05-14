@@ -8,7 +8,6 @@
   [draggable]="false"
   [style]="{ width: '50rem', height: '90vh', marginTop: '0.5rem' }"
   [breakpoints]="{ '1199px': '85vw', '575px': '90vw' }"
-  (onHide)="close()"
 >
   <ng-template pTemplate="header">
     <span>{{ "Add media" }}</span>
@@ -58,6 +57,7 @@
           </div>
           <ng-container *ngIf="!file.fileUrl; else uploadedState">
             <p-fileUpload
+              #fileUpload
               [multiple]="false"
               accept=".jpg,.jpeg,.png,.mp4,.webm"
               maxFileSize="100000000"
@@ -204,6 +204,9 @@
                 </div>
               </ng-template>
             </p-fileUpload>
+            <small class="text-color-secondary pt-2">
+              Accepted: JPG, JPEG, PNG, MP4, WEBM &nbsp;·&nbsp; Max size: 100MB
+            </small>
           </ng-container>
 
           <ng-template #uploadedState>
@@ -373,7 +376,7 @@
               label="Cancel"
               icon="pi pi-times"
               iconPos="right"
-              (onClick)="close()"
+              (onClick)="close(); prevCallback.emit()"
               severity="secondary"
             />
             <p-button

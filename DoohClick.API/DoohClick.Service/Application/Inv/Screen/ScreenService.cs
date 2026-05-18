@@ -20,7 +20,7 @@ namespace DoohClick.Service.Application.Inv.Screen
             ) : base(dataAccessService, jsonSerializer)
         { }
 
-        public async Task<MvGridResponse<MvScreen>?> GetGrid(MvGridParamOption<MvScreenFilterOptions> param)
+        public async Task<MvGridResponse<MvScreen>?> GetAll(MvGridParamOption<MvScreenFilterOptions> param)
         {
             string result = await _dataAccessService.RetrievalProcedure("inv.sp_screen_sel", JsonConvert.SerializeObject(param));
             return _jsonSerializer.DeserializeObject<MvGridResponse<MvScreen>>(result);

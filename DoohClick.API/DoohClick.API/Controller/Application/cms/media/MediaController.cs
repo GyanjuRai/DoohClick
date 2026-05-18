@@ -2,9 +2,7 @@
 using DoohClick.API.Helper;
 using DoohClick.Interface.Application.cms.media;
 using DoohClick.Model.Application.cms.media;
-using DoohClick.Model.Application.crm.advertiser;
 using DoohClick.Model.Shared.Enum.Response;
-using DoohClick.Model.Shared.File;
 using DoohClick.Model.Shared.Param;
 using DoohClick.Model.Shared.Response;
 using Microsoft.AspNetCore.Authorization;
@@ -24,9 +22,9 @@ namespace DoohClick.API.Controller.Application.cms.media
 
         [HttpGet("grid")]
         [Authorize(AppPolicy.ALL)]
-        public async Task<IActionResult> GetGrid([FromQuery] MvGridParamOption<MvMediaFilterOptions> param)
+        public async Task<IActionResult> GetAll([FromQuery] MvGridParamOption<MvMediaFilterOptions> param)
         {
-            MvGridResponse<MvMedia>? result = await _mediaService.GetGrid(param);
+            MvGridResponse<MvMedia>? result = await _mediaService.GetAll(param);
 
             if (result is null)
             {

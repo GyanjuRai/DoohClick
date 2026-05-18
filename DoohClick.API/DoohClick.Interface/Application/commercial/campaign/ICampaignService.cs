@@ -12,7 +12,7 @@ namespace DoohClick.Interface.Application.commercial.campaign
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<MvGridResponse<MvCampaign>?> GetGrid(MvGridParamOption<MvCampaignFilterOptionParam> param);
+        Task<MvGridResponse<MvCampaign>?> GetAll(MvGridParamOption<MvCampaignFilterOptionParam> param);
         /// <summary>
         /// 
         /// </summary>

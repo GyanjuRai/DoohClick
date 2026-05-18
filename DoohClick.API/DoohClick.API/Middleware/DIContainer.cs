@@ -83,6 +83,7 @@ namespace DoohClick.API.Middleware
                                 new OrphanFileCleanupService(
                                         sp.GetRequiredService<AppDbContext>(),
                                         sp.GetRequiredService<IFileService>(),
+                                        sp.GetRequiredService<ILogger<OrphanFileCleanupService>>(),
                                         webRootPath
                                     )
                                 )

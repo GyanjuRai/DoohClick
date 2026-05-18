@@ -27,9 +27,9 @@ namespace DoohClick.API.Controller.Application.Inv.Screen
 
         [HttpGet("screen/grid")]
         [Authorize(Policy = AppPolicy.ALL)]
-        public async Task<IActionResult> GetGrid([FromQuery] MvGridParamOption<MvScreenFilterOptions> param)
+        public async Task<IActionResult> GetAll([FromQuery] MvGridParamOption<MvScreenFilterOptions> param)
         {
-            MvGridResponse<MvScreen>? result = await _screenService.GetGrid(param);
+            MvGridResponse<MvScreen>? result = await _screenService.GetAll(param);
             if (result is null)
             {
                 return NotFound(ApiResponse.Success("No data", ResponseStatusEnum.NotFound.ToString()));

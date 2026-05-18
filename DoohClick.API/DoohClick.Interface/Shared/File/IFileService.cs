@@ -15,6 +15,6 @@ namespace DoohClick.Interface.Shared.File
         /// </summary>
         /// <param name="mediaUrl"></param>
         /// <returns></returns>
-        void DeleteAsync(string fileUrl);
+        Task DeleteAsync(string fileUrl);
     }
 }

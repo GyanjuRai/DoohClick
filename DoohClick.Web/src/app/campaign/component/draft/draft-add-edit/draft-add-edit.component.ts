@@ -68,27 +68,6 @@ export class DraftAddEditComponent
     this.getDdl();
   }
 
-  protected groupByCity(screens: MvScreenDdl[]): TreeNode[] {
-    const cityMap = new Map<string, MvScreenDdl[]>();
-
-    screens.forEach((s) => {
-      if (!cityMap.has(s.city)) {
-        cityMap.set(s.city, []);
-      }
-      cityMap.get(s.city)!.push(s);
-    });
-
-    return Array.from(cityMap.entries()).map(([city, list]) => ({
-      label: city,
-      selectable: false,
-      children: list.map((s) => ({
-        label: s.name,
-        data: s.id,
-        key: String(s.id),
-      })),
-    }));
-  }
-
   protected getDdl() {
     this.getScreenDdl();
     this.getAdvertiserDdl();
@@ -131,6 +110,27 @@ export class DraftAddEditComponent
 
   protected get action(): string {
     return this.campaign?.id ? 'edit' : 'save';
+  }
+
+  protected groupByCity(screens: MvScreenDdl[]): TreeNode[] {
+    const cityMap = new Map<string, MvScreenDdl[]>();
+
+    screens.forEach((s) => {
+      if (!cityMap.has(s.city)) {
+        cityMap.set(s.city, []);
+      }
+      cityMap.get(s.city)!.push(s);
+    });
+
+    return Array.from(cityMap.entries()).map(([city, list]) => ({
+      label: city,
+      selectable: false,
+      children: list.map((s) => ({
+        label: s.name,
+        data: s.id,
+        key: String(s.id),
+      })),
+    }));
   }
 
   public open(campaign?: MvCampaign) {

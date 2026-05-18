@@ -15,7 +15,7 @@ namespace DoohClick.Interface.Application.cms.media
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<MvGridResponse<MvMedia>?> GetGrid(MvGridParamOption<MvMediaFilterOptions> param);
+        Task<MvGridResponse<MvMedia>?> GetAll(MvGridParamOption<MvMediaFilterOptions> param);
         /// <summary>
         /// 
         /// </summary>

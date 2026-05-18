@@ -20,9 +20,9 @@ namespace DoohClick.API.Controller.Application.commercial.campaign
         }
 
         [HttpGet("campaign/grid")]
-        public async Task<IActionResult> GetGrid([FromQuery] MvGridParamOption<MvCampaignFilterOptionParam> param)
+        public async Task<IActionResult> GetAll([FromQuery] MvGridParamOption<MvCampaignFilterOptionParam> param)
         {
-            MvGridResponse<MvCampaign>? result = await _campaignService.GetGrid(param);
+            MvGridResponse<MvCampaign>? result = await _campaignService.GetAll(param);
 
             return Ok(ApiResponse.Success(result));
         }

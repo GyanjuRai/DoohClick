@@ -19,7 +19,7 @@ namespace DoohClick.Service.Application.crm.advertiser
             ): base( dataAccessService, jsonSerializer ) 
         { }
 
-        public async Task<MvGridResponse<MvAdvertiser>?> GetGrid(MvGridParamOption<MvAdvertiserFilterOptions> param)
+        public async Task<MvGridResponse<MvAdvertiser>?> GetAll(MvGridParamOption<MvAdvertiserFilterOptions> param)
         {
             string result = await _dataAccessService.RetrievalProcedure("crm.sp_advertiser_sel", JsonConvert.SerializeObject(param));
             return _jsonSerializer.DeserializeObject<MvGridResponse<MvAdvertiser>>(result);

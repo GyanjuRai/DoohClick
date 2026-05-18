@@ -5,7 +5,6 @@ namespace DoohClick.API.worker
     public class OrphanFileCleanupJob : BackgroundService
     {
         private readonly IServiceScopeFactory _serviceScopeFactory;
-        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILogger _logger;
         public OrphanFileCleanupJob(
                 IServiceScopeFactory serviceScopeFactory,
@@ -14,7 +13,6 @@ namespace DoohClick.API.worker
             )
         {
             _serviceScopeFactory = serviceScopeFactory;
-            _webHostEnvironment = webHostEnvironment;
             _logger = logger;
         }
 
@@ -26,19 +24,24 @@ namespace DoohClick.API.worker
                 try
                 {
                     await DoCleanUp();
-                    await Task.Delay(GetNextRunDelay(), stoppingToken);
                     _logger.LogInformation("DoCleanUp completed at {Time}", DateTime.UtcNow);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "DoCleanUp failed at {Time}", DateTime.Now);
+                    _logger.LogError(ex, "DoCleanUp failed at {Time}", DateTime.UtcNow);
                 }
+                await Task.Delay(GetNextRunDelay(), stoppingToken);
+
             }
         }
 
         private static TimeSpan GetNextRunDelay()
         {
-            DateTime now = DateTime.Now;
+            DateTime now = DateTime.UtcNow;
             DateTime next = now.Date.AddDays(1).AddHours(2);
             return next - now;
         }

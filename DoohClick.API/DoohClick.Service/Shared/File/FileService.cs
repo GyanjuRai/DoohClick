@@ -64,7 +64,7 @@ namespace DoohClick.Service.Shared.File
             };
         }
 
-        public void DeleteAsync(string fileUrl)
+        public Task DeleteAsync(string fileUrl)
         {
             string filePath = Path.Combine(
                 _webRootPath,
@@ -75,6 +75,8 @@ namespace DoohClick.Service.Shared.File
             {
                 System.IO.File.Delete(filePath);
             }
+
+            return Task.CompletedTask;
         }
 
         private static async Task<(string Resolution, decimal DurationSec)> ExtractVideoMetadataAsync(string filePath)

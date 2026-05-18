@@ -24,9 +24,9 @@ namespace DoohClick.API.Controller.Application.crm.advertiser
 
         [HttpGet("advertiser/grid")]
         [Authorize(AppPolicy.ADMINMANAGER)]
-        public async Task<IActionResult> GetGrid([FromQuery] MvGridParamOption<MvAdvertiserFilterOptions> param)
+        public async Task<IActionResult> GetAll([FromQuery] MvGridParamOption<MvAdvertiserFilterOptions> param)
         {
-            MvGridResponse<MvAdvertiser>? result = await _advertiserService.GetGrid(param);
+            MvGridResponse<MvAdvertiser>? result = await _advertiserService.GetAll(param);
 
             if (result is null)
             {

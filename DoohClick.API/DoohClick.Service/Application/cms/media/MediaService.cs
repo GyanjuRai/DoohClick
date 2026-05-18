@@ -26,7 +26,7 @@ namespace DoohClick.Service.Application.cms.media
             _fileService = fileService;
         }
 
-        public async Task<MvGridResponse<MvMedia>?> GetGrid(MvGridParamOption<MvMediaFilterOptions> param)
+        public async Task<MvGridResponse<MvMedia>?> GetAll(MvGridParamOption<MvMediaFilterOptions> param)
         {
             string result = await _dataAccessService.RetrievalProcedure("dbo.sp_media_sel", JsonConvert.SerializeObject(param));
             return _jsonSerializer.DeserializeObject<MvGridResponse<MvMedia>>(result);

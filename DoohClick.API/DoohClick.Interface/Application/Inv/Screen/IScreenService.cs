@@ -13,7 +13,7 @@ namespace DoohClick.Interface.Application.Inv.Screen
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        Task<MvGridResponse<MvScreen>?> GetGrid(MvGridParamOption<MvScreenFilterOptions> param);
+        Task<MvGridResponse<MvScreen>?> GetAll(MvGridParamOption<MvScreenFilterOptions> param);
         /// <summary>
         /// Add if Id is null, Update if Id is not null
         /// </summary>

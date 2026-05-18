@@ -38,8 +38,7 @@ namespace DoohClick.DataAccess.Dapper
             }
             catch (SqlException ex)
             {
-                MapSqlException(ex);
-                return "{}";
+                throw MapSqlException(ex);
             }
         }
 
@@ -56,8 +55,7 @@ namespace DoohClick.DataAccess.Dapper
             }
             catch (SqlException ex)
             {
-                MapSqlException(ex);
-                return "{}";
+                throw MapSqlException(ex);
             }
         }
 
@@ -72,8 +70,7 @@ namespace DoohClick.DataAccess.Dapper
             }
             catch (SqlException ex)
             {
-                MapSqlException(ex);
-                return "{}";
+                throw MapSqlException(ex);
             }
         }
 

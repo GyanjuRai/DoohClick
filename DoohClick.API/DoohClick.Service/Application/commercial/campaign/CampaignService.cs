@@ -25,7 +25,7 @@ namespace DoohClick.Service.Application.commercial.campaign
             _dbContext = dbContext;
         }
 
-        public async Task<MvGridResponse<MvCampaign>?> GetGrid(MvGridParamOption<MvCampaignFilterOptionParam> param)
+        public async Task<MvGridResponse<MvCampaign>?> GetAll(MvGridParamOption<MvCampaignFilterOptionParam> param)
         {
             string result = await _dataAccessService.RetrievalProcedure("dbo.sp_campaign_sel", JsonConvert.SerializeObject(param));
             return _jsonSerializer.DeserializeObject<MvGridResponse<MvCampaign>>(result);
